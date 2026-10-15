@@ -77,10 +77,10 @@ describe('SectionRenderer', () => {
     expect(wrapper.find('blockquote.analogy').text()).toContain('Analogía del aro y la estaca')
   })
 
-  it('2.6: "Módulo 0.5" queda como texto mientras el Módulo 0 no está cargado', async () => {
+  it('2.6: "Módulo 0.5" es un enlace a esa sección (AC-14)', async () => {
     const wrapper = await renderSection('2.6')
-    expect(wrapper.text()).toContain('Módulo 0.5')
-    expect(wrapper.findAll('a')).toHaveLength(0)
+    const link = wrapper.findAll('a').find((a) => a.text() === 'Módulo 0.5')
+    expect(link?.attributes('href')).toBe('/seccion/0.5')
   })
 })
 

@@ -1,18 +1,34 @@
 import type { ModuleInfo, RichText } from '../types'
+import { module4Intro } from './module4'
+import { module5Intro } from './module5'
+import { module6Intro } from './module6'
+import { module7Intro } from './module7'
 
 // Fuente: recorrido-guias-de-aprendizaje-v3.md. Títulos de "## Módulo N" y tabla
 // "Orden de los módulos" de "Cómo usar esta guía".
-// Las aperturas (`intro`) de cada módulo se cargan junto con su contenido.
+// Las aperturas (`intro`) de los módulos largos viven junto a sus secciones (module4.ts a module7.ts).
 export const modules: ModuleInfo[] = [
   {
     id: 0,
     title: 'La Matemática Mínima que Necesitas',
     summary: 'Matemática mínima necesaria: sumatorias, probabilidad, álgebra lineal, cálculo, logaritmos',
+    intro: [
+      {
+        type: 'paragraph',
+        text: 'No necesitas ser matemático. Necesitas entender **cinco herramientas**, que son las que el resto de la guía usa una y otra vez. Cada una se explica con lo justo.',
+      },
+    ],
   },
   {
     id: 1,
     title: 'La Mente del Aprendiz y el Arte de Pensar Científicamente',
     summary: 'Cómo aprender: metacognición y pensamiento científico',
+    intro: [
+      {
+        type: 'paragraph',
+        text: 'Antes de aprender estadística o programación hay que preparar el instrumento con el que aprendemos: la propia mente. Este módulo no tiene fórmulas, pero es el que más te sirve si estudias con poco tiempo, porque te ayuda a **decidir qué estudiar y a detectar cuándo crees saber algo que no sabes**.',
+      },
+    ],
   },
   {
     id: 2,
@@ -29,26 +45,36 @@ export const modules: ModuleInfo[] = [
     id: 3,
     title: 'Econometría, Regresión y Causalidad',
     summary: 'Econometría: regresión, causalidad, datos de panel',
+    intro: [
+      {
+        type: 'paragraph',
+        text: String.raw`La **econometría** usa herramientas estadísticas para responder preguntas del tipo "¿cuánto cambia $Y$ cuando cambia $X$?", y sobre todo "¿**es causal** esa relación?", a partir de datos que casi nunca provienen de experimentos controlados. Es la base del análisis de impacto y de buena parte de la modelización estadística en ciencia de datos.`,
+      },
+    ],
   },
   {
     id: 4,
     title: 'Minería de Datos, Preprocesamiento y Descubrimiento de Patrones',
     summary: 'Minería de datos: preprocesamiento, árboles, asociación, clustering',
+    intro: module4Intro,
   },
   {
     id: 5,
     title: 'Elección Binaria, Regresión Logística y Modelos Generativos',
     summary: 'Clasificación: regresión logística y modelos generativos',
+    intro: module5Intro,
   },
   {
     id: 6,
     title: 'Aprendizaje Estadístico, Ensambles, SVM y Agrupamiento',
     summary: 'Aprendizaje estadístico: sesgo-varianza, regularización, ensambles, SVM',
+    intro: module6Intro,
   },
   {
     id: 7,
     title: 'Teoría Formal del Aprendizaje Automático',
     summary: 'Teoría del aprendizaje: PAC, dimensión VC',
+    intro: module7Intro,
   },
 ]
 

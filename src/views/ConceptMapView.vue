@@ -18,7 +18,6 @@ const selected = computed<ConceptNode | undefined>(() => conceptGraph.nodes.find
 const links = computed(() => (selected.value ? conceptGraph.linksOf(selected.value.id) : undefined))
 
 const titleOf = (id: string): string => conceptGraph.nodes.find((node) => node.id === id)?.title ?? ''
-const isLoaded = (id: string): boolean => courseIndex.hasSection(id)
 
 type Relation = 'selected' | 'prerequisite' | 'dependent' | undefined
 function relationOf(id: string): Relation {
@@ -46,7 +45,6 @@ function select(id: string): void {
     <h1>Mapa de conceptos</h1>
     <p>
       Cada casilla es una sección de la guía. Elegí una para ver de cuáles depende (prerrequisitos) y cuáles la usan.
-      Las de líneas punteadas todavía no están cargadas en el curso.
     </p>
 
     <section ref="panel" class="detail" aria-labelledby="detalle" aria-live="polite">
@@ -55,18 +53,14 @@ function select(id: string): void {
       <template v-else-if="links">
         <p class="detail__title">
           <strong>{{ selected.id }} {{ selected.title }}</strong>
-          <RouterLink v-if="isLoaded(selected.id)" :to="{ name: 'section', params: { sectionId: selected.id } }">
-            Abrir sección
-          </RouterLink>
-          <span v-else class="detail__pending">(aún no cargada)</span>
+          <RouterLink :to="{ name: 'section', params: { sectionId: selected.id } }">Abrir sección</RouterLink>
         </p>
         <div class="detail__lists">
           <div>
             <h3>Depende de</h3>
             <ul v-if="links.prerequisites.length > 0">
               <li v-for="id in links.prerequisites" :key="id">
-                <RouterLink v-if="isLoaded(id)" :to="{ name: 'section', params: { sectionId: id } }">{{ id }} {{ titleOf(id) }}</RouterLink>
-                <template v-else>{{ id }} {{ titleOf(id) }} <span class="detail__pending">(aún no cargada)</span></template>
+                <RouterLink :to="{ name: 'section', params: { sectionId: id } }">{{ id }} {{ titleOf(id) }}</RouterLink>
               </li>
             </ul>
             <p v-else>No depende de otras secciones.</p>
@@ -75,8 +69,7 @@ function select(id: string): void {
             <h3>La usan</h3>
             <ul v-if="links.dependents.length > 0">
               <li v-for="id in links.dependents" :key="id">
-                <RouterLink v-if="isLoaded(id)" :to="{ name: 'section', params: { sectionId: id } }">{{ id }} {{ titleOf(id) }}</RouterLink>
-                <template v-else>{{ id }} {{ titleOf(id) }} <span class="detail__pending">(aún no cargada)</span></template>
+                <RouterLink :to="{ name: 'section', params: { sectionId: id } }">{{ id }} {{ titleOf(id) }}</RouterLink>
               </li>
             </ul>
             <p v-else>Ninguna otra sección la usa.</p>
@@ -93,7 +86,6 @@ function select(id: string): void {
             type="button"
             class="node"
             :class="[
-              { 'node--pending': !isLoaded(node.id) },
               relationOf(node.id) && `node--${relationOf(node.id)}`,
             ]"
             :aria-pressed="selectedId === node.id"
@@ -102,7 +94,6 @@ function select(id: string): void {
             <span class="node__id">{{ node.id }}</span>
             <span class="node__title">{{ node.title }}</span>
             <span v-if="relationOf(node.id)" class="node__tag">{{ RELATION_TEXT[relationOf(node.id)!] }}</span>
-            <span v-if="!isLoaded(node.id)" class="visually-hidden">(aún no cargada)</span>
           </button>
         </li>
       </ul>
@@ -143,10 +134,6 @@ function select(id: string): void {
   display: inline-flex;
   align-items: center;
   min-height: var(--touch-min);
-}
-
-.detail__pending {
-  color: var(--color-muted);
 }
 
 .detail__lists {
@@ -198,11 +185,6 @@ function select(id: string): void {
 
 .node:hover {
   background: var(--color-surface);
-}
-
-.node--pending {
-  border-style: dashed;
-  color: var(--color-muted);
 }
 
 .node--selected {

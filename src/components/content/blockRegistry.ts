@@ -4,6 +4,7 @@ import SimulationBlock from '@/components/simulations/SimulationBlock.vue'
 import type { BlockType } from '@/content/types'
 import AnalogyBlock from './AnalogyBlock.vue'
 import CalloutBlock from './CalloutBlock.vue'
+import ExtraExampleBlock from './ExtraExampleBlock.vue'
 import FormulaBlock from './FormulaBlock.vue'
 import ListBlock from './ListBlock.vue'
 import ParagraphBlock from './ParagraphBlock.vue'
@@ -22,6 +23,7 @@ export const blockComponents: Record<BlockType, Component> = {
   formula: FormulaBlock,
   callout: CalloutBlock,
   analogy: AnalogyBlock,
+  extra: ExtraExampleBlock,
   table: TableBlock,
   miniCheck: MiniCheckBlock,
   simulation: SimulationBlock,

@@ -7,6 +7,7 @@ export function blockTexts(block: ContentBlock): string[] {
     case 'subheading':
     case 'callout':
     case 'analogy':
+    case 'extra':
       return [block.text]
     case 'list':
       return block.items

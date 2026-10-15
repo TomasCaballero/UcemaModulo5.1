@@ -105,9 +105,7 @@ function retry(): void {
     </nav>
     <h1>Autoevaluación del Módulo {{ module.id }}</h1>
 
-    <p v-if="questions.length === 0">Este módulo todavía no tiene preguntas cargadas.</p>
-
-    <form v-else-if="phase === 'confidence'" class="confidence" @submit.prevent="start">
+    <form v-if="phase === 'confidence'" class="confidence" @submit.prevent="start">
       <p>
         Esta evaluación tiene {{ questions.length }} preguntas. Antes de empezar, estimá qué porcentaje esperás
         acertar. Al final te mostramos cuánto difiere de tu resultado.

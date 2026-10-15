@@ -68,9 +68,12 @@ describe('módulo', () => {
     expect(wrapper.text()).toContain('tomar decisiones razonables')
   })
 
-  it('un módulo sin secciones cargadas lo avisa en vez de quedar vacío', async () => {
+  it('el último módulo también lista sus secciones y su apertura', async () => {
     const wrapper = await openApp('/modulo/7')
-    expect(wrapper.text()).toContain('todavía no están cargadas')
+    expect(wrapper.findAll('.section-index__id').map((n) => n.text())).toEqual([
+      '7.1', '7.2', '7.3', '7.4', '7.5', '7.6', '7.7',
+    ])
+    expect(wrapper.text()).toContain('Notación de este módulo')
   })
 
   it('un módulo inexistente muestra "no encontrado"', async () => {
@@ -98,12 +101,18 @@ describe('sección', () => {
     expect(router.currentRoute.value.params.sectionId).toBe('2.3')
   })
 
-  it('la primera y la última sección del módulo cargado no tienen vecino en ese extremo', async () => {
-    const first = await openApp('/seccion/2.1')
+  it('la primera y la última sección del curso no tienen vecino en ese extremo', async () => {
+    const first = await openApp('/seccion/0.1')
     expect(first.find('a[rel="prev"]').exists()).toBe(false)
     expect(first.find('a[rel="next"]').exists()).toBe(true)
-    const last = await openApp('/seccion/2.7')
+    const last = await openApp('/seccion/7.7')
     expect(last.find('a[rel="next"]').exists()).toBe(false)
+  })
+
+  it('entre módulos, "Siguiente" pasa a la primera sección del módulo que sigue', async () => {
+    const wrapper = await openApp('/seccion/2.7')
+    expect(wrapper.find('a[rel="next"]').attributes('href')).toBe('/seccion/3.1')
+    expect(wrapper.find('a[rel="prev"]').attributes('href')).toBe('/seccion/2.6')
   })
 
   it('el menú de secciones lista todas las del módulo y marca la actual (AC-04)', async () => {

@@ -66,7 +66,7 @@ describe('cuadro síntesis', () => {
     expect(steps[0]?.text()).toContain('Garantías formales de generalización')
   })
 
-  it('los módulos de la tabla son enlaces y las referencias de los errores enlazan si la sección está cargada', async () => {
+  it('los módulos de la tabla y las secciones citadas en los errores son enlaces', async () => {
     const wrapper = await openApp('/sintesis')
     const row = wrapper.findAll('tbody tr')[2]
     expect(row?.findAll('td')[0]?.text()).toContain('Logit')
@@ -75,8 +75,10 @@ describe('cuadro síntesis', () => {
     const interval = wrapper.findAll('.errors li')[1]
     expect(interval?.find('a').attributes('href')).toBe('/seccion/2.6')
     const causal = wrapper.findAll('.errors li')[0]
-    expect(causal?.find('a').exists()).toBe(false) // 3.2 todavía no está cargada
+    expect(causal?.find('a').attributes('href')).toBe('/seccion/3.2')
     expect(causal?.text()).toContain('(3.2)')
+    const mixed = wrapper.findAll('.errors li')[5]
+    expect(mixed?.findAll('a').map((a) => a.attributes('href'))).toEqual(['/seccion/3.4', '/seccion/3.7'])
   })
 
   it('tiene título propio', async () => {
@@ -117,16 +119,12 @@ describe('mapa de conceptos', () => {
     expect(router.currentRoute.value.params.sectionId).toBe('2.2')
   })
 
-  it('las secciones sin cargar se marcan y no son enlaces', async () => {
+  it('OLS (3.3) ofrece abrir la sección y enlaza cada prerrequisito y cada sección que la usa (AC-15)', async () => {
     const wrapper = await openApp('/mapa')
     await node(wrapper, '3.3').trigger('click')
-    expect(node(wrapper, '3.3').classes()).toContain('node--pending')
-    expect(node(wrapper, '2.2').classes()).not.toContain('node--pending')
-    expect(node(wrapper, '3.3').text()).toContain('aún no cargada')
-    const detail = wrapper.find('.detail')
-    expect(detail.find('.detail__title .detail__pending').text()).toBe('(aún no cargada)')
-    expect(detail.findAll('a').some((a) => a.attributes('href') === '/seccion/3.3')).toBe(false)
-    expect(detail.findAll('a').some((a) => a.attributes('href') === '/seccion/0.4')).toBe(false) // 0.4 tampoco está
+    const hrefs = wrapper.find('.detail').findAll('a').map((a) => a.attributes('href'))
+    expect(hrefs).toEqual(expect.arrayContaining(['/seccion/3.3', '/seccion/0.4', '/seccion/2.2', '/seccion/5.1']))
+    expect(wrapper.findAll('button.node').every((b) => !b.classes().includes('node--pending'))).toBe(true)
   })
 
   it('una sección cargada ofrece "Abrir sección"', async () => {

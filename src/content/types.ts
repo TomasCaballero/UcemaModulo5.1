@@ -20,6 +20,11 @@ export type ContentBlock =
   | { type: 'analogy'; text: RichText }
   /** `illustrative`: la guía marca la tabla como "ilustrativa (cifras inventadas)". */
   | { type: 'table'; headers: RichText[]; rows: RichText[][]; illustrative?: boolean }
+  /**
+   * Ejemplo cotidiano o clásico agregado a la guía para practicar la idea. No es contenido de la
+   * guía: se muestra rotulado y no entra en las verificaciones de fidelidad (RNF-17/18).
+   */
+  | { type: 'extra'; text: RichText }
   | { type: 'workedExample'; title: RichText; steps: RichText[]; result: RichText }
   | { type: 'miniCheck'; questionIds: string[] }
   | { type: 'simulation'; simulationId: string }

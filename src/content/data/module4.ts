@@ -1,0 +1,367 @@
+import type { ContentBlock, Section } from '../types'
+
+// Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 4. Los bloques extra son ejemplos
+// agregados (cotidianos o clásicos): no son de la guía y se muestran rotulados.
+const t = String.raw
+
+/** Apertura del módulo, previa a la sección 4.1. */
+export const module4Intro: ContentBlock[] = [
+  {
+    type: 'paragraph',
+    text: t`La **minería de datos** combina informática y estadística para **extraer patrones útiles de grandes volúmenes de datos**. A diferencia de la econometría (Módulo 3), que busca sobre todo **explicar y estimar efectos causales**, aquí el foco suele estar en **predecir y descubrir estructura**, aunque no siempre sepamos "por qué".`,
+  },
+  { type: 'paragraph', text: '**Vocabulario base:**' },
+  {
+    type: 'list',
+    items: [
+      t`**Registro** (o instancia, observación): una fila de datos (un cliente, una transacción).`,
+      t`**Atributo** (o variable, característica): una columna (edad, monto de compra).`,
+      t`**Clase** (o etiqueta): el atributo que queremos predecir (¿pagó el crédito? sí/no).`,
+    ],
+  },
+  { type: 'paragraph', text: '**Dos familias de tareas:**' },
+  {
+    type: 'list',
+    items: [
+      t`**Predictivas** (hay una variable objetivo): clasificación (predecir una categoría) y regresión (predecir un número).`,
+      t`**Descriptivas** (no hay objetivo; se busca estructura): asociación (qué cosas ocurren juntas), agrupamiento o *clustering* (qué registros se parecen) y detección de anomalías.`,
+    ],
+  },
+]
+
+export const module4Sections: Section[] = [
+  {
+    id: '4.1',
+    moduleId: 4,
+    title: 'El proceso KDD (Knowledge Discovery in Databases)',
+    blocks: [
+      { type: 'paragraph', text: 'Extraer conocimiento no es "correr un algoritmo": es un ciclo completo.' },
+      {
+        type: 'list',
+        ordered: true,
+        items: [
+          t`**Preprocesamiento**: limpiar, integrar y transformar los datos brutos. Suele ser la etapa que **más tiempo consume**.`,
+          t`**Minería de datos**: aplicar los algoritmos que extraen patrones.`,
+          t`**Postprocesamiento**: interpretar, evaluar, visualizar y decidir si los patrones son útiles, nuevos y válidos.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`*Ejemplo:* un banco quiere detectar fraudes. (1) Une las tablas de transacciones y clientes, corrige errores y rellena faltantes. (2) Entrena un clasificador. (3) Revisa cuántos fraudes detecta y cuántas falsas alarmas genera, y lo presenta al equipo de riesgo.`,
+      },
+      {
+        type: 'extra',
+        text: t`Es como preparar una comida para invitados. Primero compras, lavas, pelas y cortas los ingredientes (preprocesamiento: casi siempre lo que más tiempo lleva). Después cocinas (minería de datos). Y al final pruebas el plato, ajustas la sal y decides si está listo para servir (postprocesamiento). Si omites la primera etapa, el mejor cocinero no salva la comida.`,
+      },
+    ],
+  },
+  {
+    id: '4.2',
+    moduleId: 4,
+    title: 'Preprocesamiento',
+    blocks: [
+      {
+        type: 'list',
+        items: [
+          t`**Limpieza**: tratar duplicados, errores, valores atípicos y faltantes (Módulo 2.3).`,
+          t`**Agregación**: combinar registros en uno solo (ventas por día en lugar de por ticket); reduce volumen y suaviza el ruido.`,
+          t`**Muestreo**: trabajar con un subconjunto representativo cuando los datos completos son demasiados. Debe ser aleatorio (o estratificado) para que la muestra conserve la composición de la población.`,
+          t`**Reducción de dimensionalidad**: la **dimensión** es el número de atributos. Con muchos atributos, los datos se vuelven "ralos": hay poquísimos registros por cada región del espacio y las distancias pierden sentido (la llamada **maldición de la dimensionalidad**). Se reduce eliminando atributos redundantes o irrelevantes, o transformándolos (técnicas como PCA, en el Módulo 6).`,
+          t`**Discretización**: convertir un atributo continuo en categorías. *Ejemplo:* edad → Joven (< 30), Adulto (30-59), Mayor (≥ 60).`,
+          t`**Binarización y codificación *one-hot***: convertir una categoría en columnas 0/1. *Ejemplo:* el atributo "color" con valores {rojo, azul, verde} pasa a tres columnas "es_rojo", "es_azul", "es_verde", donde solo una vale 1. Muchos algoritmos exigen números, y asignar 1, 2, 3 a categorías sugeriría un orden que no existe.`,
+          t`**Escalado de atributos**: poner variables en escalas comparables, importante en métodos basados en distancias.`,
+        ],
+      },
+      {
+        type: 'list',
+        items: [
+          t`**Min-max**: $x' = \dfrac{x - x_{\min}}{x_{\max} - x_{\min}}$ lleva los valores a $[0,1]$. *Ejemplo:* ingresos entre 10 000 y 50 000: el valor 20 000 pasa a $(20-10)/(50-10) = 0.25$.`,
+          t`**Estandarización** (puntaje $z$, Módulo 2.4): $z = (x-\bar{x})/s$ deja media 0 y desviación 1.`,
+        ],
+      },
+      {
+        type: 'extra',
+        text: t`Si comparas dos personas por altura (en metros: 1.70 y 1.80) y peso (en kilos: 60 y 90), la diferencia de peso (30) aplasta a la de altura (0.10) al calcular distancias, solo por las unidades. Con min-max, si las alturas van de 1.50 a 2.00 y los pesos de 50 a 100, la altura 1.70 pasa a $(1.70-1.50)/0.50 = 0.4$ y el peso 60 a $(60-50)/50 = 0.2$: ahora ambas variables pesan parecido. Y para one-hot, el "estado civil" {soltero, casado, viudo} se vuelve tres columnas 0/1; si lo codificaras 1, 2, 3, el modelo creería que viudo "vale el triple" que soltero.`,
+      },
+    ],
+  },
+  {
+    id: '4.3',
+    moduleId: 4,
+    title: 'Clasificación predictiva',
+    blocks: [
+      {
+        type: 'paragraph',
+        text: t`**Clasificar** es asignar cada registro a una **clase predefinida**. Se aprende de ejemplos con la clase conocida y se aplica a registros nuevos.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**Entrenamiento y prueba.** Un modelo no debe evaluarse con los mismos datos con que se construyó, porque un modelo puede **memorizar** esos datos y fallar con datos nuevos. Por eso se separan:`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**Conjunto de entrenamiento**: se usa para construir el modelo.`,
+          t`**Conjunto de prueba**: datos que el modelo **nunca vio**, usados solo para medir su rendimiento real.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Cuando un modelo rinde muy bien en entrenamiento y mal en prueba, hay **sobreajuste** (*overfitting*): aprendió el ruido en lugar del patrón. Este tema se formaliza en el Módulo 6.`,
+      },
+      {
+        type: 'extra',
+        text: t`Es la diferencia entre estudiar con los mismos ejercicios que después te toman y rendir un examen con ejercicios nuevos. Si memorizaste las respuestas del cuadernillo, sacas 10 en la práctica y te va mal en el examen real. El conjunto de prueba es el examen con preguntas que no viste.`,
+      },
+      { type: 'miniCheck', questionIds: ['m4-q08'] },
+      { type: 'subheading', text: 'Árboles de decisión' },
+      {
+        type: 'paragraph',
+        text: t`Un **árbol de decisión** clasifica mediante una secuencia de preguntas sobre los atributos:`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**Nodo interno**: una pregunta ("¿ingreso > 3000?").`,
+          t`**Rama**: cada respuesta posible.`,
+          t`**Hoja**: la clase asignada.`,
+        ],
+      },
+      { type: 'paragraph', text: t`Ventaja principal: son **interpretables** (se leen como reglas "si... entonces...").` },
+      {
+        type: 'paragraph',
+        text: t`**¿Cómo elige el árbol qué pregunta hacer?** Busca la división que deja **grupos lo más "puros" posible** (donde casi todos los registros son de la misma clase).`,
+      },
+      {
+        type: 'analogy',
+        text: t`**Analogía de las 20 preguntas:** para adivinar un animal, la primera pregunta eficiente no es "¿es un caniche?", sino "¿es un vertebrado?", porque divide el conjunto en grupos muy distintos. Las mejores preguntas son las que más reducen la incertidumbre.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`La **impureza** de un nodo se mide con dos criterios habituales. Si $p_c$ es la proporción de la clase $c$ en el nodo:`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**Entropía**: $H = -\sum_c p_c \log_2 p_c$ (en bits). Vale $0$ en un nodo puro y es máxima cuando las clases están parejas.`,
+          t`**Índice Gini**: $G = 1 - \sum_c p_c^2$. También vale $0$ en un nodo puro.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`La **ganancia de información** de una división es la entropía del nodo padre **menos** la entropía promedio de los hijos, ponderada por su tamaño. Se elige la división con mayor ganancia.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**Ejemplo con números.** Un nodo con 10 clientes: 6 pagan y 4 no ($p = 0.6$ y $0.4$).`,
+      },
+      {
+        type: 'list',
+        items: [t`Entropía: $-(0.6\log_2 0.6 + 0.4\log_2 0.4) \approx 0.971$. Gini: $1 - (0.36+0.16) = 0.48$.`],
+      },
+      { type: 'paragraph', text: 'Una pregunta lo divide así:' },
+      {
+        type: 'list',
+        items: [
+          t`Hijo izquierdo: 5 clientes (4 pagan, 1 no): entropía $\approx 0.722$; Gini $= 0.32$.`,
+          t`Hijo derecho: 5 clientes (2 pagan, 3 no): entropía $\approx 0.971$; Gini $= 0.48$.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Entropía ponderada de los hijos: $0.5\times0.722 + 0.5\times0.971 \approx 0.847$. **Ganancia de información** $= 0.971 - 0.847 \approx 0.12$. (En Gini, la reducción es $0.48 - 0.40 = 0.08$.) El árbol probaría todas las preguntas candidatas y se quedaría con la de mayor ganancia, y repetiría el proceso en cada hijo.`,
+      },
+      {
+        type: 'extra',
+        text: t`La entropía mide cuánta sorpresa hay: una moneda justa tiene entropía de 1 bit (no puedes anticipar el resultado). Una moneda cargada que cae cara el 90 % de las veces tiene $-(0.9\log_2 0.9 + 0.1\log_2 0.1) \approx 0.469$ bits: ya casi sabes qué va a pasar. Para un árbol que decide "¿llevo paraguas?", una buena primera pregunta es "¿el cielo está cubierto?", porque separa los días mayormente secos de los mayormente lluviosos y baja la entropía de cada grupo.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**Sobreajuste y poda.** Si el árbol sigue dividiendo hasta que cada hoja tenga un solo registro, memoriza el entrenamiento. Se controla **limitando la profundidad**, exigiendo un mínimo de registros por hoja, o **podando** ramas que no mejoran el rendimiento en datos de validación.`,
+      },
+      { type: 'subheading', text: 'Evaluación: la matriz de confusión' },
+      {
+        type: 'paragraph',
+        text: t`Para una clasificación de dos clases (positivo/negativo), cada predicción cae en una de cuatro celdas:`,
+      },
+      {
+        type: 'table',
+        headers: ['', 'Predicho **positivo**', 'Predicho **negativo**'],
+        rows: [
+          ['**Real positivo**', '**VP** (verdadero positivo)', '**FN** (falso negativo)'],
+          ['**Real negativo**', '**FP** (falso positivo)', '**VN** (verdadero negativo)'],
+        ],
+      },
+      { type: 'paragraph', text: 'Métricas derivadas:' },
+      {
+        type: 'list',
+        items: [
+          t`**Exactitud** (*accuracy*) $= \dfrac{VP+VN}{\text{total}}$: proporción de aciertos.`,
+          t`**Precisión** (*precision*) $= \dfrac{VP}{VP+FP}$: de todo lo que **predije** como positivo, ¿cuánto lo era realmente?`,
+          t`**Exhaustividad / Sensibilidad** (*recall*) $= \dfrac{VP}{VP+FN}$: de todos los positivos **reales**, ¿cuántos detecté?`,
+          t`**$F_1$** $= \dfrac{2\cdot\text{precisión}\cdot\text{recall}}{\text{precisión}+\text{recall}}$: un solo número que equilibra las dos.`,
+        ],
+      },
+      {
+        type: 'workedExample',
+        title: t`**Ejemplo.** De 100 pacientes, 10 están enfermos. El modelo da: $VP=8$, $FN=2$, $FP=18$, $VN=72$.`,
+        steps: [
+          t`Exactitud: $(8+72)/100 = 0.80$.`,
+          t`Precisión: $8/(8+18) \approx 0.31$. Recall: $8/(8+2) = 0.80$.`,
+        ],
+        result: t`$F_1 \approx 0.44$`,
+      },
+      { type: 'miniCheck', questionIds: ['m4-q05'] },
+      {
+        type: 'paragraph',
+        text: t`**¿Por qué la exactitud puede engañar?** Un modelo que dice "nadie está enfermo" acierta en 90 de los 100: **exactitud del 90 %**, pero **recall $=0$**: no detecta a ningún enfermo. Cuando una clase es rara (fraude, enfermedades), la exactitud es una mala métrica. Además, la **precisión baja** del ejemplo es la misma intuición del test médico del Módulo 0.2 (Bayes): cuando los positivos son pocos, aun un buen test genera muchos falsos positivos en términos relativos.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**Qué priorizar:** si un falso negativo es muy costoso (no detectar un cáncer), importa el **recall**; si lo costoso es un falso positivo (bloquear a un cliente legítimo), importa la **precisión**.`,
+      },
+      {
+        type: 'extra',
+        text: t`Un filtro de spam sobre 100 correos, de los cuales 20 son spam: detecta 15 ($VP=15$), deja pasar 5 ($FN=5$), marca por error 4 correos buenos ($FP=4$) y acierta 76 correos buenos ($VN=76$). Exactitud $=(15+76)/100 = 0.91$; precisión $=15/19 \approx 0.79$ (de lo que marcó como spam, el 79 % lo era); recall $=15/20 = 0.75$ (detectó tres cuartos del spam); $F_1 = 2\cdot15/(2\cdot15+4+5) \approx 0.77$. Aquí un falso positivo duele (perder un correo importante), así que se cuida la precisión.`,
+      },
+    ],
+  },
+  {
+    id: '4.4',
+    moduleId: 4,
+    title: 'Análisis de asociación y algoritmo Apriori',
+    blocks: [
+      {
+        type: 'paragraph',
+        text: t`Busca **qué elementos suelen aparecer juntos** (análisis de la cesta de la compra). Vocabulario:`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**Transacción**: un conjunto de ítems comprados juntos.`,
+          t`**Conjunto de ítems** (*itemset*): un grupo de ítems, por ejemplo $\{\text{pan, leche}\}$.`,
+          t`**Regla de asociación** $A \rightarrow B$: "quien compra $A$ suele comprar $B$".`,
+        ],
+      },
+      { type: 'paragraph', text: '**Tres medidas:**' },
+      {
+        type: 'list',
+        items: [
+          t`**Soporte** de un conjunto: fracción de transacciones que lo contienen. Mide **qué tan frecuente** es.`,
+          t`**Confianza** de $A \rightarrow B$: $\dfrac{\text{soporte}(A\cup B)}{\text{soporte}(A)}$ $= P(B \mid A)$. De los que compran $A$, ¿qué fracción compra también $B$?`,
+          t`**Lift** de $A \rightarrow B$: $\dfrac{\text{confianza}(A\rightarrow B)}{\text{soporte}(B)}$. Compara con lo que se esperaría **si $A$ y $B$ fueran independientes**: $>1$ asociación positiva; $=1$ independientes; $<1$ asociación negativa. La confianza sola engaña: si casi todos compran $B$, cualquier regla hacia $B$ tendrá confianza alta sin ser informativa.`,
+        ],
+      },
+      { type: 'paragraph', text: '**Ejemplo con 5 transacciones:**' },
+      {
+        type: 'table',
+        headers: ['N.º', 'Ítems'],
+        rows: [
+          ['1', 'pan, leche'],
+          ['2', 'pan, pañales, cerveza, huevos'],
+          ['3', 'leche, pañales, cerveza, cola'],
+          ['4', 'pan, leche, pañales, cerveza'],
+          ['5', 'pan, leche, pañales, cola'],
+        ],
+      },
+      {
+        type: 'list',
+        items: [
+          t`Soporte$\{\text{pañales, cerveza}\} = 3/5 = 0.6$; soporte$\{\text{pañales}\} = 4/5$; soporte$\{\text{cerveza}\} = 3/5$.`,
+          t`Regla pañales $\rightarrow$ cerveza: confianza $= 3/4 = 0.75$; lift $= 0.75/0.6 = 1.25$ (asociación positiva moderada).`,
+          t`Regla pan $\rightarrow$ leche: soporte$\{\text{pan, leche}\} = 3/5$; confianza $= 3/4 = 0.75$; lift $= 0.75/0.8 = 0.94$ (ligeramente por debajo de 1: **no** hay asociación real, aunque la confianza sea alta).`,
+        ],
+      },
+      {
+        type: 'extra',
+        text: t`Sobre 100 tickets de un supermercado, 90 llevan pan y 20 llevan queso; 18 llevan los dos. La regla queso $\rightarrow$ pan tiene confianza $18/20 = 0.90$, que suena muy alta. Pero el pan está en el 90 % de todos los tickets, así que el lift es $0.90/0.90 = 1$: saber que alguien compró queso no cambia la probabilidad de que compre pan. La confianza sola engaña; el lift la pone en contexto.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**El problema computacional.** Con 1000 ítems existen más de $2^{1000}$ combinaciones posibles: es imposible evaluarlas todas.`,
+      },
+      { type: 'miniCheck', questionIds: ['m4-q07'] },
+      {
+        type: 'paragraph',
+        text: t`**Algoritmo Apriori.** Se apoya en la propiedad: **si un conjunto de ítems es infrecuente, todos los conjuntos que lo contienen (sus superconjuntos) también lo son**. (Si pocos compran pan y cerveza juntos, menos aún comprarán pan, cerveza *y* pañales.) Así, se avanza **por niveles** y se **descarta sin contar**.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`*Con soporte mínimo $= 3$ transacciones (0.6):*`,
+      },
+      {
+        type: 'list',
+        ordered: true,
+        items: [
+          t`**Ítems individuales.** Conteos: pan 4, leche 4, pañales 4, cerveza 3, huevos 1, cola 2. Quedan los frecuentes: pan, leche, pañales, cerveza. **Huevos y cola se descartan** y con ellos todos los conjuntos que los contengan, sin evaluarlos.`,
+          t`**Pares** (solo con ítems frecuentes): $\{\text{pan, leche}\}$ 3 ✓; $\{\text{pan, pañales}\}$ 3 ✓; $\{\text{pan, cerveza}\}$ 2 ✗; $\{\text{leche, pañales}\}$ 3 ✓; $\{\text{leche, cerveza}\}$ 2 ✗; $\{\text{pañales, cerveza}\}$ 3 ✓.`,
+          t`**Tríos:** el único candidato cuyos subconjuntos son todos frecuentes es $\{\text{pan, leche, pañales}\}$, y tiene conteo 2 ✗. Todos los demás tríos contienen un par infrecuente y se descartan sin contarlos.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Con los conjuntos frecuentes se generan reglas y se filtran por confianza y lift. *Advertencia:* una regla describe **co-ocurrencia**, no causalidad: no implica que comprar pañales cause comprar cerveza.`,
+      },
+    ],
+  },
+  {
+    id: '4.5',
+    moduleId: 4,
+    title: 'Agrupamiento (clustering) y DBSCAN',
+    blocks: [
+      {
+        type: 'paragraph',
+        text: t`El **agrupamiento** es una tarea **no supervisada** (no hay clase conocida): se busca organizar los registros en **grupos** de modo que los de un mismo grupo se parezcan entre sí y se diferencien de los otros. Para decir "se parecen" se necesita una **medida de distancia**; la más común es la **distancia euclídea** (la recta entre dos puntos): en 2D, entre $(1,2)$ y $(4,6)$ es $\sqrt{3^2+4^2} = 5$.`,
+      },
+      { type: 'paragraph', text: 'Hay dos enfoques típicos:' },
+      {
+        type: 'list',
+        items: [
+          t`**Basados en prototipos** (como **K-Means**, Módulo 6.7): cada grupo se representa por un "centro", y cada punto va al centro más cercano. Funcionan bien con grupos compactos y redondeados, y exigen decidir de antemano **cuántos** grupos hay.`,
+          t`**Basados en densidad** (**DBSCAN**): un grupo es una **región continua de alta densidad** rodeada de regiones de baja densidad.`,
+        ],
+      },
+      {
+        type: 'extra',
+        text: t`Mira un mapa nocturno de las luces de una región: las ciudades se ven como manchas densas de puntos separadas por zonas oscuras, y alguna casa aislada en el campo. Eso es un agrupamiento por densidad: las manchas son los grupos y la casa suelta es el ruido. K-Means, en cambio, necesitaría que le digas de antemano cuántas ciudades hay.`,
+      },
+      { type: 'subheading', text: 'DBSCAN' },
+      { type: 'paragraph', text: 'Usa dos parámetros:' },
+      {
+        type: 'list',
+        items: [
+          t`**Eps**: radio de "vecindad".`,
+          t`**MinPts**: número mínimo de puntos (contando el propio) que debe haber dentro de ese radio.`,
+        ],
+      },
+      { type: 'miniCheck', questionIds: ['m4-q10'] },
+      { type: 'paragraph', text: 'Y clasifica cada punto en tres tipos:' },
+      {
+        type: 'list',
+        items: [
+          t`**Punto núcleo** (*core*): tiene al menos MinPts puntos dentro de su radio Eps. Está en el "interior" de una zona densa.`,
+          t`**Punto borde** (*border*): **no** es núcleo, pero cae dentro del radio de **algún** punto núcleo. Está en la frontera del grupo.`,
+          t`**Punto ruido** (*noise*): ni núcleo ni borde. Es un punto aislado.`,
+        ],
+      },
+      { type: 'paragraph', text: 'Un grupo se forma conectando puntos núcleo cercanos entre sí, más sus puntos borde.' },
+      {
+        type: 'paragraph',
+        text: t`**Ejemplo en una dimensión.** Puntos: $1,\ 1.5,\ 2,\ 2.5,\ 3.4,\ 8,\ 8.4,\ 9,\ 20$ con $\text{Eps}=1$ y $\text{MinPts}=3$.`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`$1, 1.5, 2, 2.5$ tienen al menos 3 puntos en su vecindad: son **núcleo** y forman el **Grupo A**.`,
+          t`$3.4$ solo tiene 2 puntos a menos de 1 (él mismo y $2.5$): no es núcleo, pero está dentro del radio de $2.5$, que sí lo es: **borde** del Grupo A.`,
+          t`$8, 8.4, 9$ son núcleo: **Grupo B**.`,
+          t`$20$ no tiene vecinos: **ruido**.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`**Ventajas:** encuentra grupos de **formas arbitrarias** (anillos, espirales), **no necesita fijar** el número de grupos y **separa el ruido** en lugar de forzarlo a pertenecer a un grupo. **Limitaciones:** es sensible a la elección de Eps y MinPts; tiene dificultades cuando los grupos tienen **densidades muy distintas**; y en dimensiones altas las distancias pierden significado.`,
+      },
+    ],
+  },
+]

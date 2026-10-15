@@ -337,9 +337,9 @@ describe('páginas de interactivos', () => {
     expect(page.find('main > p a').attributes('href')).toBe('/seccion/2.5')
     expect(document.title).toContain('IN-21')
 
-    const pending = await openApp('/simulacion/IN-58')
-    expect(pending.find('main > p').text()).toContain('sección 6.7')
-    expect(pending.find('main > p a').exists()).toBe(false) // el Módulo 6 aún no está cargado
+    const kmeans = await openApp('/simulacion/IN-58')
+    expect(kmeans.find('main > p').text()).toContain('sección 6.7')
+    expect(kmeans.find('main > p a').attributes('href')).toBe('/seccion/6.7')
   })
 
   it('un interactivo inexistente muestra "no encontrado"', async () => {

@@ -28,9 +28,7 @@ const sections = computed(() => (module.value ? courseIndex.sectionsOf(module.va
     <SectionRenderer v-if="module.intro" :blocks="module.intro" />
 
     <h2>Secciones</h2>
-    <SectionIndex v-if="sections.length > 0" :sections="sections" :completed-ids="progress.completedIds" :assessment-module-id="questionCount > 0 ? module.id : undefined" />
-    <!-- Provisorio: desaparece cuando los 8 módulos tengan su contenido cargado. -->
-    <p v-else>Las secciones de este módulo todavía no están cargadas.</p>
+    <SectionIndex :sections="sections" :completed-ids="progress.completedIds" :assessment-module-id="questionCount > 0 ? module.id : undefined" />
     <section v-if="simulations.length > 0" aria-labelledby="simulaciones">
       <h2 id="simulaciones">Simulaciones</h2>
       <ul class="simulation-list">

@@ -106,11 +106,9 @@ describe('glosario', () => {
     expect(router.currentRoute.value.params.sectionId).toBe('2.2')
   })
 
-  it('una referencia a una sección que todavía no está cargada se muestra como texto', async () => {
+  it('la referencia de Lasso (6.4) abre esa sección', async () => {
     const wrapper = await openApp('/glosario?q=lasso')
-    const entry = wrapper.find('.glossary__entry')
-    expect(entry.find('.references').text()).toContain('6.4')
-    expect(entry.find('.references a').exists()).toBe(false)
+    expect(wrapper.find('.glossary__entry .references a').attributes('href')).toBe('/seccion/6.4')
   })
 
   it('una referencia solo al módulo enlaza a la página del módulo', async () => {
@@ -173,7 +171,7 @@ describe('búsqueda', () => {
   })
 
   it('usa el singular con un solo resultado', async () => {
-    const wrapper = await openApp('/buscar?q=heterocedasticidad')
+    const wrapper = await openApp('/buscar?q=hausman')
     expect(wrapper.find('.status').text()).toBe('1 resultado')
   })
 
