@@ -16,6 +16,8 @@ function search(): void {
     <nav aria-label="Principal" class="app-header__nav">
       <RouterLink :to="{ name: 'home' }">Inicio</RouterLink>
       <RouterLink :to="{ name: 'glossary' }">Glosario</RouterLink>
+      <RouterLink :to="{ name: 'synthesis' }">Síntesis</RouterLink>
+      <RouterLink :to="{ name: 'concepts' }">Mapa</RouterLink>
       <RouterLink :to="{ name: 'review' }">Repaso</RouterLink>
     </nav>
     <form role="search" class="app-header__search" @submit.prevent="search">

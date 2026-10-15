@@ -17,6 +17,8 @@ export function routeTitle(route: RouteLocationNormalized): string {
     const simulation = courseIndex.getSimulation(String(route.params.simulationId))
     if (simulation) return `${simulation.id} ${simulation.title} · ${APP_TITLE}`
   }
+  if (route.name === 'concepts') return `Mapa de conceptos · ${APP_TITLE}`
+  if (route.name === 'synthesis') return `Cuadro síntesis · ${APP_TITLE}`
   if (route.name === 'glossary') return `Glosario · ${APP_TITLE}`
   if (route.name === 'search') return `Búsqueda · ${APP_TITLE}`
   if (route.name === 'review') return `Repaso · ${APP_TITLE}`
@@ -50,6 +52,8 @@ export function createAppRouter(history: RouterHistory = createWebHashHistory())
         component: () => import('@/views/SimulationView.vue'),
         props: true,
       },
+      { path: '/mapa', name: 'concepts', component: () => import('@/views/ConceptMapView.vue') },
+      { path: '/sintesis', name: 'synthesis', component: () => import('@/views/SynthesisView.vue') },
       { path: '/glosario', name: 'glossary', component: () => import('@/views/GlossaryView.vue') },
       { path: '/buscar', name: 'search', component: () => import('@/views/SearchView.vue') },
       { path: '/repaso', name: 'review', component: () => import('@/views/ReviewView.vue') },

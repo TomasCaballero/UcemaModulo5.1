@@ -37,7 +37,7 @@ describe('encabezado', () => {
   it.each(['/', '/glosario', '/seccion/2.1'])('ofrece navegación principal y un buscador en %s', async (path) => {
     const wrapper = await openApp(path)
     const links = wrapper.find('nav[aria-label="Principal"]').findAll('a').map((a) => a.text())
-    expect(links).toEqual(['Inicio', 'Glosario', 'Repaso'])
+    expect(links).toEqual(['Inicio', 'Glosario', 'Síntesis', 'Mapa', 'Repaso'])
     expect(wrapper.find('form[role="search"] input[type="search"]').exists()).toBe(true)
   })
 
