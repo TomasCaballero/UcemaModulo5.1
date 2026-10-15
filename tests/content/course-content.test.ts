@@ -1,0 +1,87 @@
+import { describe, expect, it } from 'vitest'
+import { courseContent, courseIndex } from '@/content'
+import { findUnresolvedReferences } from '@/content/references'
+import type { CourseContent } from '@/content/types'
+import { validateContent } from '@/content/validate'
+import { blockComponents } from '@/components/content/blockRegistry'
+
+describe('contenido cargado', () => {
+  it('es válido', () => {
+    expect(validateContent(courseContent)).toEqual([])
+  })
+
+  it('tiene las secciones 2.1 a 2.7 en orden', () => {
+    expect(courseContent.sections.map((s) => s.id)).toEqual(['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7'])
+  })
+
+  it('consulta secciones por id', () => {
+    expect(courseIndex.getSection('2.4')?.title).toBe('Distribuciones de probabilidad')
+    expect(courseIndex.getSection('9.9')).toBeUndefined()
+    expect(courseIndex.hasSection('2.4')).toBe(true)
+    expect(courseIndex.hasSection('9.9')).toBe(false)
+  })
+
+  it('cada tipo de bloque usado tiene componente registrado', () => {
+    const used = new Set(courseContent.sections.flatMap((s) => s.blocks.map((b) => b.type)))
+    for (const type of used) expect(blockComponents[type], `bloque "${type}"`).toBeDefined()
+  })
+
+  it('las referencias pendientes apuntan solo a módulos que todavía no se cargaron', () => {
+    const pending = findUnresolvedReferences(courseContent)
+    expect(pending).toContain('2.6 → 0.5')
+    for (const reference of pending) {
+      const target = reference.split('→')[1]?.trim() ?? ''
+      expect(target.startsWith('2.'), reference).toBe(false) // el Módulo 2 sí está completo
+    }
+  })
+})
+
+describe('findUnresolvedReferences', () => {
+  const content = (text: string, withTarget: boolean): CourseContent => ({
+    modules: [],
+    sections: [
+      { id: '2.1', moduleId: 2, title: 'A', blocks: [{ type: 'paragraph', text }] },
+      ...(withTarget ? [{ id: '0.4' as const, moduleId: 0 as const, title: 'B', blocks: [] }] : []),
+    ],
+    glossary: [],
+    questions: [],
+    simulations: [],
+  })
+
+  it('no reporta referencias que existen', () => {
+    expect(findUnresolvedReferences(content('ver Módulo 0.4', true))).toEqual([])
+  })
+
+  it('reporta las que no existen', () => {
+    expect(findUnresolvedReferences(content('ver Módulo 0.4', false))).toEqual(['2.1 → 0.4'])
+  })
+
+  it('revisa todos los tipos de bloque con texto', () => {
+    const ref = 'Módulo 7.7'
+    const all: CourseContent = {
+      modules: [],
+      sections: [
+        {
+          id: '2.1',
+          moduleId: 2,
+          title: 'A',
+          blocks: [
+            { type: 'subheading', text: ref },
+            { type: 'list', items: [ref] },
+            { type: 'callout', kind: 'ojo', text: ref },
+            { type: 'analogy', text: ref },
+            { type: 'table', headers: [ref], rows: [[ref]] },
+            { type: 'workedExample', title: ref, steps: [ref], result: ref },
+            { type: 'formula', latex: 'x' },
+            { type: 'miniCheck', questionIds: [] },
+            { type: 'simulation', simulationId: 'IN-01' },
+          ],
+        },
+      ],
+      glossary: [],
+      questions: [],
+      simulations: [],
+    }
+    expect(findUnresolvedReferences(all)).toHaveLength(9)
+  })
+})

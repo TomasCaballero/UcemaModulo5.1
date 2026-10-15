@@ -1,0 +1,106 @@
+:root {
+  --color-bg: #ffffff;
+  --color-surface: #f4f6f9;
+  --color-text: #1b1f24;
+  --color-muted: #4a5360;
+  --color-border: #c9d0d9;
+  --color-link: #0a4fb3;
+  --color-accent: #0a4fb3;
+  --color-accent-contrast: #ffffff;
+  --color-cuidado-bg: #fff4e0;
+  --color-cuidado-border: #8a4b00;
+  --color-ojo-bg: #fdecec;
+  --color-ojo-border: #9b1c1c;
+  --color-advertencia-bg: #fff8d6;
+  --color-advertencia-border: #7a5a00;
+  --color-salvedad-bg: #e8f0fb;
+  --color-salvedad-border: #0a4fb3;
+  --color-analogy-bg: #eaf6ee;
+  --color-analogy-border: #1d6b3a;
+  /* Paleta categórica de gráficos (validada con validate_palette.js, modo claro, todos los pares). */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --viz-neutral: #c3c2b7;
+  --viz-neutral-strong: #6b6a66;
+  --viz-grid: #e3e2dc;
+  --max-content: 46rem;
+  --touch-min: 44px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+a {
+  color: var(--color-link);
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.25;
+}
+
+.button {
+  min-height: var(--touch-min);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--color-surface);
+}
+
+.button--danger {
+  border-color: var(--color-ojo-border);
+  color: var(--color-ojo-border);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.page {
+  max-width: var(--max-content);
+  margin: 0 auto;
+  padding: 1rem;
+}
