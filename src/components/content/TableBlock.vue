@@ -12,9 +12,11 @@ defineProps<{ block: BlockOf<'table'> }>()
       <table>
         <thead>
           <tr>
-            <th v-for="(header, index) in block.headers" :key="index" scope="col">
-              <RichText :text="header" />
-            </th>
+            <template v-for="(header, index) in block.headers" :key="index">
+              <!-- Un encabezado vacío (esquina de la tabla) no puede ser un <th> sin texto. -->
+              <td v-if="header === ''" />
+              <th v-else scope="col"><RichText :text="header" /></th>
+            </template>
           </tr>
         </thead>
         <tbody>

@@ -48,6 +48,8 @@ function search(): void {
 .app-header__nav a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: var(--touch-min);
   min-height: var(--touch-min);
   font-weight: 600;
 }

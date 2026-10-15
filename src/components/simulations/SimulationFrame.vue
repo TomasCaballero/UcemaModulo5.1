@@ -8,11 +8,11 @@ const descriptionId = useId()
 </script>
 
 <template>
-  <figure class="simulation" role="group" :aria-label="meta.title" :aria-describedby="descriptionId">
-    <figcaption v-if="showTitle" class="simulation__title">{{ meta.id }} · {{ meta.title }}</figcaption>
+  <div class="simulation" role="group" :aria-label="meta.title" :aria-describedby="descriptionId">
+    <p v-if="showTitle" class="simulation__title">{{ meta.id }} · {{ meta.title }}</p>
     <p :id="descriptionId" class="simulation__description">{{ meta.description }}</p>
     <slot />
-  </figure>
+  </div>
 </template>
 
 <style scoped>
@@ -24,6 +24,7 @@ const descriptionId = useId()
 }
 
 .simulation__title {
+  margin: 0;
   font-weight: 700;
 }
 

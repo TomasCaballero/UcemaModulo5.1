@@ -92,7 +92,7 @@ describe('humo: cada interactivo se monta sin errores (RF-45)', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const wrapper = await mountSimulation(id)
 
-    const figure = wrapper.find('figure[role="group"]')
+    const figure = wrapper.find('div.simulation[role="group"]')
     expect(figure.exists()).toBe(true)
     const describedBy = figure.attributes('aria-describedby') ?? ''
     expect(wrapper.find(`[id="${describedBy}"]`).text()).toBe(courseIndex.getSimulation(id)?.description)
@@ -228,7 +228,7 @@ describe('IN-21 Teorema del Límite Central', () => {
 
   it('está incrustado en la sección 2.5', async () => {
     const wrapper = await openApp('/seccion/2.5')
-    expect(wrapper.find('figure[aria-label="Simulador del Teorema del Límite Central"]').exists()).toBe(true)
+    expect(wrapper.find('[role="group"][aria-label="Simulador del Teorema del Límite Central"]').exists()).toBe(true)
   })
 })
 
@@ -333,7 +333,7 @@ describe('páginas de interactivos', () => {
   it('la página del interactivo lo muestra y cita las secciones donde se explica', async () => {
     const page = await openApp('/simulacion/IN-21')
     expect(page.find('h1').text()).toContain('IN-21')
-    expect(page.find('figure').exists()).toBe(true)
+    expect(page.find('[role="group"].simulation').exists()).toBe(true)
     expect(page.find('main > p a').attributes('href')).toBe('/seccion/2.5')
     expect(document.title).toContain('IN-21')
 

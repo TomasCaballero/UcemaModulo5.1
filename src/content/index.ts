@@ -6,7 +6,7 @@ import { module2Questions } from './data/module2-questions'
 import { createCourseIndex } from './navigation'
 import type { CourseContent } from './types'
 
-export { studyAdvice } from './data/guide'
+export { studyAdvice, usageGuide } from './data/guide'
 
 export const courseContent: CourseContent = {
   modules,

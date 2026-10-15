@@ -22,7 +22,9 @@ npm run test:coverage  # cobertura de la lógica de negocio
 npm run test:e2e       # Playwright
 npm run build; npm run preview   # build de producción (probar el service worker)
 ```
-Scripts de verificación del PRD (RNF-17 encabezados, RNF-18 números, RNF-19 trazabilidad de las 82 preguntas): a crear, quedan bajo `npm run verify:*`.
+Verificaciones del PRD (corren con Vitest sobre `verify/`): `npm run verify` (RNF-17 encabezados, RNF-18 números, RNF-19/20 trazabilidad y banco, RNF-05 peso de descarga; este último necesita `npm run build` antes) y `npm run verify:strict`, que además exige que estén cargados los 8 módulos. Parsers y reglas en `tools/`.
+
+Pruebas en navegador (Playwright, usa Chrome y Edge instalados; compila y sirve el build): `npm run test:e2e`. Lighthouse suelto: `npx -y lighthouse <url> --only-categories=accessibility,performance --chrome-flags="--headless=new"` con el servidor de `npm run preview` levantado.
 
 ## Qué NO hacer
 - No agregar backend, cuentas ni enviar datos de progreso o respuestas a servidores externos (RNF-21).

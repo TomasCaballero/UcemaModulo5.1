@@ -127,9 +127,11 @@ tbody th {
 }
 
 td a {
-  display: inline-block;
-  min-width: 1.5rem;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
 }
 
 @media (min-width: 40rem) {

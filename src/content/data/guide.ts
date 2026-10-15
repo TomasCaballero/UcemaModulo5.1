@@ -60,3 +60,15 @@ export const studyAdvice: RichText[] = [
   'Si estudias con poco tiempo, prioriza según tu posgrado: para ciencia de datos aplicada, **2, 5 y 6** son el núcleo; **3** si trabajas con causalidad o evaluación de políticas; **7** como marco conceptual (basta con entender sesgo-varianza, ERM, VC y No-Free-Lunch a nivel intuitivo).',
   'Esta guía **resume**: para profundizar, usa los libros como referencia y para consultar demostraciones.',
 ]
+
+/** "Cómo usar esta guía": cómo está pensada y sus tres reglas de diseño. */
+export const usageGuide = {
+  intro:
+    'Esta guía está pensada para alguien que parte de **conocimientos previos mínimos** (aritmética y álgebra de secundaria). Tiene tres reglas de diseño:',
+  rules: [
+    '**Cada término se explica antes de usarse.** Cuando por necesidad aparece antes de su explicación (por ejemplo, un anticipo en el Módulo 0), se indica el módulo donde se desarrolla.',
+    '**Cada idea tiene un ejemplo con números**, para que puedas rehacer la cuenta a mano.',
+    '**Cada módulo termina con preguntas de autoevaluación** y sus respuestas. Intenta responder *antes* de mirar las respuestas: eso es lo que te protege de creer que sabes algo que no sabes (ver Módulo 1).',
+  ] satisfies RichText[],
+  note: 'Los ejemplos numéricos fueron verificados con un script de Python; las tablas marcadas como "ilustrativas" y el ejemplo de DID usan cifras inventadas.',
+}

@@ -160,8 +160,9 @@ function select(id: string): void {
 }
 
 .detail li a {
-  display: inline-block;
-  min-height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
 }
 
 .module-title {

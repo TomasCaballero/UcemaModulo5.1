@@ -29,8 +29,12 @@ const isSection = (reference: string): boolean => reference.includes('.')
 </template>
 
 <style scoped>
+/* Cada referencia es un destino táctil de 44 px, aunque esté dentro de una frase. */
 .references a {
-  display: inline-block;
-  min-height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
 }
 </style>

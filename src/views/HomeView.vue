@@ -3,7 +3,7 @@ import RichText from '@/components/content/RichText.vue'
 import DataManagement from '@/components/progress/DataManagement.vue'
 import ProgressBar from '@/components/progress/ProgressBar.vue'
 import ReviewSummary from '@/components/progress/ReviewSummary.vue'
-import { courseIndex, studyAdvice } from '@/content'
+import { courseIndex, studyAdvice, usageGuide } from '@/content'
 import { useProgressStore } from '@/stores/progress'
 
 const progress = useProgressStore()
@@ -25,6 +25,15 @@ const progress = useProgressStore()
     <ProgressBar :completion="progress.overall" label="Progreso total del curso" />
 
     <ReviewSummary />
+
+    <section aria-labelledby="como-usar">
+      <h2 id="como-usar">Cómo usar esta guía</h2>
+      <p><RichText :text="usageGuide.intro" /></p>
+      <ol>
+        <li v-for="(rule, index) in usageGuide.rules" :key="index"><RichText :text="rule" /></li>
+      </ol>
+      <p class="usage-note">{{ usageGuide.note }}</p>
+    </section>
 
     <section aria-labelledby="como-estudiar">
       <h2 id="como-estudiar">Cómo estudiar con esta guía</h2>
@@ -52,6 +61,11 @@ const progress = useProgressStore()
 </template>
 
 <style scoped>
+.usage-note {
+  color: var(--color-muted);
+  font-size: 0.9375rem;
+}
+
 .continue__link {
   display: inline-flex;
   align-items: center;
