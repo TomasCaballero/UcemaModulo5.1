@@ -1,3 +1,17 @@
+import {
+  confusionAtThreshold,
+  forestProbability,
+  gini,
+  logistic,
+  oddsRatio,
+  precision,
+  probabilityAfterOddsRatio,
+  recall,
+  specificity,
+  THRESHOLD_EXAMPLE,
+  vif,
+  weightedGini,
+} from '@/logic/classification/classification'
 import { bayes } from '@/logic/simulations/bayes'
 import { assignLabels, sse, updateCentroids, GUIDE_POINTS, GUIDE_START_INDEXES, type Point } from '@/logic/simulations/kmeans'
 import { mean, sampleStdDev, sampleVariance } from '@/logic/statistics/descriptive'
@@ -31,6 +45,24 @@ const bayesGuide = () => bayes({ prevalence: 0.01, sensitivity: 0.9, falsePositi
 const guideStart = (): Point[] => GUIDE_START_INDEXES.map((index) => GUIDE_POINTS[index] as Point)
 const guideLabels = () => assignLabels(GUIDE_POINTS, guideStart())
 const guideCentroids = () => updateCentroids(GUIDE_POINTS, guideLabels(), guideStart())
+
+/** Filas de la tabla de umbrales del ejemplo ilustrativo de 4.3 (recall, precisión y especificidad). */
+function umbralExamples(): NumericExample[] {
+  const rows: [number, string, [number, number, number]][] = [
+    [0.3, r`| $0.30$ | 4 | 2 | 1 | 1 | $0.80$ | $0.67$ | $0.33$ |`, [0.8, 0.67, 0.33]],
+    [0.5, r`| $0.50$ | 3 | 1 | 2 | 2 | $0.60$ | $0.75$ | $0.67$ |`, [0.6, 0.75, 0.67]],
+    [0.7, r`| $0.70$ | 2 | 0 | 3 | 3 | $0.40$ | $1.00$ | $1.00$ |`, [0.4, 1, 1]],
+  ]
+  return rows.flatMap(([threshold, snippet, [r, p, e]]) => {
+    const matrix = () => confusionAtThreshold(THRESHOLD_EXAMPLE.probabilities, THRESHOLD_EXAMPLE.labels, threshold)
+    const tag = String(threshold).replace('.', '')
+    return [
+      { id: `umbral-${tag}-recall`, section: '4.3', snippet, expected: r, precision: 2, actual: () => recall(matrix()) },
+      { id: `umbral-${tag}-precision`, section: '4.3', snippet, expected: p, precision: 2, actual: () => precision(matrix()) },
+      { id: `umbral-${tag}-especificidad`, section: '4.3', snippet, expected: e, precision: 2, actual: () => specificity(matrix()) },
+    ]
+  })
+}
 
 export const numericExamples: NumericExample[] = [
   // 0.2 Probabilidad: test médico (Bayes)
@@ -90,6 +122,34 @@ export const numericExamples: NumericExample[] = [
   { id: 'kmeans-centroide-1', section: '6.7', snippet: r`$7/3 \approx 2.33$ y $34/3 \approx 11.33$`, expected: 2.33, precision: 2, actual: () => (guideCentroids()[0] as Point)[0] as number },
   { id: 'kmeans-centroide-2', section: '6.7', snippet: r`$7/3 \approx 2.33$ y $34/3 \approx 11.33$`, expected: 11.33, precision: 2, actual: () => (guideCentroids()[1] as Point)[0] as number },
   { id: 'kmeans-sse', section: '6.7', snippet: r`\approx 4.67 + 4.67 = 9.33$`, expected: 9.33, precision: 2, actual: () => sse(GUIDE_POINTS, guideLabels(), guideCentroids()) },
+
+  // 4.3 Gini ponderado, especificidad y umbral (material de clase)
+  { id: 'gini-mujeres', section: '4.3', snippet: r`Gini $\approx 0.374$; 406 hombres`, expected: 0.374, precision: 3, actual: () => gini(163, 54) },
+  { id: 'gini-hombres', section: '4.3', snippet: r`Gini $\approx 0.304$. Gini ponderado`, expected: 0.304, precision: 3, actual: () => gini(76, 330) },
+  { id: 'gini-ponderado-sexo', section: '4.3', snippet: r`\cdot 0.304 \approx 0.329$`, expected: 0.329, precision: 3, actual: () => weightedGini([{ positives: 163, negatives: 54 }, { positives: 76, negatives: 330 }]) },
+  { id: 'gini-tercera-clase', section: '4.3', snippet: r`Gini $\approx 0.374$; 277 pasajeros`, expected: 0.374, precision: 3, actual: () => gini(86, 260) },
+  { id: 'gini-otras-clases', section: '4.3', snippet: r`Gini $\approx 0.495$.`, expected: 0.495, precision: 3, actual: () => gini(153, 124) },
+  { id: 'gini-ponderado-clase', section: '4.3', snippet: r`Gini ponderado $\approx 0.427$`, expected: 0.427, precision: 3, actual: () => weightedGini([{ positives: 86, negatives: 260 }, { positives: 153, negatives: 124 }]) },
+  { id: 'especificidad-pacientes', section: '4.3', snippet: 'Especificidad: $72/(72+18) = 0.80$', expected: 0.8, precision: 2, actual: () => specificity({ tp: 8, fn: 2, fp: 18, tn: 72 }) },
+  ...umbralExamples(),
+
+  // 5.2 Regresión logística: caso del Titanic de la clase
+  { id: 'titanic-z-mujer', section: '5.2', snippet: '$z = -1.468 + 2.573 = 1.105$', expected: 1.105, precision: 3, actual: () => -1.468 + 2.573 },
+  { id: 'titanic-p-mujer', section: '5.2', snippet: r`1/(1+e^{-1.105}) \approx 0.751$`, expected: 0.751, precision: 3, actual: () => logistic(1.105) },
+  { id: 'titanic-or-female', section: '5.2', snippet: r`$\text{OR} = e^{2.61} \approx 13.6$`, expected: 13.6, precision: 1, actual: () => oddsRatio(2.61) },
+  { id: 'titanic-or-age', section: '5.2', snippet: '$-0.0439$ | $0.96$', expected: 0.96, precision: 2, actual: () => oddsRatio(-0.0439) },
+  { id: 'titanic-or-pclass2', section: '5.2', snippet: '$-1.3946$ | $0.25$', expected: 0.25, precision: 2, actual: () => oddsRatio(-1.3946) },
+  { id: 'titanic-or-pclass3', section: '5.2', snippet: '$-2.5846$ | $0.08$', expected: 0.08, precision: 2, actual: () => oddsRatio(-2.5846) },
+  { id: 'titanic-p-mujer-23', section: '5.2', snippet: r`$\hat{p} \approx 0.956$`, expected: 0.956, precision: 3, actual: () => logistic(1.4666 + 2.61 - 0.0439 * 23) },
+  { id: 'titanic-p-hombre-1a', section: '5.2', snippet: r`$\hat{p} \approx 0.537$`, expected: 0.537, precision: 3, actual: () => logistic(1.4666 - 0.0439 * 30) },
+  { id: 'titanic-p-hombre-3a', section: '5.2', snippet: r`$\hat{p} \approx 0.081$`, expected: 0.081, precision: 3, actual: () => logistic(1.4666 - 0.0439 * 30 - 2.5846) },
+  { id: 'or-probabilidad-baja', section: '5.2', snippet: r`$p_1 = 0.60$`, expected: 0.6, precision: 2, actual: () => probabilityAfterOddsRatio(0.1, 13.6) },
+  { id: 'or-probabilidad-alta', section: '5.2', snippet: r`$p_1 \approx 0.93$`, expected: 0.93, precision: 2, actual: () => probabilityAfterOddsRatio(0.5, 13.6) },
+  { id: 'vif-r2-05', section: '5.2', snippet: r`$R_j^2 = 0.5$, $\text{VIF} = 2$`, expected: 2, precision: 0, actual: () => vif(0.5) },
+  { id: 'vif-r2-08', section: '5.2', snippet: r`$R_j^2 = 0.8$, $\text{VIF} = 5$`, expected: 5, precision: 0, actual: () => vif(0.8) },
+
+  // 6.5 Bosque aleatorio: promedio de probabilidades
+  { id: 'bosque-promedio', section: '6.5', snippet: r`promedio $= 1.101/5 \approx 0.220$`, expected: 0.22, precision: 3, actual: () => forestProbability([0.125, 0.5, 0.333, 0.143, 0]) },
 ]
 
 export interface ExampleResult {

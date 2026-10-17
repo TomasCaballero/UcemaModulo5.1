@@ -255,4 +255,32 @@ export const module6Questions: Question[] = [
     correctIndex: 0,
     explanation: t`Cada árbol pequeño se suma al modelo multiplicado por $\lambda$: el modelo final es la suma de todos los árboles pequeños y **aprende despacio a propósito**, avanzando por pasos pequeños en lugar de saltar al valor final.`,
   },
+  {
+    id: 'm6-q18',
+    moduleId: 6,
+    sectionId: '6.5',
+    prompt: t`En un bosque de 5 árboles, un pasajero recibe probabilidades de sobrevivir $0.125, 0.500, 0.333, 0.143$ y $0.000$. Con umbral $0.50$, ¿cuál es la predicción del bosque?`,
+    options: [
+      t`Promedio $\approx 0.220$ $<0.50$: predice "no sobrevive"`,
+      t`Promedio $\approx 0.220$: predice "sobrevive", porque un árbol dio $0.500$`,
+      t`Promedio $= 0.500$: predice "sobrevive"`,
+      t`Gana la mayoría de árboles con probabilidad $>0$: predice "sobrevive"`,
+    ],
+    correctIndex: 0,
+    explanation: t`El bosque promedia las probabilidades de cada árbol: $(0.125+0.500+0.333+0.143+0)/5 = 1.101/5 \approx 0.220$. Como $0.220 < 0.50$, la clase predicha es 0 (no sobrevive).`,
+  },
+  {
+    id: 'm6-q19',
+    moduleId: 6,
+    sectionId: '6.5',
+    prompt: t`Para ajustar los hiperparámetros de un bosque aleatorio (n_estimators, max_features, max_depth, etc.), ¿qué procedimiento es correcto?`,
+    options: [
+      t`Probar una grilla de combinaciones con validación cruzada solo sobre el entrenamiento, elegir la de mayor AUC promedio y recién entonces evaluar en la prueba`,
+      t`Probar todas las combinaciones directamente sobre la prueba y quedarse con la mejor`,
+      t`Usar siempre el bosque con más árboles y la máxima profundidad`,
+      t`Elegir la combinación con mejor AUC en entrenamiento`,
+    ],
+    correctIndex: 0,
+    explanation: t`Los hiperparámetros se eligen con entrenamiento + validación cruzada (estratificada); la prueba se reserva para la evaluación final. No se busca el bosque más grande sino la combinación que mejor generaliza.`,
+  },
 ]

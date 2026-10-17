@@ -52,11 +52,11 @@ describe('lectura de la guía', () => {
     expect(autoevaluationCounts(SAMPLE)).toEqual({ 1: 2 })
   })
 
-  it('la guía real tiene las 82 preguntas del PRD y 80 términos de glosario', () => {
+  it('la guía real tiene las 82 preguntas del PRD y 87 términos de glosario', () => {
     const counts = autoevaluationCounts(guide)
     expect(counts).toEqual(PRD_QUESTION_COUNTS)
     expect(Object.values(counts).reduce((a, b) => a + b, 0)).toBe(82)
-    expect(countBullets(guide, 'Glosario')).toBe(80)
+    expect(countBullets(guide, 'Glosario')).toBe(87)
     expect(countNumberedItems(guide, 'Los errores más comunes (y cómo evitarlos)')).toBe(11)
   })
 })
@@ -77,7 +77,7 @@ describe('RNF-17: equivalencia de encabezados', () => {
     expect(byHeading('2.4 Distribuciones de probabilidad')?.status).toBe('covered')
     expect(byHeading('Autoevaluación del Módulo 2')).toMatchObject({ status: 'covered', detail: '12 preguntas' })
     expect(byHeading('Respuestas del Módulo 2')?.status).toBe('covered')
-    expect(byHeading('Glosario')).toMatchObject({ status: 'covered', detail: '80 términos' })
+    expect(byHeading('Glosario')).toMatchObject({ status: 'covered', detail: '87 términos' })
     expect(byHeading('Cómo usar esta guía')).toMatchObject({ status: 'covered', detail: '3 reglas' })
     expect(byHeading('Cómo estudiar con esta guía')).toMatchObject({ status: 'covered', detail: '5 puntos' })
     expect(byHeading('La escalera del conocimiento')?.status).toBe('covered')

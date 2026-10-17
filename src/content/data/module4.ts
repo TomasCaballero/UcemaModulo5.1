@@ -110,6 +110,10 @@ export const module4Sections: Section[] = [
         text: t`Cuando un modelo rinde muy bien en entrenamiento y mal en prueba, hay **sobreajuste** (*overfitting*): aprendió el ruido en lugar del patrón. Este tema se formaliza en el Módulo 6.`,
       },
       {
+        type: 'paragraph',
+        text: t`**Partición estratificada.** Al separar entrenamiento y prueba conviene **estratificar** por la variable objetivo: las dos partes conservan la misma proporción de cada clase. *Ejemplo de clase (Titanic, Kaggle: 891 pasajeros, de los que sobrevivió el 38.4 %):* se usó el 70 % para entrenar (623 pasajeros) y el 30 % para probar (268). Toda transformación que se aprende de los datos (por ejemplo, imputar la edad faltante con la **mediana**) se calcula **solo con el entrenamiento** y después se aplica a la prueba; si no, información de la prueba se "filtra" al modelo y la evaluación queda optimista.`,
+      },
+      {
         type: 'extra',
         text: t`Es la diferencia entre estudiar con los mismos ejercicios que después te toman y rendir un examen con ejercicios nuevos. Si memorizaste las respuestas del cuadernillo, sacas 10 en la práctica y te va mal en el examen real. El conjunto de prueba es el examen con preguntas que no viste.`,
       },
@@ -177,7 +181,27 @@ export const module4Sections: Section[] = [
       },
       {
         type: 'paragraph',
+        text: t`**Comparar dos preguntas con el Gini ponderado.** Para elegir la pregunta, se calcula el Gini de cada hijo y se promedian ponderando por su tamaño. *Ejemplo de clase (Titanic, entrenamiento: 623 pasajeros, 239 sobrevivieron):*`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`Opción A, "¿es mujer?": 217 mujeres (163 sobrevivieron, 54 no), Gini $\approx 0.374$; 406 hombres (76 sobrevivieron, 330 no), Gini $\approx 0.304$. Gini ponderado $= \tfrac{217}{623}\cdot 0.374 + \tfrac{406}{623}\cdot 0.304 \approx 0.329$.`,
+          t`Opción B, "¿viaja en 3.ª clase?": 346 pasajeros (86 sobrevivieron, 260 no), Gini $\approx 0.374$; 277 pasajeros (153 sobrevivieron, 124 no), Gini $\approx 0.495$. Gini ponderado $\approx 0.427$.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Como $0.329 < 0.427$, el árbol abre con "¿es mujer?": la división que deja los hijos más puros.`,
+      },
+      { type: 'miniCheck', questionIds: ['m4-q14'] },
+      {
+        type: 'paragraph',
         text: t`**Sobreajuste y poda.** Si el árbol sigue dividiendo hasta que cada hoja tenga un solo registro, memoriza el entrenamiento. Se controla **limitando la profundidad**, exigiendo un mínimo de registros por hoja, o **podando** ramas que no mejoran el rendimiento en datos de validación.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**¿Un árbol más grande es siempre mejor? (ejemplo de clase).** No. Al crecer, el AUC en entrenamiento sube casi siempre, pero el AUC en prueba mejora solo hasta cierto punto. En el Titanic de la clase (variables sexo, edad y clase), con max_depth de 1 a 5 el AUC de entrenamiento fue $0.771$, $0.821$, $0.863$, $0.884$ y $0.900$, y el árbol sin límite (107 hojas) llegó a $0.958$. En prueba, el mejor valor apareció con max_depth = 3 ($0.833$); con más profundidad no se recuperó ($0.793$ y $0.804$) y el árbol completo cayó a $0.768$: **más complejidad puede mejorar el entrenamiento y empeorar la prueba**. Los hiperparámetros que se suelen ajustar son max_depth (profundidad máxima), min_samples_split (mínimo de observaciones para dividir un nodo), min_samples_leaf (mínimo permitido en una hoja), max_leaf_nodes (límite de hojas) y ccp_alpha (poda). La proporción de sobrevivientes de entrenamiento que cayó en una hoja es la **probabilidad estimada** para los pasajeros nuevos que lleguen a ella.`,
       },
       { type: 'subheading', text: 'Evaluación: la matriz de confusión' },
       {
@@ -199,6 +223,7 @@ export const module4Sections: Section[] = [
           t`**Exactitud** (*accuracy*) $= \dfrac{VP+VN}{\text{total}}$: proporción de aciertos.`,
           t`**Precisión** (*precision*) $= \dfrac{VP}{VP+FP}$: de todo lo que **predije** como positivo, ¿cuánto lo era realmente?`,
           t`**Exhaustividad / Sensibilidad** (*recall*) $= \dfrac{VP}{VP+FN}$: de todos los positivos **reales**, ¿cuántos detecté?`,
+          t`**Especificidad** (*specificity*) $= \dfrac{VN}{VN+FP}$: de todos los negativos **reales**, ¿cuántos identifiqué correctamente como negativos?`,
           t`**$F_1$** $= \dfrac{2\cdot\text{precisión}\cdot\text{recall}}{\text{precisión}+\text{recall}}$: un solo número que equilibra las dos.`,
         ],
       },
@@ -207,7 +232,7 @@ export const module4Sections: Section[] = [
         title: t`**Ejemplo.** De 100 pacientes, 10 están enfermos. El modelo da: $VP=8$, $FN=2$, $FP=18$, $VN=72$.`,
         steps: [
           t`Exactitud: $(8+72)/100 = 0.80$.`,
-          t`Precisión: $8/(8+18) \approx 0.31$. Recall: $8/(8+2) = 0.80$.`,
+          t`Precisión: $8/(8+18) \approx 0.31$. Recall: $8/(8+2) = 0.80$. Especificidad: $72/(72+18) = 0.80$.`,
         ],
         result: t`$F_1 \approx 0.44$`,
       },
@@ -220,6 +245,25 @@ export const module4Sections: Section[] = [
         type: 'paragraph',
         text: t`**Qué priorizar:** si un falso negativo es muy costoso (no detectar un cáncer), importa el **recall**; si lo costoso es un falso positivo (bloquear a un cliente legítimo), importa la **precisión**.`,
       },
+      {
+        type: 'paragraph',
+        text: t`**El umbral cambia las métricas, no el modelo.** Un modelo que entrega probabilidades se convierte en clasificador al fijar un **umbral** $t$: se predice positivo si $\hat{p} \ge t$. Con el mismo modelo, subir $t$ lo vuelve más exigente (sube la precisión y la especificidad, pero puede bajar el recall) y bajarlo hace lo contrario. *Ejemplo ilustrativo (cifras inventadas):* 8 pasajeros con probabilidades estimadas $0.95, 0.85, 0.60, 0.55, 0.45, 0.35, 0.20, 0.10$; sobrevivieron 5 de ellos (los de probabilidad $0.95$, $0.85$, $0.55$, $0.45$ y $0.20$).`,
+      },
+      {
+        type: 'table',
+        illustrative: true,
+        headers: ['Umbral', 'VP', 'FP', 'FN', 'VN', 'Recall', 'Precisión', 'Especificidad'],
+        rows: [
+          ['$0.30$', '4', '2', '1', '1', '$0.80$', '$0.67$', '$0.33$'],
+          ['$0.50$', '3', '1', '2', '2', '$0.60$', '$0.75$', '$0.67$'],
+          ['$0.70$', '2', '0', '3', '3', '$0.40$', '$1.00$', '$1.00$'],
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`**No existe un umbral universalmente óptimo:** la elección es una decisión posterior al modelo y depende del **costo de cada error**. Si un falso negativo es muy caro (medicina: dejar pasar a un paciente enfermo), conviene un umbral más bajo para ganar recall. Si lo caro es el falso positivo (fraude: bloquear clientes legítimos), conviene uno más alto para ganar precisión y especificidad; en riesgo crediticio el corte equilibra la mora esperada con el negocio aprobado. El mejor punto de corte no es el que maximiza una métrica por definición, sino el que mejor representa el objetivo y el costo de los errores. **Buena práctica:** elegirlo con entrenamiento y validación (o validación cruzada) y reservar la **prueba** para la evaluación final.`,
+      },
+      { type: 'miniCheck', questionIds: ['m4-q15'] },
       {
         type: 'extra',
         text: t`Un filtro de spam sobre 100 correos, de los cuales 20 son spam: detecta 15 ($VP=15$), deja pasar 5 ($FN=5$), marca por error 4 correos buenos ($FP=4$) y acierta 76 correos buenos ($VN=76$). Exactitud $=(15+76)/100 = 0.91$; precisión $=15/19 \approx 0.79$ (de lo que marcó como spam, el 79 % lo era); recall $=15/20 = 0.75$ (detectó tres cuartos del spam); $F_1 = 2\cdot15/(2\cdot15+4+5) \approx 0.77$. Aquí un falso positivo duele (perder un correo importante), así que se cuida la precisión.`,

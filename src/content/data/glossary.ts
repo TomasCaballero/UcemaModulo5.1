@@ -1,6 +1,6 @@
 import type { GlossaryEntry } from '../types'
 
-// Fuente: recorrido-guias-de-aprendizaje-v3.md, "Glosario" (80 términos, en el orden de la guía).
+// Fuente: recorrido-guias-de-aprendizaje-v3.md, "Glosario" (87 términos, en el orden de la guía).
 // Los números entre paréntesis de la guía son `references`: una sección ("6.4") o solo un
 // módulo ("4"). El término va en cursiva con `*...*` donde la guía lo marca (se muestra en negrita).
 const t = String.raw
@@ -17,6 +17,8 @@ export const glossary: GlossaryEntry[] = [
     references: ['3.6'],
   },
   { term: 'Bootstrap', definition: t`muestra de $n$ datos extraída con reemplazo`, references: ['6.3'] },
+  { term: 'C (parámetro de regularización)', definition: 'inverso de la fuerza de regularización en la regresión logística; C chico = más regularización', references: ['5.2'] },
+  { term: 'Calibración', definition: 'las probabilidades predichas coinciden con las frecuencias observadas', references: ['5.2'] },
   {
     term: '*Ceteris paribus*',
     definition: '"manteniendo todo lo demás constante"',
@@ -87,10 +89,12 @@ export const glossary: GlossaryEntry[] = [
     references: ['2.7'],
   },
   { term: 'ERM', definition: 'minimizar el riesgo empírico', references: ['7.2'] },
+  { term: 'Especificidad', definition: t`de los negativos reales, proporción identificada como negativa, $VN/(VN+FP)$`, references: ['4.3'] },
   { term: 'Esperanza', definition: 'promedio ponderado por probabilidad', references: ['0.2'] },
   { term: 'Estadístico', definition: 'número calculado desde la muestra', references: ['2.1'] },
   { term: 'Estimador', definition: 'regla para estimar un parámetro', references: ['2.6'] },
   { term: t`$F$ de Fisher`, definition: t`cociente de dos $\chi^2$`, references: ['2.4'] },
+  { term: 'Forward / backward / stepwise', definition: 'selección de variables agregando, quitando o ambas cosas paso a paso', references: ['5.2'] },
   { term: 'Función de pérdida', definition: 'medida del costo de un error', references: ['6.5', '7.2'] },
   { term: 'Gini, índice', definition: 'impureza de un nodo', references: ['4.3'] },
   {
@@ -106,6 +110,7 @@ export const glossary: GlossaryEntry[] = [
     references: ['0.3', '6.6'],
   },
   { term: 'Homocedasticidad', definition: 'varianza del error constante', references: ['3.6'] },
+  { term: 'Hosmer–Lemeshow, test de', definition: 'compara casos observados y esperados por grupos para evaluar la calibración', references: ['5.2'] },
   {
     term: 'Intervalo de confianza',
     definition: 'rango construido con un método que acierta con cierta frecuencia',
@@ -202,6 +207,7 @@ export const glossary: GlossaryEntry[] = [
   { term: 'SVM', definition: 'máquina de vectores de soporte', references: ['6.6'] },
   { term: t`$t$ de Student`, definition: 'Normal con colas pesadas', references: ['2.4'] },
   { term: 'TLC', definition: 'las medias muestrales se aproximan a una Normal', references: ['2.5'] },
+  { term: 'Umbral (*threshold*)', definition: 'probabilidad a partir de la cual se predice la clase positiva; mueve precisión y recall', references: ['4.3', '5.2'] },
   {
     term: 'Validación cruzada',
     definition: 'estimar el error de prueba reutilizando los datos',
@@ -222,4 +228,5 @@ export const glossary: GlossaryEntry[] = [
     definition: 'promedio de desviaciones al cuadrado / sensibilidad del modelo a los datos',
     references: ['2.2', '6.2'],
   },
+  { term: 'VIF', definition: t`factor de inflación de la varianza, $1/(1-R_j^2)$; mide multicolinealidad`, references: ['5.2'] },
 ]

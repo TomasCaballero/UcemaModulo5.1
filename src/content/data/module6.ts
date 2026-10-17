@@ -298,6 +298,23 @@ export const module6Sections: Section[] = [
         type: 'paragraph',
         text: t`Agregar más árboles **no causa sobreajuste**: la varianza se estabiliza.`,
       },
+      {
+        type: 'paragraph',
+        text: t`**Dos fuentes de diversidad.** (1) **Bootstrap de las observaciones:** cada árbol se entrena con una muestra del entrenamiento hecha **con reemplazo**, así que algunos pasajeros aparecen más de una vez en una muestra y otros no aparecen. (2) **Variables aleatorias en cada nodo:** en cada división el árbol solo evalúa un subconjunto aleatorio de variables. Con ambas, los árboles se parecen menos entre sí y al promediarlos el modelo suele ser más robusto.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**Cómo se obtiene la predicción final.** Cada árbol entrega una **probabilidad**; el bosque **promedia esas probabilidades** y luego aplica un umbral. *Ejemplo de clase (5 árboles, para un hombre de 30 años en 3.ª clase):* probabilidades $0.125, 0.500, 0.333, 0.143$ y $0.000$; promedio $= 1.101/5 \approx 0.220$; con umbral $0.50$, $0.220 < 0.50$ y la predicción es "no sobrevive". En la práctica se usan muchos más árboles (por ejemplo, 100).`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q18'] },
+      {
+        type: 'paragraph',
+        text: t`**Ajuste de hiperparámetros del bosque.** Hay hiperparámetros **del bosque** (n_estimators: cantidad de árboles; max_features: cuántas variables se evalúan en cada nodo; bootstrap: si cada árbol usa una muestra con reemplazo) e hiperparámetros **de cada árbol** (max_depth, min_samples_split, min_samples_leaf). Para elegir la combinación: (1) se define una **grilla** de valores; (2) se prueban las combinaciones solo sobre el entrenamiento; (3) se usa **validación cruzada estratificada** (por ejemplo, 3 folds); (4) se elige la de mayor AUC promedio; y (5) se reentrena con todo el entrenamiento y recién entonces se evalúa en la prueba. *Ejemplo de clase (Titanic):* la mejor combinación fue n_estimators=100, max_features=1, max_depth=None, min_samples_split=2, min_samples_leaf=5 y bootstrap=True, con AUC promedio de validación cruzada de $0.861$. **No se busca el bosque más grande, sino la combinación que mejor generaliza.**`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**Comparación final (ejemplo de clase, Titanic, prueba).** Con la misma partición y las mismas variables (sexo, edad imputada y clase), los tres modelos dieron: regresión logística, AUC $0.838$, accuracy $0.780$, precisión $0.700$, recall $0.748$; árbol de decisión (max_depth=None, min_samples_leaf=5), AUC $0.837$, accuracy $0.813$, precisión $0.752$, recall $0.767$; bosque aleatorio, AUC $0.856$, accuracy $0.802$, precisión $0.755$, recall $0.718$. **Si se prioriza el AUC, el mejor fue el bosque; si se miran accuracy y recall, el árbol tuvo los valores más altos:** el "mejor" modelo depende de la métrica elegida.`,
+      },
       { type: 'subheading', text: 'Boosting' },
       {
         type: 'paragraph',

@@ -123,6 +123,10 @@ export const module5Sections: Section[] = [
         text: t`**El efecto sobre la probabilidad no es constante.** Los odds se duplican siempre, pero la probabilidad sube $0.095$ al pasar de 0 a 1 atraso y $0.171$ al pasar de 2 a 3. El efecto de $x_j$ sobre $p$ es aproximadamente $\beta_j\, p(1-p)$: **es máximo cerca de $p=0.5$** (ahí vale $\beta_j/4$, regla práctica rápida) y se achata hacia los extremos. Esto resuelve el segundo problema del LPM.`,
       },
       {
+        type: 'paragraph',
+        text: t`**El mismo odds ratio, distinto cambio en probabilidad.** Si una variable multiplica los odds por $\text{OR}$ y la probabilidad inicial era $p_0$, la nueva probabilidad es $p_1 = \dfrac{\text{OR}\cdot p_0}{1-p_0+\text{OR}\cdot p_0}$. *Ejemplo de clase (Titanic, ser mujer, $\text{OR} = e^{2.61} \approx 13.6$):* con $p_0 = 0.10$ los odds pasan de $0.11$ a $0.11 \times 13.6 \approx 1.50$ y $p_1 = 0.60$ (**+50 puntos porcentuales**); con $p_0 = 0.50$ los odds pasan de $1$ a $13.6$ y $p_1 \approx 0.93$ (**+43 puntos**). El OR es el mismo, pero el cambio en probabilidad depende del punto de partida.`,
+      },
+      {
         type: 'extra',
         text: t`Volvamos al examen: ahora con un modelo logístico $z = -3 + 0.5\,\text{horas}$. Con 2 horas, $z=-2$ y $p \approx 0.119$; con 4 horas, $z=-1$ y $p \approx 0.269$; con 6 horas, $z=0$ y $p = 0.5$; con 8 horas, $z=1$ y $p \approx 0.731$; con 10 horas, $p \approx 0.881$. Nunca pasa de 1, y las horas que más suben la probabilidad son las del medio (alrededor de 6 horas). Cada hora multiplica los odds por $e^{0.5} \approx 1.65$.`,
       },
@@ -147,6 +151,116 @@ export const module5Sections: Section[] = [
       {
         type: 'extra',
         text: t`El AUC se entiende con un juego: elige al azar a una persona realmente enferma y a otra sana, y fíjate a cuál le asignó el modelo la probabilidad más alta. Un AUC de 0.5 es lo mismo que tirar una moneda para decidir cuál es la enferma; un AUC de 0.9 significa que, en 9 de cada 10 pares así, el modelo pone más arriba a la persona enferma.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**Cómo leer la curva ROC.** Cada punto de la curva corresponde a un **umbral** distinto: el eje vertical es la tasa de verdaderos positivos (recall) y el horizontal la tasa de falsos positivos $= 1-\text{especificidad}$. La diagonal representa el azar (un clasificador sin capacidad de discriminar); cuanto más cerca de la esquina superior izquierda, mejor discrimina el modelo. La ROC mira **todos** los umbrales a la vez; el AUC resume qué tan bien el modelo distingue entre quienes tienen el evento y quienes no. Mover el umbral no cambia el modelo ni su AUC: solo recorre la curva (Módulo 4.3).`,
+      },
+      { type: 'subheading', text: 'Un caso completo: el Titanic de la clase' },
+      {
+        type: 'paragraph',
+        text: t`*Ejemplo de clase (Titanic, Kaggle).* Se parte train.csv (891 pasajeros) en 70 % entrenamiento (623) y 30 % prueba (268), estratificando por Survived. Con **una sola variable** (Female), el modelo estimado fue $\text{logit}(p) = -1.468 + 2.573\cdot\text{Female}$. Para una mujer: $z = -1.468 + 2.573 = 1.105$ y $p = 1/(1+e^{-1.105}) \approx 0.751$, coherente con la tasa observada en entrenamiento (163 de 217 mujeres, 75.1 %).`,
+      },
+      {
+        type: 'paragraph',
+        text: t`Con **tres variables** (Female, Age y Pclass como categórica, con la 1.ª clase de referencia) el modelo es $z = 1.4666 + 2.6100\,\text{Female} - 0.0439\,\text{Age} - 1.3946\,\text{Pclass}_2 - 2.5846\,\text{Pclass}_3$:`,
+      },
+      {
+        type: 'table',
+        headers: ['Variable', '$\\beta$', 'Odds ratio $e^{\\beta}$', 'Lectura (demás variables constantes)'],
+        rows: [
+          ['Female (1 = mujer)', '$2.6100$', '$13.6$', 'ser mujer multiplica los odds de sobrevivir por $13.6$'],
+          ['Age (años)', '$-0.0439$', '$0.96$', 'cada año adicional multiplica los odds por $0.96$ ($\\approx 4\\,\\%$ menos)'],
+          ['Pclass = 2 (vs. 1)', '$-1.3946$', '$0.25$', 'viajar en 2.ª clase multiplica los odds por $0.25$ ($\\approx 75\\,\\%$ menos)'],
+          ['Pclass = 3 (vs. 1)', '$-2.5846$', '$0.08$', 'viajar en 3.ª clase multiplica los odds por $0.08$ ($\\approx 92\\,\\%$ menos)'],
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Con el umbral $0.50$: una mujer de 23 años en 1.ª clase tiene $\hat{p} \approx 0.956$ (se predice "sobrevive"); un hombre de 30 años en 1.ª clase, $\hat{p} \approx 0.537$ ("sobrevive"); y un hombre de 30 años en 3.ª clase, $\hat{p} \approx 0.081$ ("no sobrevive"). El signo de cada $\beta$ indica hacia dónde empuja la probabilidad; el odds ratio dice cuántas veces se multiplican los odds.`,
+      },
+      { type: 'subheading', text: 'Seleccionar variables: forward, backward y stepwise' },
+      {
+        type: 'paragraph',
+        text: t`Más variables no siempre dan un mejor modelo: pueden aportar información, pero también **redundancia** y complejidad innecesaria. Para decidir **qué variables conservar** se sigue un criterio sistemático (no se prueban combinaciones al azar):`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**Forward (hacia adelante):** parte del modelo vacío. En cada paso prueba agregar cada variable candidata **por separado** y se queda con la que más mejora el modelo; se detiene cuando ninguna aporta una mejora relevante.`,
+          t`**Backward (hacia atrás):** parte del modelo con **todas** las variables y, en cada paso, elimina la que menos aporta; se detiene cuando ninguna de las que quedan cumple el criterio de eliminación.`,
+          t`**Stepwise:** combina ambos enfoques: puede agregar variables y también **volver a quitar** alguna que ya estaba y dejó de aportar.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`El **criterio de selección** puede ser estadístico (p-valor, AIC o BIC) o predictivo (por ejemplo, el AUC promedio por validación cruzada). Lo que distingue a los métodos es el punto de partida y la flexibilidad para agregar o quitar variables. *Ejemplo de clase (Titanic):* con candidatas Female, Age, Pclass, Fare y FamilySize, forward con AUC por validación cruzada de 5 folds incorporó primero Female (AUC CV $0.7708$), luego Pclass ($0.8333$) y luego Age ($0.8466$); Fare y FamilySize quedaron fuera. **Seleccionar variables no es lo mismo que regularizar:** seleccionar decide cuáles se conservan; regularizar cambia cómo se estiman los coeficientes de las que se conservan.`,
+      },
+      { type: 'miniCheck', questionIds: ['m5-q15'] },
+      { type: 'subheading', text: 'Regularización en la regresión logística: L1, L2 y el parámetro C' },
+      {
+        type: 'paragraph',
+        text: t`Sin regularización, los coeficientes se estiman maximizando la log-verosimilitud, es decir, minimizando el **Log Loss**. Regularizar significa **cambiar el criterio de estimación**: se minimiza $\text{Log Loss}(\beta) + \text{penalización}(\beta)$, de modo que el modelo ajuste bien los datos **y** evite coeficientes demasiado grandes.`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**L1 (Lasso):** penaliza la suma de valores absolutos, $\lambda\sum_j |\beta_j|$. Puede llevar algunos coeficientes **exactamente a 0**, así que sirve también como selección automática de variables; es útil si se busca parsimonia.`,
+          t`**L2 (Ridge):** penaliza la suma de cuadrados, $\lambda\sum_j \beta_j^2$. Tiende a **achicar** todos los coeficientes sin anularlos; es útil si se busca estabilizar los coeficientes.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`En *scikit-learn* se eligen dos cosas: penalty ('l1' o 'l2', el **tipo** de regularización; para L1 se usa el solver 'liblinear') y C, que es el **inverso** de la fuerza de regularización y aplica tanto a L1 como a L2: **C chico = regularización más fuerte; C grande = más débil**. Valores típicos: $0.01$, $0.1$, $1$, $10$, $100$. Primero se elige la penalización y después su intensidad; para elegir C conviene usar entrenamiento con validación cruzada y reservar la prueba para la evaluación final.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`*Ejemplo de clase (Titanic, Female, Age y Pclass numérica, L2 con $C=1$):* los coeficientes pasaron de $2.646$, $-0.038$ y $-1.173$ a $2.511$, $-0.037$ y $-1.130$: las mismas variables, pero coeficientes algo más moderados. Es la misma idea de Ridge y Lasso del Módulo 6.4, con Log Loss en lugar de RSS.`,
+      },
+      { type: 'miniCheck', questionIds: ['m5-q16'] },
+      { type: 'subheading', text: 'Discriminar bien no es estimar buenas probabilidades: calibración y Hosmer–Lemeshow' },
+      {
+        type: 'paragraph',
+        text: t`**Discriminar** es asignar probabilidades más altas a quienes realmente tienen el evento (se mide con la ROC y el AUC). **Estimar buenas probabilidades** (estar **calibrado**) significa que si el modelo asigna $80\,\%$ a un grupo, aproximadamente el $80\,\%$ de ese grupo debería tener el evento. Un modelo puede ordenar bien a los pasajeros y, aun así, sobreestimar o subestimar las probabilidades: **discriminar bien no implica estar bien calibrado**.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`El **test de Hosmer–Lemeshow** evalúa esa calibración (la *bondad de ajuste* de la regresión logística): (1) se ordenan las observaciones según su probabilidad predicha; (2) se dividen en grupos (por ejemplo, 10 deciles); (3) en cada grupo se comparan los casos **observados** con los **esperados**; (4) si las diferencias son pequeñas en la mayoría de los grupos, el ajuste es razonable. Interpretación: $H_0$ = no hay evidencia de falta de ajuste. Un **p-valor grande** (por ejemplo, $>0.05$) indica que no hay evidencia contra el ajuste; un **p-valor chico** indica que las probabilidades predichas no coinciden bien con lo observado. Es una herramienta útil, pero conviene complementarla con otras métricas y con gráficos de calibración. *No mide discriminación (como el AUC): compara probabilidades predichas con frecuencias observadas.*`,
+      },
+      { type: 'miniCheck', questionIds: ['m5-q17'] },
+      { type: 'subheading', text: 'Antes de confiar en el modelo: significancia y multicolinealidad (VIF)' },
+      {
+        type: 'paragraph',
+        text: t`**Significancia de los coeficientes.** Para cada coeficiente se contrasta $H_0:\beta_j = 0$ (la variable no aporta información) contra $H_1:\beta_j \neq 0$ con el estadístico $z = \hat{\beta}_j/\text{ee}(\hat{\beta}_j)$ (coeficiente dividido su error estándar). Si el p-valor es pequeño (por ejemplo, $<0.05$), hay evidencia de que la variable está asociada con la probabilidad del evento, una vez controladas las demás variables. *Ejemplo de clase (Titanic):* Female ($\hat\beta = 2.6100$, ee $= 0.2257$, $z = 11.57$), Age ($-0.0439$, ee $= 0.0093$, $z = -4.72$) y las dos dummies de Pclass ($z = -4.31$ y $-8.22$) tienen p-valor menor que $0.05$.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**Multicolinealidad y VIF.** Ocurre cuando dos o más variables explicativas contienen información muy parecida; los coeficientes se vuelven **inestables**, aumentan sus errores estándar y el modelo es más difícil de interpretar. El **factor de inflación de la varianza** de la variable $X_j$ mide cuánta de su información está explicada por las demás:`,
+      },
+      { type: 'formula', latex: t`\text{VIF}_j = \frac{1}{1 - R_j^2}` },
+      {
+        type: 'paragraph',
+        text: t`donde $R_j^2$ es el coeficiente de determinación de la regresión de $X_j$ contra las otras variables explicativas. *Ejemplo:* si $R_j^2 = 0.5$, $\text{VIF} = 2$; si $R_j^2 = 0.8$, $\text{VIF} = 5$. **Regla práctica:** un VIF mayor que $5$ suele considerarse una señal de alerta (y valores mucho más altos, un problema serio). En el Titanic de la clase todos los VIF estuvieron entre $1.06$ y $1.85$: sin indicios de multicolinealidad importante.`,
+      },
+      { type: 'miniCheck', questionIds: ['m5-q18'] },
+      { type: 'subheading', text: 'Comparar modelos: ¿qué pasó al agregar variables?' },
+      {
+        type: 'paragraph',
+        text: t`*Ejemplo de clase (Titanic, evaluación en prueba, 268 pasajeros).* Modelos: **Original** (Female, Age, Pclass), **Seleccionado** (agrega FamilySize), **Seleccionado + L2** (el mismo con $C=10$) y **Completo** (agrega también Fare).`,
+      },
+      {
+        type: 'table',
+        headers: ['Modelo', 'AUC CV (train)', 'AUC test', 'Log Loss test', 'Accuracy test', 'Hosmer–Lemeshow (p)'],
+        rows: [
+          ['Original', '$0.8464$', '$0.8361$', '$0.4685$', '$0.7761$', '$0.1363$'],
+          ['Seleccionado', '$0.8500$', '$0.8485$', '$0.4534$', '$0.7985$', '$0.6582$'],
+          ['Seleccionado + L2', '$0.8502$', '$0.8485$', '$0.4534$', '$0.7985$', '$0.6613$'],
+          ['Completo', '$0.8481$', '$0.8503$', '$0.4523$', '$0.7910$', '$0.6419$'],
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Lectura: el modelo seleccionado mejora al original; la regularización L2 aporta una mejora muy leve en el AUC por validación cruzada; el completo logra el mejor AUC en prueba y el menor Log Loss; y todos los p-valores de Hosmer–Lemeshow son mayores que $0.05$. Más variables no son automáticamente mejores: las diferencias entre los tres últimos son pequeñas.`,
       },
     ],
   },

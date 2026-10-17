@@ -4,8 +4,8 @@ import { glossary } from '@/content/data/glossary'
 import { richTextToPlain } from '@/content/plainText'
 
 describe('glosario de la guía', () => {
-  it('tiene los 80 términos de la guía', () => {
-    expect(glossary).toHaveLength(80)
+  it('tiene los 87 términos de la guía', () => {
+    expect(glossary).toHaveLength(87)
   })
 
   it('no repite términos y todos tienen definición y referencias', () => {

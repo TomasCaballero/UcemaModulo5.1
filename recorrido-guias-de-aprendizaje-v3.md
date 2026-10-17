@@ -847,6 +847,8 @@ Extraer conocimiento no es "correr un algoritmo": es un ciclo completo.
 
 Cuando un modelo rinde muy bien en entrenamiento y mal en prueba, hay **sobreajuste** (*overfitting*): aprendió el ruido en lugar del patrón. Este tema se formaliza en el Módulo 6.
 
+**Partición estratificada.** Al separar entrenamiento y prueba conviene **estratificar** por la variable objetivo: las dos partes conservan la misma proporción de cada clase. *Ejemplo de clase (Titanic, Kaggle: 891 pasajeros, de los que sobrevivió el 38.4 %):* se usó el 70 % para entrenar (623 pasajeros) y el 30 % para probar (268). Toda transformación que se aprende de los datos (por ejemplo, imputar la edad faltante con la **mediana**) se calcula **solo con el entrenamiento** y después se aplica a la prueba; si no, información de la prueba se "filtra" al modelo y la evaluación queda optimista.
+
 #### Árboles de decisión
 Un **árbol de decisión** clasifica mediante una secuencia de preguntas sobre los atributos:
 * **Nodo interno**: una pregunta ("¿ingreso > 3000?").
@@ -875,7 +877,15 @@ Una pregunta lo divide así:
 
 Entropía ponderada de los hijos: $0.5\times0.722 + 0.5\times0.971 \approx 0.847$. **Ganancia de información** $= 0.971 - 0.847 \approx 0.12$. (En Gini, la reducción es $0.48 - 0.40 = 0.08$.) El árbol probaría todas las preguntas candidatas y se quedaría con la de mayor ganancia, y repetiría el proceso en cada hijo.
 
+**Comparar dos preguntas con el Gini ponderado.** Para elegir la pregunta, se calcula el Gini de cada hijo y se promedian ponderando por su tamaño. *Ejemplo de clase (Titanic, entrenamiento: 623 pasajeros, 239 sobrevivieron):*
+* Opción A, "¿es mujer?": 217 mujeres (163 sobrevivieron, 54 no), Gini $\approx 0.374$; 406 hombres (76 sobrevivieron, 330 no), Gini $\approx 0.304$. Gini ponderado $= \tfrac{217}{623}\cdot 0.374 + \tfrac{406}{623}\cdot 0.304 \approx 0.329$.
+* Opción B, "¿viaja en 3.ª clase?": 346 pasajeros (86 sobrevivieron, 260 no), Gini $\approx 0.374$; 277 pasajeros (153 sobrevivieron, 124 no), Gini $\approx 0.495$. Gini ponderado $\approx 0.427$.
+
+Como $0.329 < 0.427$, el árbol abre con "¿es mujer?": la división que deja los hijos más puros.
+
 **Sobreajuste y poda.** Si el árbol sigue dividiendo hasta que cada hoja tenga un solo registro, memoriza el entrenamiento. Se controla **limitando la profundidad**, exigiendo un mínimo de registros por hoja, o **podando** ramas que no mejoran el rendimiento en datos de validación.
+
+**¿Un árbol más grande es siempre mejor? (ejemplo de clase).** No. Al crecer, el AUC en entrenamiento sube casi siempre, pero el AUC en prueba mejora solo hasta cierto punto. En el Titanic de la clase (variables sexo, edad y clase), con `max_depth` de 1 a 5 el AUC de entrenamiento fue $0.771$, $0.821$, $0.863$, $0.884$ y $0.900$, y el árbol sin límite (107 hojas) llegó a $0.958$. En prueba, el mejor valor apareció con `max_depth = 3` ($0.833$); con más profundidad no se recuperó ($0.793$ y $0.804$) y el árbol completo cayó a $0.768$: **más complejidad puede mejorar el entrenamiento y empeorar la prueba**. Los hiperparámetros que se suelen ajustar son `max_depth` (profundidad máxima), `min_samples_split` (mínimo de observaciones para dividir un nodo), `min_samples_leaf` (mínimo permitido en una hoja), `max_leaf_nodes` (límite de hojas) y `ccp_alpha` (poda). La proporción de sobrevivientes de entrenamiento que cayó en una hoja es la **probabilidad estimada** para los pasajeros nuevos que lleguen a ella.
 
 #### Evaluación: la matriz de confusión
 Para una clasificación de dos clases (positivo/negativo), cada predicción cae en una de cuatro celdas:
@@ -890,15 +900,26 @@ Métricas derivadas:
 * **Exactitud** (*accuracy*) $= \dfrac{VP+VN}{\text{total}}$: proporción de aciertos.
 * **Precisión** (*precision*) $= \dfrac{VP}{VP+FP}$: de todo lo que **predije** como positivo, ¿cuánto lo era realmente?
 * **Exhaustividad / Sensibilidad** (*recall*) $= \dfrac{VP}{VP+FN}$: de todos los positivos **reales**, ¿cuántos detecté?
+* **Especificidad** (*specificity*) $= \dfrac{VN}{VN+FP}$: de todos los negativos **reales**, ¿cuántos identifiqué correctamente como negativos?
 * **$F_1$** $= \dfrac{2\cdot\text{precisión}\cdot\text{recall}}{\text{precisión}+\text{recall}}$: un solo número que equilibra las dos.
 
 **Ejemplo.** De 100 pacientes, 10 están enfermos. El modelo da: $VP=8$, $FN=2$, $FP=18$, $VN=72$.
 * Exactitud: $(8+72)/100 = 0.80$.
-* Precisión: $8/(8+18) \approx 0.31$. Recall: $8/(8+2) = 0.80$. $F_1 \approx 0.44$.
+* Precisión: $8/(8+18) \approx 0.31$. Recall: $8/(8+2) = 0.80$. Especificidad: $72/(72+18) = 0.80$. $F_1 \approx 0.44$.
 
 **¿Por qué la exactitud puede engañar?** Un modelo que dice "nadie está enfermo" acierta en 90 de los 100: **exactitud del 90 %**, pero **recall $=0$**: no detecta a ningún enfermo. Cuando una clase es rara (fraude, enfermedades), la exactitud es una mala métrica. Además, la **precisión baja** del ejemplo es la misma intuición del test médico del Módulo 0.2 (Bayes): cuando los positivos son pocos, aun un buen test genera muchos falsos positivos en términos relativos.
 
 **Qué priorizar:** si un falso negativo es muy costoso (no detectar un cáncer), importa el **recall**; si lo costoso es un falso positivo (bloquear a un cliente legítimo), importa la **precisión**.
+
+**El umbral cambia las métricas, no el modelo.** Un modelo que entrega probabilidades se convierte en clasificador al fijar un **umbral** $t$: se predice positivo si $\hat{p} \ge t$. Con el mismo modelo, subir $t$ lo vuelve más exigente (sube la precisión y la especificidad, pero puede bajar el recall) y bajarlo hace lo contrario. *Ejemplo ilustrativo (cifras inventadas):* 8 pasajeros con probabilidades estimadas $0.95, 0.85, 0.60, 0.55, 0.45, 0.35, 0.20, 0.10$; sobrevivieron 5 de ellos (los de probabilidad $0.95$, $0.85$, $0.55$, $0.45$ y $0.20$).
+
+| Umbral | VP | FP | FN | VN | Recall | Precisión | Especificidad |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| $0.30$ | 4 | 2 | 1 | 1 | $0.80$ | $0.67$ | $0.33$ |
+| $0.50$ | 3 | 1 | 2 | 2 | $0.60$ | $0.75$ | $0.67$ |
+| $0.70$ | 2 | 0 | 3 | 3 | $0.40$ | $1.00$ | $1.00$ |
+
+**No existe un umbral universalmente óptimo:** la elección es una decisión posterior al modelo y depende del **costo de cada error**. Si un falso negativo es muy caro (medicina: dejar pasar a un paciente enfermo), conviene un umbral más bajo para ganar recall. Si lo caro es el falso positivo (fraude: bloquear clientes legítimos), conviene uno más alto para ganar precisión y especificidad; en riesgo crediticio el corte equilibra la mora esperada con el negocio aprobado. El mejor punto de corte no es el que maximiza una métrica por definición, sino el que mejor representa el objetivo y el costo de los errores. **Buena práctica:** elegirlo con entrenamiento y validación (o validación cruzada) y reservar la **prueba** para la evaluación final.
 
 ### 4.4 Análisis de asociación y algoritmo Apriori
 
@@ -1052,6 +1073,8 @@ Es decir: **el modelo es lineal en los log-odds**. Por eso $\beta_1$ es el cambi
 
 **El efecto sobre la probabilidad no es constante.** Los odds se duplican siempre, pero la probabilidad sube $0.095$ al pasar de 0 a 1 atraso y $0.171$ al pasar de 2 a 3. El efecto de $x_j$ sobre $p$ es aproximadamente $\beta_j\, p(1-p)$: **es máximo cerca de $p=0.5$** (ahí vale $\beta_j/4$, regla práctica rápida) y se achata hacia los extremos. Esto resuelve el segundo problema del LPM.
 
+**El mismo odds ratio, distinto cambio en probabilidad.** Si una variable multiplica los odds por $\text{OR}$ y la probabilidad inicial era $p_0$, la nueva probabilidad es $p_1 = \dfrac{\text{OR}\cdot p_0}{1-p_0+\text{OR}\cdot p_0}$. *Ejemplo de clase (Titanic, ser mujer, $\text{OR} = e^{2.61} \approx 13.6$):* con $p_0 = 0.10$ los odds pasan de $0.11$ a $0.11 \times 13.6 \approx 1.50$ y $p_1 = 0.60$ (**+50 puntos porcentuales**); con $p_0 = 0.50$ los odds pasan de $1$ a $13.6$ y $p_1 \approx 0.93$ (**+43 puntos**). El OR es el mismo, pero el cambio en probabilidad depende del punto de partida.
+
 #### Estimación: máxima verosimilitud
 Los coeficientes no se calculan con una fórmula cerrada como OLS, sino por **máxima verosimilitud (MLE)**, como la moneda del Módulo 2.6, pero ahora con una probabilidad $p_i$ distinta para cada observación. La probabilidad de observar $y_i$ es $p_i^{y_i}(1-p_i)^{1-y_i}$, la verosimilitud es el producto de todas, y se maximiza su logaritmo (suma) con un **algoritmo iterativo** (Newton-Raphson). Para el logit la función a maximizar es cóncava, así que hay un único máximo.
 
@@ -1061,6 +1084,63 @@ Los coeficientes no se calculan con una fórmula cerrada como OLS, sino por **m�
 * **Test de razón de verosimilitud (LR):** compara un modelo completo con uno restringido: $LR = 2(\ln L_{\text{completo}} - \ln L_{\text{restringido}})$, que bajo $H_0$ sigue una $\chi^2$ con tantos grados de libertad como restricciones (Módulo 2.4). Es el equivalente del test $F$ de la regresión.
 * **Pseudo $R^2$ de McFadden:** $1 - \ln L_{\text{modelo}}/\ln L_{\text{nulo}}$ (el modelo nulo solo tiene constante). *Ejemplo:* $\ln L_{\text{nulo}} = -100$ y $\ln L_{\text{modelo}} = -70 \Rightarrow R^2_{\text{McF}} = 0.30$ (y $LR = 60$). **No es comparable con el $R^2$ de OLS:** valores de 0.2 a 0.4 ya se consideran un buen ajuste.
 * **Curva ROC y AUC:** al variar el umbral de 0 a 1 se grafica la **tasa de verdaderos positivos** (el recall, $VP/(VP+FN)$) contra la **tasa de falsos positivos** ($FP/(FP+VN)$). El **AUC** (área bajo la curva) es la probabilidad de que el modelo asigne mayor $\hat{p}$ a un positivo real elegido al azar que a un negativo real. $0.5$ equivale a azar; $1$ es un clasificador perfecto.
+
+**Cómo leer la curva ROC.** Cada punto de la curva corresponde a un **umbral** distinto: el eje vertical es la tasa de verdaderos positivos (recall) y el horizontal la tasa de falsos positivos $= 1-\text{especificidad}$. La diagonal representa el azar (un clasificador sin capacidad de discriminar); cuanto más cerca de la esquina superior izquierda, mejor discrimina el modelo. La ROC mira **todos** los umbrales a la vez; el AUC resume qué tan bien el modelo distingue entre quienes tienen el evento y quienes no. Mover el umbral no cambia el modelo ni su AUC: solo recorre la curva (Módulo 4.3).
+
+#### Un caso completo: el Titanic de la clase
+*Ejemplo de clase (Titanic, Kaggle).* Se parte `train.csv` (891 pasajeros) en 70 % entrenamiento (623) y 30 % prueba (268), estratificando por `Survived`. Con **una sola variable** (`Female`), el modelo estimado fue $\text{logit}(p) = -1.468 + 2.573\cdot\text{Female}$. Para una mujer: $z = -1.468 + 2.573 = 1.105$ y $p = 1/(1+e^{-1.105}) \approx 0.751$, coherente con la tasa observada en entrenamiento (163 de 217 mujeres, 75.1 %).
+
+Con **tres variables** (`Female`, `Age` y `Pclass` como categórica, con la 1.ª clase de referencia) el modelo es $z = 1.4666 + 2.6100\,\text{Female} - 0.0439\,\text{Age} - 1.3946\,\text{Pclass}_2 - 2.5846\,\text{Pclass}_3$:
+
+| Variable | $\beta$ | Odds ratio $e^{\beta}$ | Lectura (demás variables constantes) |
+| :--- | :--- | :--- | :--- |
+| `Female` (1 = mujer) | $2.6100$ | $13.6$ | ser mujer multiplica los odds de sobrevivir por $13.6$ |
+| `Age` (años) | $-0.0439$ | $0.96$ | cada año adicional multiplica los odds por $0.96$ ($\approx 4\,\%$ menos) |
+| `Pclass` = 2 (vs. 1) | $-1.3946$ | $0.25$ | viajar en 2.ª clase multiplica los odds por $0.25$ ($\approx 75\,\%$ menos) |
+| `Pclass` = 3 (vs. 1) | $-2.5846$ | $0.08$ | viajar en 3.ª clase multiplica los odds por $0.08$ ($\approx 92\,\%$ menos) |
+
+Con el umbral $0.50$: una mujer de 23 años en 1.ª clase tiene $\hat{p} \approx 0.956$ (se predice "sobrevive"); un hombre de 30 años en 1.ª clase, $\hat{p} \approx 0.537$ ("sobrevive"); y un hombre de 30 años en 3.ª clase, $\hat{p} \approx 0.081$ ("no sobrevive"). El signo de cada $\beta$ indica hacia dónde empuja la probabilidad; el odds ratio dice cuántas veces se multiplican los odds.
+
+#### Seleccionar variables: forward, backward y stepwise
+Más variables no siempre dan un mejor modelo: pueden aportar información, pero también **redundancia** y complejidad innecesaria. Para decidir **qué variables conservar** se sigue un criterio sistemático (no se prueban combinaciones al azar):
+* **Forward (hacia adelante):** parte del modelo vacío. En cada paso prueba agregar cada variable candidata **por separado** y se queda con la que más mejora el modelo; se detiene cuando ninguna aporta una mejora relevante.
+* **Backward (hacia atrás):** parte del modelo con **todas** las variables y, en cada paso, elimina la que menos aporta; se detiene cuando ninguna de las que quedan cumple el criterio de eliminación.
+* **Stepwise:** combina ambos enfoques: puede agregar variables y también **volver a quitar** alguna que ya estaba y dejó de aportar.
+
+El **criterio de selección** puede ser estadístico (p-valor, AIC o BIC) o predictivo (por ejemplo, el AUC promedio por validación cruzada). Lo que distingue a los métodos es el punto de partida y la flexibilidad para agregar o quitar variables. *Ejemplo de clase (Titanic):* con candidatas `Female`, `Age`, `Pclass`, `Fare` y `FamilySize`, forward con AUC por validación cruzada de 5 folds incorporó primero `Female` (AUC CV $0.7708$), luego `Pclass` ($0.8333$) y luego `Age` ($0.8466$); `Fare` y `FamilySize` quedaron fuera. **Seleccionar variables no es lo mismo que regularizar:** seleccionar decide cuáles se conservan; regularizar cambia cómo se estiman los coeficientes de las que se conservan.
+
+#### Regularización en la regresión logística: L1, L2 y el parámetro C
+Sin regularización, los coeficientes se estiman maximizando la log-verosimilitud, es decir, minimizando el **Log Loss**. Regularizar significa **cambiar el criterio de estimación**: se minimiza $\text{Log Loss}(\beta) + \text{penalización}(\beta)$, de modo que el modelo ajuste bien los datos **y** evite coeficientes demasiado grandes.
+* **L1 (Lasso):** penaliza la suma de valores absolutos, $\lambda\sum_j |\beta_j|$. Puede llevar algunos coeficientes **exactamente a 0**, así que sirve también como selección automática de variables; es útil si se busca parsimonia.
+* **L2 (Ridge):** penaliza la suma de cuadrados, $\lambda\sum_j \beta_j^2$. Tiende a **achicar** todos los coeficientes sin anularlos; es útil si se busca estabilizar los coeficientes.
+
+En *scikit-learn* se eligen dos cosas: `penalty` (`'l1'` o `'l2'`, el **tipo** de regularización; para L1 se usa el solver `'liblinear'`) y `C`, que es el **inverso** de la fuerza de regularización y aplica tanto a L1 como a L2: **`C` chico = regularización más fuerte; `C` grande = más débil**. Valores típicos: $0.01$, $0.1$, $1$, $10$, $100$. Primero se elige la penalización y después su intensidad; para elegir `C` conviene usar entrenamiento con validación cruzada y reservar la prueba para la evaluación final. *Ejemplo de clase (Titanic, `Female`, `Age`, `Pclass` numérica, L2 con $C=1$):* los coeficientes pasaron de $2.646$, $-0.038$ y $-1.173$ a $2.511$, $-0.037$ y $-1.130$: las mismas variables, pero coeficientes algo más moderados. (Es la misma idea de Ridge y Lasso del Módulo 6.4, con Log Loss en lugar de RSS.)
+
+#### Discriminar bien no es estimar buenas probabilidades: calibración y Hosmer–Lemeshow
+**Discriminar** es asignar probabilidades más altas a quienes realmente tienen el evento (se mide con la ROC y el AUC). **Estimar buenas probabilidades** (estar **calibrado**) significa que si el modelo asigna $80\,\%$ a un grupo, aproximadamente el $80\,\%$ de ese grupo debería tener el evento. Un modelo puede ordenar bien a los pasajeros y, aun así, sobreestimar o subestimar las probabilidades: **discriminar bien no implica estar bien calibrado**.
+
+El **test de Hosmer–Lemeshow** evalúa esa calibración (la *bondad de ajuste* de la regresión logística): (1) se ordenan las observaciones según su probabilidad predicha; (2) se dividen en grupos (por ejemplo, 10 deciles); (3) en cada grupo se comparan los casos **observados** con los **esperados**; (4) si las diferencias son pequeñas en la mayoría de los grupos, el ajuste es razonable. Interpretación: $H_0$ = no hay evidencia de falta de ajuste. Un **p-valor grande** (por ejemplo, $>0.05$) indica que no hay evidencia contra el ajuste; un **p-valor chico** indica que las probabilidades predichas no coinciden bien con lo observado. Es una herramienta útil, pero conviene complementarla con otras métricas y con gráficos de calibración. *No mide discriminación (como el AUC): compara probabilidades predichas con frecuencias observadas.*
+
+#### Antes de confiar en el modelo: significancia y multicolinealidad (VIF)
+**Significancia de los coeficientes.** Para cada coeficiente se contrasta $H_0:\beta_j = 0$ (la variable no aporta información) contra $H_1:\beta_j \neq 0$ con el estadístico $z = \hat{\beta}_j/\text{ee}(\hat{\beta}_j)$ (coeficiente dividido su error estándar). Si el p-valor es pequeño (por ejemplo, $<0.05$), hay evidencia de que la variable está asociada con la probabilidad del evento, una vez controladas las demás variables. *Ejemplo de clase (Titanic):* `Female` ($\hat\beta = 2.6100$, ee $= 0.2257$, $z = 11.57$), `Age` ($-0.0439$, ee $= 0.0093$, $z = -4.72$) y las dos dummies de `Pclass` ($z = -4.31$ y $-8.22$) tienen p-valor menor que $0.05$.
+
+**Multicolinealidad y VIF.** Ocurre cuando dos o más variables explicativas contienen información muy parecida; los coeficientes se vuelven **inestables**, aumentan sus errores estándar y el modelo es más difícil de interpretar. El **factor de inflación de la varianza** de la variable $X_j$ mide cuánta de su información está explicada por las demás:
+
+$$\text{VIF}_j = \frac{1}{1 - R_j^2}$$
+
+donde $R_j^2$ es el coeficiente de determinación de la regresión de $X_j$ contra las otras variables explicativas. *Ejemplo:* si $R_j^2 = 0.5$, $\text{VIF} = 2$; si $R_j^2 = 0.8$, $\text{VIF} = 5$. **Regla práctica:** un VIF mayor que $5$ suele considerarse una señal de alerta (y valores mucho más altos, un problema serio). En el Titanic de la clase todos los VIF estuvieron entre $1.06$ y $1.85$: sin indicios de multicolinealidad importante.
+
+#### Comparar modelos: ¿qué pasó al agregar variables?
+*Ejemplo de clase (Titanic, evaluación en prueba, 268 pasajeros).* Modelos: **Original** (`Female`, `Age`, `Pclass`), **Seleccionado** (agrega `FamilySize`), **Seleccionado + L2** (el mismo con $C=10$) y **Completo** (agrega también `Fare`).
+
+| Modelo | AUC CV (train) | AUC test | Log Loss test | Accuracy test | Hosmer–Lemeshow (p) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Original | $0.8464$ | $0.8361$ | $0.4685$ | $0.7761$ | $0.1363$ |
+| Seleccionado | $0.8500$ | $0.8485$ | $0.4534$ | $0.7985$ | $0.6582$ |
+| Seleccionado + L2 | $0.8502$ | $0.8485$ | $0.4534$ | $0.7985$ | $0.6613$ |
+| Completo | $0.8481$ | $0.8503$ | $0.4523$ | $0.7910$ | $0.6419$ |
+
+Lectura: el modelo seleccionado mejora al original; la regularización L2 aporta una mejora muy leve en el AUC por validación cruzada; el completo logra el mejor AUC en prueba y el menor Log Loss; y todos los p-valores de Hosmer–Lemeshow son mayores que $0.05$. Más variables no son automáticamente mejores: las diferencias entre los tres últimos son pequeñas.
 
 ### 5.3 Probit y el modelo de variable latente
 
@@ -1274,6 +1354,14 @@ Mejoran el bagging **descorrelacionando** los árboles. En **cada división** de
 > **Metáfora del comité:** si en un panel de médicos hay un especialista muy dominante, todos los diagnósticos se parecerán. Si a cada médico se le permite consultar solo un grupo aleatorio de síntomas, las opiniones se diversifican y el voto del comité es más robusto.
 
 Agregar más árboles **no causa sobreajuste**: la varianza se estabiliza.
+
+**Dos fuentes de diversidad.** (1) **Bootstrap de las observaciones:** cada árbol se entrena con una muestra del entrenamiento hecha **con reemplazo**, así que algunos pasajeros aparecen más de una vez en una muestra y otros no aparecen. (2) **Variables aleatorias en cada nodo:** en cada división el árbol solo evalúa un subconjunto aleatorio de variables. Con ambas, los árboles se parecen menos entre sí y al promediarlos el modelo suele ser más robusto.
+
+**Cómo se obtiene la predicción final.** Cada árbol entrega una **probabilidad**; el bosque **promedia esas probabilidades** y luego aplica un umbral. *Ejemplo de clase (5 árboles, para un hombre de 30 años en 3.ª clase):* probabilidades $0.125, 0.500, 0.333, 0.143$ y $0.000$; promedio $= 1.101/5 \approx 0.220$; con umbral $0.50$, $0.220 < 0.50$ y la predicción es "no sobrevive". En la práctica se usan muchos más árboles (por ejemplo, 100).
+
+**Ajuste de hiperparámetros del bosque.** Hay hiperparámetros **del bosque** (`n_estimators`: cantidad de árboles; `max_features`: cuántas variables se evalúan en cada nodo; `bootstrap`: si cada árbol usa una muestra con reemplazo) e hiperparámetros **de cada árbol** (`max_depth`, `min_samples_split`, `min_samples_leaf`). Para elegir la combinación: (1) se define una **grilla** de valores; (2) se prueban las combinaciones solo sobre el entrenamiento; (3) se usa **validación cruzada estratificada** (por ejemplo, 3 folds); (4) se elige la de mayor AUC promedio; y (5) se reentrena con todo el entrenamiento y recién entonces se evalúa en la prueba. *Ejemplo de clase (Titanic):* la mejor combinación fue `n_estimators=100`, `max_features=1`, `max_depth=None`, `min_samples_split=2`, `min_samples_leaf=5` y `bootstrap=True`, con AUC promedio de validación cruzada de $0.861$. **No se busca el bosque más grande, sino la combinación que mejor generaliza.**
+
+**Comparación final (ejemplo de clase, Titanic, prueba).** Con la misma partición y las mismas variables (sexo, edad imputada y clase), los tres modelos dieron: regresión logística, AUC $0.838$, accuracy $0.780$, precisión $0.700$, recall $0.748$; árbol de decisión (`max_depth=None`, `min_samples_leaf=5`), AUC $0.837$, accuracy $0.813$, precisión $0.752$, recall $0.767$; bosque aleatorio, AUC $0.856$, accuracy $0.802$, precisión $0.755$, recall $0.718$. **Si se prioriza el AUC, el mejor fue el bosque; si se miran accuracy y recall, el árbol tuvo los valores más altos:** el "mejor" modelo depende de la métrica elegida.
 
 #### Boosting
 A diferencia del bagging (árboles independientes en paralelo), el **boosting** entrena árboles **en secuencia**, cada uno **corrigiendo los errores del anterior**:
@@ -1592,6 +1680,8 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **Bayes, teorema de**: invierte una probabilidad condicional (0.2).
 * **BLUE**: mejor estimador lineal insesgado; propiedad de OLS bajo Gauss-Markov (3.6).
 * **Bootstrap**: muestra de $n$ datos extraída con reemplazo (6.3).
+* **C (parámetro de regularización)**: inverso de la fuerza de regularización en la regresión logística; C chico = más regularización (5.2).
+* **Calibración**: las probabilidades predichas coinciden con las frecuencias observadas (5.2).
 * ***Ceteris paribus***: "manteniendo todo lo demás constante" (3.2).
 * **Chi-cuadrado ($\chi^2$)**: distribución de una suma de normales al cuadrado (2.4).
 * **Clasificación**: predecir una categoría (4.3).
@@ -1614,10 +1704,12 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **Error estándar**: desviación típica de un estimador (2.5).
 * **Error Tipo I / Tipo II**: rechazar $H_0$ verdadera / no rechazar $H_0$ falsa (2.7).
 * **ERM**: minimizar el riesgo empírico (7.2).
+* **Especificidad**: de los negativos reales, proporción identificada como negativa, $VN/(VN+FP)$ (4.3).
 * **Esperanza**: promedio ponderado por probabilidad (0.2).
 * **Estadístico**: número calculado desde la muestra (2.1).
 * **Estimador**: regla para estimar un parámetro (2.6).
 * **$F$ de Fisher**: cociente de dos $\chi^2$ (2.4).
+* **Forward / backward / stepwise**: selección de variables agregando, quitando o ambas cosas paso a paso (5.2).
 * **Función de pérdida**: medida del costo de un error (6.5, 7.2).
 * **Gini, índice**: impureza de un nodo (4.3).
 * **Gradient boosting**: boosting con árboles ajustados al gradiente de la pérdida (6.5).
@@ -1625,6 +1717,7 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **Hiperparámetro**: parámetro que se fija antes de entrenar (6.3).
 * **Hiperplano**: generalización de la recta/plano a $k$ dimensiones (0.3, 6.6).
 * **Homocedasticidad**: varianza del error constante (3.6).
+* **Hosmer–Lemeshow, test de**: compara casos observados y esperados por grupos para evaluar la calibración (5.2).
 * **Intervalo de confianza**: rango construido con un método que acierta con cierta frecuencia (2.6).
 * **Kernel**: función que calcula productos internos en un espacio ampliado (6.6).
 * **K-Means**: agrupamiento por centroides (6.7).
@@ -1661,10 +1754,12 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **SVM**: máquina de vectores de soporte (6.6).
 * **$t$ de Student**: Normal con colas pesadas (2.4).
 * **TLC**: las medias muestrales se aproximan a una Normal (2.5).
+* **Umbral (*threshold*)**: probabilidad a partir de la cual se predice la clase positiva; mueve precisión y recall (4.3, 5.2).
 * **Validación cruzada**: estimar el error de prueba reutilizando los datos (6.3).
 * **Variable instrumental**: instrumento que mueve a $x$ sin correlacionarse con $u$ (3.7).
 * **Variable latente**: magnitud no observada que determina la respuesta binaria (5.3).
 * **Varianza**: promedio de desviaciones al cuadrado / sensibilidad del modelo a los datos (2.2, 6.2).
+* **VIF**: factor de inflación de la varianza, $1/(1-R_j^2)$; mide multicolinealidad (5.2).
 
 ---
 
