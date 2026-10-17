@@ -4,3 +4,6 @@ coverage
 *.local
 test-results
 playwright-report
+
+# Diapositivas del profesor (material de clase, no va al repo)
+presentaciones/
