@@ -2,7 +2,9 @@ import {
   confusionAtThreshold,
   forestProbability,
   gini,
+  logLikelihood,
   logistic,
+  odds,
   oddsRatio,
   precision,
   probabilityAfterOddsRatio,
@@ -147,6 +149,12 @@ export const numericExamples: NumericExample[] = [
   { id: 'or-probabilidad-alta', section: '5.2', snippet: r`$p_1 \approx 0.93$`, expected: 0.93, precision: 2, actual: () => probabilityAfterOddsRatio(0.5, 13.6) },
   { id: 'vif-r2-05', section: '5.2', snippet: r`$R_j^2 = 0.5$, $\text{VIF} = 2$`, expected: 2, precision: 0, actual: () => vif(0.5) },
   { id: 'vif-r2-08', section: '5.2', snippet: r`$R_j^2 = 0.8$, $\text{VIF} = 5$`, expected: 5, precision: 0, actual: () => vif(0.8) },
+  { id: 'titanic-hombres-sobreviven', section: '5.2', snippet: r`solo el $18.7\,\%$ de los hombres`, expected: 18.7, precision: 1, actual: () => (76 / 406) * 100 },
+  { id: 'titanic-odds-080', section: '5.2', snippet: r`\text{odds} = 0.80/0.20 = 4.0$`, expected: 4, precision: 1, actual: () => odds(0.8) },
+  { id: 'titanic-odds-020', section: '5.2', snippet: r`$\text{odds} = 0.25$`, expected: 0.25, precision: 2, actual: () => odds(0.2) },
+  { id: 'titanic-loglik-a', section: '5.2', snippet: r`$\ell \approx -0.60$`, expected: -0.6, precision: 2, actual: () => logLikelihood([0.9, 0.15, 0.8, 0.1], [1, 0, 1, 0]) },
+  { id: 'titanic-loglik-b', section: '5.2', snippet: r`$\ell \approx -2.42$`, expected: -2.42, precision: 2, actual: () => logLikelihood([0.6, 0.55, 0.55, 0.4], [1, 0, 1, 0]) },
+  { id: 'titanic-raiz-sobreviven', section: '4.3', snippet: r`(239 sobrevivieron, $38.4\,\%$)`, expected: 38.4, precision: 1, actual: () => (239 / 623) * 100 },
 
   // 6.5 Bosque aleatorio: promedio de probabilidades
   { id: 'bosque-promedio', section: '6.5', snippet: r`promedio $= 1.101/5 \approx 0.220$`, expected: 0.22, precision: 3, actual: () => forestProbability([0.125, 0.5, 0.333, 0.143, 0]) },

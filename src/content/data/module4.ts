@@ -194,6 +194,10 @@ export const module4Sections: Section[] = [
         type: 'paragraph',
         text: t`Como $0.329 < 0.427$, el árbol abre con "¿es mujer?": la división que deja los hijos más puros.`,
       },
+      {
+        type: 'paragraph',
+        text: t`**El árbol del Titanic (ejemplo de clase, profundidad 3).** La raíz contiene los 623 pasajeros de entrenamiento (239 sobrevivieron, $38.4\,\%$) y pregunta "¿es mujer?". Para clasificar a un pasajero se sigue **un único camino** desde la raíz hasta una hoja: por ejemplo, un hombre de 3.ª clase responde "¿es mujer?" $\to$ no, "¿clase = 3?" $\to$ sí, y llega a una hoja con **baja** probabilidad de sobrevivir; una mujer de 1.ª clase llega a una hoja con probabilidad alta. Los componentes son el **nodo raíz** (primera pregunta), los **nodos internos**, las **ramas** (respuestas) y las **hojas** (predicción: la proporción de sobrevivientes del entrenamiento que cayó en ellas). Un árbol no usa una fórmula única: toma decisiones a partir de preguntas sucesivas.`,
+      },
       { type: 'miniCheck', questionIds: ['m4-q14'] },
       {
         type: 'paragraph',

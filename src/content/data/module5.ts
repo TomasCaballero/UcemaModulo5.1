@@ -43,6 +43,10 @@ export const module5Sections: Section[] = [
         text: t`El LPM se usa a veces en econometría por su simplicidad, pero para predecir o para probabilidades extremas se prefieren los modelos siguientes.`,
       },
       {
+        type: 'paragraph',
+        text: t`*Ejemplo de clase (Titanic):* si se codifica Survived como $0$ (no sobrevivió) y $1$ (sobrevivió) y se ajusta una recta, las predicciones de tres pasajeros pueden ser $-0.20$, $0.67$ y $1.12$: la recta se sale de $[0,1]$ y dos de esos valores no pueden ser probabilidades. Es el problema que resuelve la función logística de 5.2.`,
+      },
+      {
         type: 'extra',
         text: t`Imagina que modelas la probabilidad de aprobar un examen según las horas de estudio con $\hat{y} = -0.2 + 0.15\,\text{horas}$. Con 4 horas da $0.40$, razonable. Pero con 9 horas da $-0.2 + 1.35 = 1.15$: una "probabilidad" del 115 %. Y la recta sigue sumando 0.15 por hora aunque la probabilidad ya esté cerca de 100 %, cuando en la realidad cada hora extra aporta cada vez menos.`,
       },
@@ -159,6 +163,10 @@ export const module5Sections: Section[] = [
       { type: 'subheading', text: 'Un caso completo: el Titanic de la clase' },
       {
         type: 'paragraph',
+        text: t`**Los datos.** El archivo train.csv reúne 891 pasajeros y 12 variables. La variable objetivo $Y$ es Survived (0 = no sobrevivió, 549 pasajeros; 1 = sobrevivió, 342) y las variables explicativas $X$ incluyen Pclass (clase), Sex, Age, SibSp, Parch, Fare y Embarked. Es **aprendizaje supervisado**: el algoritmo aprende patrones de casos pasados en los que se conoce el resultado y los aplica a pasajeros nuevos. Y es un problema de **clasificación**, no de regresión: se predice una categoría (sobrevive o no), no un número. En entrenamiento sobrevivió el $75.1\,\%$ de las mujeres (163 de 217) y solo el $18.7\,\%$ de los hombres (76 de 406).`,
+      },
+      {
+        type: 'paragraph',
         text: t`*Ejemplo de clase (Titanic, Kaggle).* Se parte train.csv (891 pasajeros) en 70 % entrenamiento (623) y 30 % prueba (268), estratificando por Survived. Con **una sola variable** (Female), el modelo estimado fue $\text{logit}(p) = -1.468 + 2.573\cdot\text{Female}$. Para una mujer: $z = -1.468 + 2.573 = 1.105$ y $p = 1/(1+e^{-1.105}) \approx 0.751$, coherente con la tasa observada en entrenamiento (163 de 217 mujeres, 75.1 %).`,
       },
       {
@@ -179,6 +187,15 @@ export const module5Sections: Section[] = [
         type: 'paragraph',
         text: t`Con el umbral $0.50$: una mujer de 23 años en 1.ª clase tiene $\hat{p} \approx 0.956$ (se predice "sobrevive"); un hombre de 30 años en 1.ª clase, $\hat{p} \approx 0.537$ ("sobrevive"); y un hombre de 30 años en 3.ª clase, $\hat{p} \approx 0.081$ ("no sobrevive"). El signo de cada $\beta$ indica hacia dónde empuja la probabilidad; el odds ratio dice cuántas veces se multiplican los odds.`,
       },
+      {
+        type: 'paragraph',
+        text: t`Los odds de tres pasajeros del Titanic ilustran la escala: con $\hat{p} = 0.80$, $\text{odds} = 0.80/0.20 = 4.0$ (sobrevivir es 4 veces más probable que no); con $\hat{p} = 0.50$, $\text{odds} = 1.0$ (igual de probable); con $\hat{p} = 0.20$, $\text{odds} = 0.25$ (no sobrevivir es 4 veces más probable).`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**De dónde salen los $\beta$ (ejemplo de clase).** Hay muchos $\beta$ posibles y hace falta un criterio: elegir los que mejor explican lo observado. Con 4 pasajeros (A sobrevivió, B no, C sobrevivió, D no), un modelo que asigna $\hat{p} = 0.90, 0.15, 0.80, 0.10$ explica mejor lo ocurrido que otro que asigna $0.60, 0.55, 0.55, 0.40$. La log-verosimilitud $\ell(\beta) = \sum_i [\,y_i \ln p_i + (1-y_i)\ln(1-p_i)\,]$ lo confirma: $\ell \approx -0.60$ para el primero y $\ell \approx -2.42$ para el segundo. Se eligen los $\beta$ que **maximizan** $\ell$ (en OLS, en cambio, se minimizan los errores al cuadrado).`,
+      },
+      { type: 'miniCheck', questionIds: ['m5-q23'] },
       { type: 'subheading', text: 'Seleccionar variables: forward, backward y stepwise' },
       {
         type: 'paragraph',

@@ -245,4 +245,18 @@ export const module4Questions: Question[] = [
     correctIndex: 0,
     explanation: t`Cuando el rendimiento en entrenamiento sigue mejorando pero el de prueba empeora, el árbol está memorizando ruido: hay sobreajuste. Se controla con hiperparámetros como max_depth, min_samples_leaf o la poda, eligiéndolos sin usar la prueba.`,
   },
+  {
+    id: 'm4-q18',
+    moduleId: 4,
+    sectionId: '4.3',
+    prompt: t`En el árbol del Titanic de la clase, un hombre de 3.ª clase responde "¿es mujer?" $\to$ no y "¿clase = 3?" $\to$ sí. ¿Qué predice el árbol?`,
+    options: [
+      t`Llega a una hoja con baja probabilidad de sobrevivir: se sigue un único camino de la raíz a una hoja`,
+      t`Calcula el promedio de las probabilidades de todas las hojas del árbol`,
+      t`Llega a una hoja con alta probabilidad de sobrevivir, porque la 3.ª clase era más numerosa`,
+      t`No puede predecir, porque la raíz solo admite preguntas sobre la edad`,
+    ],
+    correctIndex: 0,
+    explanation: t`Un árbol clasifica siguiendo **un único camino** desde el nodo raíz hasta una hoja. Los hombres de 3.ª clase caen en una hoja con baja proporción de sobrevivientes en el entrenamiento, y esa proporción es la probabilidad estimada.`,
+  },
 ]

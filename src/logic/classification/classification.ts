@@ -70,6 +70,15 @@ export function vif(rSquared: number): number {
   return 1 / (1 - rSquared)
 }
 
+/** Log-verosimilitud de un modelo binario: suma de y*ln(p) + (1-y)*ln(1-p). */
+export function logLikelihood(probabilities: readonly number[], labels: readonly (0 | 1)[]): number {
+  if (probabilities.length !== labels.length) throw new RangeError('probabilities y labels deben tener la misma longitud')
+  return probabilities.reduce((sum, p, i) => sum + (labels[i] === 1 ? Math.log(p) : Math.log(1 - p)), 0)
+}
+
+/** Odds de una probabilidad: p / (1 - p). */
+export const odds = (p: number): number => p / (1 - p)
+
 /** Predicción de un bosque: promedio de las probabilidades de cada árbol. */
 export function forestProbability(treeProbabilities: readonly number[]): number {
   if (treeProbabilities.length === 0) throw new RangeError('hace falta al menos un árbol')

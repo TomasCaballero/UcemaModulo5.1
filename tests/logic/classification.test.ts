@@ -4,6 +4,8 @@ import {
   confusionAtThreshold,
   forestProbability,
   gini,
+  logLikelihood,
+  odds,
   logistic,
   oddsRatio,
   precision,
@@ -104,5 +106,24 @@ describe('bosque aleatorio', () => {
   it('promedia las probabilidades de los árboles', () => {
     expect(forestProbability([0.125, 0.5, 0.333, 0.143, 0])).toBeCloseTo(0.22, 3)
     expect(() => forestProbability([])).toThrow(RangeError)
+  })
+})
+
+describe('verosimilitud y odds (Titanic de la clase)', () => {
+  const y: (0 | 1)[] = [1, 0, 1, 0]
+
+  it('el modelo que explica mejor lo observado tiene mayor log-verosimilitud', () => {
+    const a = logLikelihood([0.9, 0.15, 0.8, 0.1], y)
+    const b = logLikelihood([0.6, 0.55, 0.55, 0.4], y)
+    expect(a).toBeCloseTo(-0.6, 2)
+    expect(b).toBeCloseTo(-2.42, 2)
+    expect(a).toBeGreaterThan(b)
+    expect(() => logLikelihood([0.5], y)).toThrow(RangeError)
+  })
+
+  it('calcula los odds de tres pasajeros', () => {
+    expect(odds(0.8)).toBeCloseTo(4, 10)
+    expect(odds(0.5)).toBe(1)
+    expect(odds(0.2)).toBeCloseTo(0.25, 10)
   })
 })

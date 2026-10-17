@@ -883,6 +883,8 @@ Entropía ponderada de los hijos: $0.5\times0.722 + 0.5\times0.971 \approx 0.847
 
 Como $0.329 < 0.427$, el árbol abre con "¿es mujer?": la división que deja los hijos más puros.
 
+**El árbol del Titanic (ejemplo de clase, profundidad 3).** La raíz contiene los 623 pasajeros de entrenamiento (239 sobrevivieron, $38.4\,\%$) y pregunta "¿es mujer?". Para clasificar a un pasajero se sigue **un único camino** desde la raíz hasta una hoja: por ejemplo, un hombre de 3.ª clase responde "¿es mujer?" $\to$ no, "¿clase = 3?" $\to$ sí, y llega a una hoja con **baja** probabilidad de sobrevivir; una mujer de 1.ª clase llega a una hoja con probabilidad alta. Los componentes son el **nodo raíz** (primera pregunta), los **nodos internos**, las **ramas** (respuestas) y las **hojas** (predicción: la proporción de sobrevivientes del entrenamiento que cayó en ellas). Un árbol no usa una fórmula única: toma decisiones a partir de preguntas sucesivas.
+
 **Sobreajuste y poda.** Si el árbol sigue dividiendo hasta que cada hoja tenga un solo registro, memoriza el entrenamiento. Se controla **limitando la profundidad**, exigiendo un mínimo de registros por hoja, o **podando** ramas que no mejoran el rendimiento en datos de validación.
 
 **¿Un árbol más grande es siempre mejor? (ejemplo de clase).** No. Al crecer, el AUC en entrenamiento sube casi siempre, pero el AUC en prueba mejora solo hasta cierto punto. En el Titanic de la clase (variables sexo, edad y clase), con `max_depth` de 1 a 5 el AUC de entrenamiento fue $0.771$, $0.821$, $0.863$, $0.884$ y $0.900$, y el árbol sin límite (107 hojas) llegó a $0.958$. En prueba, el mejor valor apareció con `max_depth = 3` ($0.833$); con más profundidad no se recuperó ($0.793$ y $0.804$) y el árbol completo cayó a $0.768$: **más complejidad puede mejorar el entrenamiento y empeorar la prueba**. Los hiperparámetros que se suelen ajustar son `max_depth` (profundidad máxima), `min_samples_split` (mínimo de observaciones para dividir un nodo), `min_samples_leaf` (mínimo permitido en una hoja), `max_leaf_nodes` (límite de hojas) y `ccp_alpha` (poda). La proporción de sobrevivientes de entrenamiento que cayó en una hoja es la **probabilidad estimada** para los pasajeros nuevos que lleguen a ella.
@@ -1034,6 +1036,8 @@ Como $E(y \mid X) = P(y=1 \mid X)$, el valor predicho $\hat{y}$ se interpreta co
 
 El LPM se usa a veces en econometría por su simplicidad, pero para predecir o para probabilidades extremas se prefieren los modelos siguientes.
 
+*Ejemplo de clase (Titanic):* si se codifica Survived como $0$ (no sobrevivió) y $1$ (sobrevivió) y se ajusta una recta, las predicciones de tres pasajeros pueden ser $-0.20$, $0.67$ y $1.12$: la recta se sale de $[0,1]$ y dos de esos valores no pueden ser probabilidades. Es el problema que resuelve la función logística de 5.2.
+
 ### 5.2 Regresión logística
 
 **Idea:** en vez de modelar la probabilidad con una recta, se pasa la combinación lineal $z = \beta_0 + \beta_1 X_1 + \dots + \beta_k X_k$ por una función en forma de "S" que **siempre devuelve valores entre 0 y 1**: la **función logística**.
@@ -1088,6 +1092,8 @@ Los coeficientes no se calculan con una fórmula cerrada como OLS, sino por **m�
 **Cómo leer la curva ROC.** Cada punto de la curva corresponde a un **umbral** distinto: el eje vertical es la tasa de verdaderos positivos (recall) y el horizontal la tasa de falsos positivos $= 1-\text{especificidad}$. La diagonal representa el azar (un clasificador sin capacidad de discriminar); cuanto más cerca de la esquina superior izquierda, mejor discrimina el modelo. La ROC mira **todos** los umbrales a la vez; el AUC resume qué tan bien el modelo distingue entre quienes tienen el evento y quienes no. Mover el umbral no cambia el modelo ni su AUC: solo recorre la curva (Módulo 4.3).
 
 #### Un caso completo: el Titanic de la clase
+**Los datos.** El archivo train.csv reúne 891 pasajeros y 12 variables. La variable objetivo $Y$ es Survived (0 = no sobrevivió, 549 pasajeros; 1 = sobrevivió, 342) y las variables explicativas $X$ incluyen Pclass (clase), Sex, Age, SibSp, Parch, Fare y Embarked. Es **aprendizaje supervisado**: el algoritmo aprende patrones de casos pasados en los que se conoce el resultado y los aplica a pasajeros nuevos. Y es un problema de **clasificación**, no de regresión: se predice una categoría (sobrevive o no), no un número. En entrenamiento sobrevivió el $75.1\,\%$ de las mujeres (163 de 217) y solo el $18.7\,\%$ de los hombres (76 de 406).
+
 *Ejemplo de clase (Titanic, Kaggle).* Se parte `train.csv` (891 pasajeros) en 70 % entrenamiento (623) y 30 % prueba (268), estratificando por `Survived`. Con **una sola variable** (`Female`), el modelo estimado fue $\text{logit}(p) = -1.468 + 2.573\cdot\text{Female}$. Para una mujer: $z = -1.468 + 2.573 = 1.105$ y $p = 1/(1+e^{-1.105}) \approx 0.751$, coherente con la tasa observada en entrenamiento (163 de 217 mujeres, 75.1 %).
 
 Con **tres variables** (`Female`, `Age` y `Pclass` como categórica, con la 1.ª clase de referencia) el modelo es $z = 1.4666 + 2.6100\,\text{Female} - 0.0439\,\text{Age} - 1.3946\,\text{Pclass}_2 - 2.5846\,\text{Pclass}_3$:
@@ -1100,6 +1106,10 @@ Con **tres variables** (`Female`, `Age` y `Pclass` como categórica, con la 1.ª
 | `Pclass` = 3 (vs. 1) | $-2.5846$ | $0.08$ | viajar en 3.ª clase multiplica los odds por $0.08$ ($\approx 92\,\%$ menos) |
 
 Con el umbral $0.50$: una mujer de 23 años en 1.ª clase tiene $\hat{p} \approx 0.956$ (se predice "sobrevive"); un hombre de 30 años en 1.ª clase, $\hat{p} \approx 0.537$ ("sobrevive"); y un hombre de 30 años en 3.ª clase, $\hat{p} \approx 0.081$ ("no sobrevive"). El signo de cada $\beta$ indica hacia dónde empuja la probabilidad; el odds ratio dice cuántas veces se multiplican los odds.
+
+Los odds de tres pasajeros del Titanic ilustran la escala: con $\hat{p} = 0.80$, $\text{odds} = 0.80/0.20 = 4.0$ (sobrevivir es 4 veces más probable que no); con $\hat{p} = 0.50$, $\text{odds} = 1.0$ (igual de probable); con $\hat{p} = 0.20$, $\text{odds} = 0.25$ (no sobrevivir es 4 veces más probable).
+
+**De dónde salen los $\beta$ (ejemplo de clase).** Hay muchos $\beta$ posibles y hace falta un criterio: elegir los que mejor explican lo observado. Con 4 pasajeros (A sobrevivió, B no, C sobrevivió, D no), un modelo que asigna $\hat{p} = 0.90, 0.15, 0.80, 0.10$ explica mejor lo ocurrido que otro que asigna $0.60, 0.55, 0.55, 0.40$. La log-verosimilitud $\ell(\beta) = \sum_i [\,y_i \ln p_i + (1-y_i)\ln(1-p_i)\,]$ lo confirma: $\ell \approx -0.60$ para el primero y $\ell \approx -2.42$ para el segundo. Se eligen los $\beta$ que **maximizan** $\ell$ (en OLS, en cambio, se minimizan los errores al cuadrado).
 
 #### Seleccionar variables: forward, backward y stepwise
 Más variables no siempre dan un mejor modelo: pueden aportar información, pero también **redundancia** y complejidad innecesaria. Para decidir **qué variables conservar** se sigue un criterio sistemático (no se prueban combinaciones al azar):
