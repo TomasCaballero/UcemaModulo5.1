@@ -113,7 +113,7 @@ export const module0Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`**Solo 15.4 %**, aunque el test parezca "bueno". La razón: hay muchísimos más sanos que enfermos, y el 5 % de una población enorme de sanos genera más positivos que el 90 % de unos pocos enfermos. Esta intuición reaparece en los Módulos 4 y 5 (precisión y recall, Naive Bayes, LDA).`,
+        text: t`**Solo 15.4 %**, aunque el test parezca "bueno". La razón: hay muchísimos más sanos que enfermos, y el 5 % de una población enorme de sanos genera más positivos que el 90 % de unos pocos enfermos. Es el error típico de mirar solo el resultado del test e ignorar cuán frecuente es la enfermedad antes de testear: ese $P(A)$ de la fórmula pesa tanto como la calidad del test.`,
       },
       { type: 'simulation', simulationId: 'IN-03' },
       {
@@ -161,7 +161,7 @@ export const module0Sections: Section[] = [
       { type: 'subheading', text: 'Esperanza condicional' },
       {
         type: 'paragraph',
-        text: t`$E(Y \mid X)$ es el valor promedio de $Y$ **entre quienes tienen un valor dado de $X$**. *Ejemplo:* $E(\text{salario} \mid \text{15 años de estudio})$ es el salario promedio de quienes estudiaron 15 años. La regresión (Módulo 3) es, en esencia, una forma de estimar $E(Y \mid X)$.`,
+        text: t`$E(Y \mid X)$ es el valor promedio de $Y$ **entre quienes tienen un valor dado de $X$**. *Ejemplo:* $E(\text{salario} \mid \text{15 años de estudio})$ es el salario promedio de quienes estudiaron 15 años. Es un promedio, pero restringido al grupo que cumple una condición, igual que $P(A \mid B)$ restringe la probabilidad a los casos donde ocurrió $B$.`,
       },
     ],
   },
@@ -185,7 +185,7 @@ export const module0Sections: Section[] = [
       { type: 'paragraph', text: 'Se multiplican los componentes uno a uno y se suman:' },
       { type: 'formula', latex: t`\langle a, b \rangle = a_1 b_1 + a_2 b_2 + \dots + a_k b_k` },
       { type: 'paragraph', text: t`*Ejemplo:* $(1,2,3) \cdot (4,5,6) = 4 + 10 + 18 = 32$.` },
-      { type: 'subheading', text: 'Combinación lineal (la idea detrás de toda regresión)' },
+      { type: 'subheading', text: 'Combinación lineal (una suma con "pesos")' },
       {
         type: 'paragraph',
         text: t`Una **combinación lineal** de variables es una suma donde cada variable se multiplica por un número y se suma:`,
@@ -193,7 +193,7 @@ export const module0Sections: Section[] = [
       { type: 'formula', latex: t`\beta_0 + \beta_1 x_1 + \beta_2 x_2` },
       {
         type: 'paragraph',
-        text: t`Esto es exactamente un producto interno entre el vector de coeficientes y el vector de variables (con un 1 delante para el $\beta_0$). Por eso en los módulos siguientes verás escrito $X\beta$: es la forma compacta de decir "la combinación lineal de todas las variables de cada individuo".`,
+        text: t`Esto es exactamente un producto interno entre el vector de coeficientes y el vector de variables (con un 1 delante para el $\beta_0$). Por eso suele escribirse de forma compacta como $X\beta$: "la combinación lineal de todas las variables de cada individuo".`,
       },
       {
         type: 'paragraph',
@@ -206,12 +206,12 @@ export const module0Sections: Section[] = [
       { type: 'subheading', text: 'Dependencia lineal (colinealidad)' },
       {
         type: 'paragraph',
-        text: t`Si una columna de $X$ se puede obtener combinando otras columnas, la información es **redundante**. *Ejemplo:* si incluyes "edad en años" y "edad en meses", una columna es 12 veces la otra. Eso se llama **colinealidad perfecta** y rompe la regresión del Módulo 3: el modelo no puede decidir cuánto del efecto atribuir a cada columna.`,
+        text: t`Si una columna de $X$ se puede obtener combinando otras columnas, la información es **redundante**. *Ejemplo:* si incluyes "edad en años" y "edad en meses", una columna es 12 veces la otra. Eso se llama **colinealidad perfecta** y hace imposible repartir el efecto de forma única: cualquier combinación lineal que use las dos columnas puede reproducirse con solo una de ellas, así que no hay manera de decidir cuánto corresponde a cada columna.`,
       },
       { type: 'subheading', text: 'Hiperplano' },
       {
         type: 'paragraph',
-        text: t`En 2 dimensiones, una **recta** ($w_1 x_1 + w_2 x_2 + b = 0$) divide el plano en dos mitades. En 3 dimensiones lo hace un plano. En $k$ dimensiones, la misma idea se llama **hiperplano**: una superficie plana que parte el espacio en dos lados. Es la herramienta de separación de las SVM (Módulo 6).`,
+        text: t`En 2 dimensiones, una **recta** ($w_1 x_1 + w_2 x_2 + b = 0$) divide el plano en dos mitades. En 3 dimensiones lo hace un plano. En $k$ dimensiones, la misma idea se llama **hiperplano**: una superficie plana que parte el espacio en dos lados. Sirve para separar casos en dos grupos con una regla lineal, como en el ejemplo que sigue.`,
       },
       {
         type: 'extra',
@@ -220,7 +220,7 @@ export const module0Sections: Section[] = [
       { type: 'subheading', text: 'Matriz de covarianza (solo la idea)' },
       {
         type: 'paragraph',
-        text: t`Cuando tienes varias variables, se resume su variabilidad en una tabla cuadrada: en la **diagonal** están las varianzas de cada variable, y fuera de la diagonal las **covarianzas** (cuánto tienden a moverse juntas dos variables). La verás en LDA/QDA (Módulo 5) y PCA (Módulo 6).`,
+        text: t`Cuando tienes varias variables, se resume su variabilidad en una tabla cuadrada: en la **diagonal** están las varianzas de cada variable, y fuera de la diagonal las **covarianzas** (cuánto tienden a moverse juntas dos variables). Si dos variables tienen covarianza positiva (por ejemplo, años de estudio y salario), tienden a subir juntas; si es negativa, una sube cuando la otra baja.`,
       },
     ],
   },
@@ -260,7 +260,7 @@ export const module0Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`**El promedio es la solución de mínimos cuadrados** cuando el modelo es solo "una constante". La regresión OLS del Módulo 3 es la misma idea, pero con una recta (o hiperplano) en vez de una constante.`,
+        text: t`**El promedio es la solución de mínimos cuadrados** cuando el modelo es solo "una constante": un único número que resume todos los datos. La idea es general: elegir el resumen que minimice la suma de los errores al cuadrado.`,
       },
       {
         type: 'extra',
@@ -269,7 +269,7 @@ export const module0Sections: Section[] = [
       { type: 'subheading', text: 'Gradiente y descenso por gradiente' },
       {
         type: 'paragraph',
-        text: t`Cuando hay varios parámetros, se calcula una derivada para cada uno; el vector de todas ellas es el **gradiente**. Apunta hacia donde la función **sube más rápido**, así que para bajar se avanza en dirección contraria. Repetir esto paso a paso es el **descenso por gradiente**: la analogía es bajar una montaña con niebla, dando cada paso hacia donde el suelo desciende más. Es la base de Gradient Boosting (Módulo 6).`,
+        text: t`Cuando hay varios parámetros, se calcula una derivada para cada uno; el vector de todas ellas es el **gradiente**. Apunta hacia donde la función **sube más rápido**, así que para bajar se avanza en dirección contraria. Repetir esto paso a paso es el **descenso por gradiente**: la analogía es bajar una montaña con niebla, dando cada paso hacia donde el suelo desciende más. Es la forma habitual de buscar un mínimo cuando no se puede despejar con una fórmula.`,
       },
       {
         type: 'extra',
@@ -304,11 +304,11 @@ export const module0Sections: Section[] = [
       { type: 'formula', latex: t`\ln(a \cdot b) = \ln(a) + \ln(b)` },
       {
         type: 'paragraph',
-        text: t`Por eso se usa tanto: sumar es mucho más fácil que multiplicar (en particular para la máxima verosimilitud del Módulo 2 y la regresión logística del Módulo 5).`,
+        text: t`Por eso se usa tanto: sumar es mucho más fácil que multiplicar (y derivar una suma es mucho más simple que derivar un producto).`,
       },
       {
         type: 'paragraph',
-        text: t`*Ejemplo de uso real (anticipo del Módulo 5):* $e^{0.693} \approx 2$. Es decir, un coeficiente de $0.693$ en una escala logarítmica equivale a **multiplicar por 2** en la escala original.`,
+        text: t`*Ejemplo de uso:* $e^{0.693} \approx 2$. Es decir, sumar $0.693$ en la escala logarítmica equivale a **multiplicar por 2** en la escala original.`,
       },
       {
         type: 'extra',

@@ -343,7 +343,7 @@ export const module2Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`La máxima verosimilitud es el método con el que se estiman los modelos del Módulo 5 (logit, probit).`,
+        text: t`La máxima verosimilitud es un método general de estimación: sirve siempre que se pueda escribir la probabilidad de los datos en función de un parámetro, no solo para una moneda.`,
       },
     ],
   },

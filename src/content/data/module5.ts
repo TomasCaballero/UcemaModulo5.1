@@ -211,7 +211,7 @@ export const module5Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`El **criterio de selección** puede ser estadístico (p-valor, AIC o BIC) o predictivo (por ejemplo, el AUC promedio por validación cruzada). Lo que distingue a los métodos es el punto de partida y la flexibilidad para agregar o quitar variables. *Ejemplo de clase (Titanic):* con candidatas Female, Age, Pclass, Fare y FamilySize, forward con AUC por validación cruzada de 5 folds incorporó primero Female (AUC CV $0.7708$), luego Pclass ($0.8333$) y luego Age ($0.8466$); Fare y FamilySize quedaron fuera. **Seleccionar variables no es lo mismo que regularizar:** seleccionar decide cuáles se conservan; regularizar cambia cómo se estiman los coeficientes de las que se conservan.`,
+        text: t`El **criterio de selección** puede ser estadístico (p-valor, AIC o BIC) o predictivo (por ejemplo, el AUC promedio por validación cruzada: se divide la muestra en partes y cada parte se evalúa con un modelo ajustado con las demás). Lo que distingue a los métodos es el punto de partida y la flexibilidad para agregar o quitar variables. *Ejemplo de clase (Titanic):* con candidatas Female, Age, Pclass, Fare y FamilySize, forward con AUC por validación cruzada de 5 folds incorporó primero Female (AUC CV $0.7708$), luego Pclass ($0.8333$) y luego Age ($0.8466$); Fare y FamilySize quedaron fuera. **Seleccionar variables no es lo mismo que regularizar:** seleccionar decide cuáles se conservan; regularizar cambia cómo se estiman los coeficientes de las que se conservan.`,
       },
       { type: 'miniCheck', questionIds: ['m5-q15'] },
       { type: 'subheading', text: 'Regularización en la regresión logística: L1, L2 y el parámetro C' },
@@ -232,7 +232,7 @@ export const module5Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`*Ejemplo de clase (Titanic, Female, Age y Pclass numérica, L2 con $C=1$):* los coeficientes pasaron de $2.646$, $-0.038$ y $-1.173$ a $2.511$, $-0.037$ y $-1.130$: las mismas variables, pero coeficientes algo más moderados. Es la misma idea de Ridge y Lasso del Módulo 6.4, con Log Loss en lugar de RSS.`,
+        text: t`*Ejemplo de clase (Titanic, Female, Age y Pclass numérica, L2 con $C=1$):* los coeficientes pasaron de $2.646$, $-0.038$ y $-1.173$ a $2.511$, $-0.037$ y $-1.130$: las mismas variables, pero coeficientes algo más moderados. Aquí la penalización se suma al Log Loss; en una regresión lineal se sumaría a la suma de residuos al cuadrado (RSS).`,
       },
       { type: 'miniCheck', questionIds: ['m5-q16'] },
       { type: 'subheading', text: 'Discriminar bien no es estimar buenas probabilidades: calibración y Hosmer–Lemeshow' },
@@ -369,7 +369,7 @@ export const module5Sections: Section[] = [
       { type: 'subheading', text: 'QDA: Análisis Discriminante Cuadrático' },
       {
         type: 'paragraph',
-        text: t`Igual que LDA, pero **cada clase tiene su propia matriz de covarianza** $\Sigma_k$. Las fronteras resultan **cuadráticas** (curvas). Es más flexible, pero **estima muchos más parámetros**. *Ejemplo:* con $p=50$ variables, la matriz de covarianza tiene $50\cdot51/2 = 1275$ parámetros; LDA estima una, y QDA con 3 clases estima $3\times1275 = 3825$. Es el trade-off sesgo-varianza del Módulo 6: **LDA** tiene más sesgo y menos varianza (mejor con pocos datos); **QDA**, menos sesgo y más varianza (mejor con muchos datos y covarianzas realmente distintas).`,
+        text: t`Igual que LDA, pero **cada clase tiene su propia matriz de covarianza** $\Sigma_k$. Las fronteras resultan **cuadráticas** (curvas). Es más flexible, pero **estima muchos más parámetros**. *Ejemplo:* con $p=50$ variables, la matriz de covarianza tiene $50\cdot51/2 = 1275$ parámetros; LDA estima una, y QDA con 3 clases estima $3\times1275 = 3825$. Es un compromiso entre rigidez y flexibilidad (sesgo frente a varianza): **LDA** tiene más sesgo y menos varianza (mejor con pocos datos); **QDA**, menos sesgo y más varianza (mejor con muchos datos y covarianzas realmente distintas).`,
       },
       { type: 'subheading', text: 'Naive Bayes' },
       {

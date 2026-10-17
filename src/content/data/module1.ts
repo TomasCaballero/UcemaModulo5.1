@@ -94,7 +94,7 @@ export const module1Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`**Aplicación:** si estudias un posgrado a la vez que trabajas, vas a vivir mesetas (semanas en que parece que no entiendes nada de regresión logística, por ejemplo). Eso es normal. Lo que más ayuda es la **constancia**, más que la intensidad de un día aislado.`,
+        text: t`**Aplicación:** si estudias un posgrado a la vez que trabajas, vas a vivir mesetas (semanas en que parece que no entiendes nada de probabilidad condicional, por ejemplo). Eso es normal. Lo que más ayuda es la **constancia**, más que la intensidad de un día aislado.`,
       },
       {
         type: 'extra',
@@ -187,7 +187,7 @@ export const module1Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`**Idea general (para todo el curso):** agregar **redundancia estructurada** permite detectar y corregir errores. Vas a volver a ver esta idea de "redundancia útil" en conceptos como regularización y ensambles.`,
+        text: t`**Idea general (para todo el curso):** agregar **redundancia estructurada** permite detectar y corregir errores. Conviene retener esta idea de "redundancia útil": repetir con estructura no es desperdicio, es lo que da capacidad de corregir.`,
       },
       {
         type: 'extra',
@@ -221,7 +221,7 @@ export const module1Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`**La red de pescar de Eddington.** Un científico pesca con una red de malla de 5 cm y concluye que "no existen peces más pequeños de 5 cm". Moraleja: **nuestras herramientas de medición determinan lo que podemos ver**. Un modelo o un muestreo solo detecta los patrones para los que fue diseñado. Es una versión del *sesgo de selección*: si la muestra o el instrumento no son representativos de lo que se quiere estudiar (ver Módulo 2.1), las conclusiones salen distorsionadas.`,
+        text: t`**La red de pescar de Eddington.** Un científico pesca con una red de malla de 5 cm y concluye que "no existen peces más pequeños de 5 cm". Moraleja: **nuestras herramientas de medición determinan lo que podemos ver**. Un modelo o un muestreo solo detecta los patrones para los que fue diseñado. Es una versión del *sesgo de selección*: si la muestra o el instrumento no son representativos de lo que se quiere estudiar, las conclusiones salen distorsionadas.`,
       },
       {
         type: 'extra',

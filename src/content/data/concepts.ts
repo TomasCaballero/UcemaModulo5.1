@@ -69,10 +69,11 @@ export interface Dependency {
 
 /**
  * Dependencias entre secciones. Criterio: una sección depende de otra cuando la guía la remite
- * ("ver Módulo 0.4", "(3.6)"), o cuando una sección anticipa un tema que otra desarrolla (el 0.5
- * anuncia la regresión logística, así que el 5.2 depende de él). No se incluyen las remisiones
- * hacia adelante. La única dependencia que no sale de una remisión de la guía es 3.3 → 2.2, que
- * pide el PRD (AC-15): OLS usa las medidas descriptivas.
+ * ("ver Módulo 0.4", "(3.6)"), o cuando una sección usa una herramienta que otra enseña (el 5.2
+ * trabaja con logaritmos, así que depende del 0.5). Siempre apuntan de lo nuevo a lo previo: el
+ * texto del curso no remite hacia adelante (lo vigila verify/forward-references.verify.ts). La
+ * única dependencia que no sale de una remisión de la guía es 3.3 → 2.2, que pide el PRD
+ * (AC-15): OLS usa las medidas descriptivas.
  */
 export const dependencies: Dependency[] = [
   { from: '2.6', to: '0.5' },

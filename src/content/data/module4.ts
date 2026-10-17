@@ -66,7 +66,7 @@ export const module4Sections: Section[] = [
           t`**Limpieza**: tratar duplicados, errores, valores atípicos y faltantes (Módulo 2.3).`,
           t`**Agregación**: combinar registros en uno solo (ventas por día en lugar de por ticket); reduce volumen y suaviza el ruido.`,
           t`**Muestreo**: trabajar con un subconjunto representativo cuando los datos completos son demasiados. Debe ser aleatorio (o estratificado) para que la muestra conserve la composición de la población.`,
-          t`**Reducción de dimensionalidad**: la **dimensión** es el número de atributos. Con muchos atributos, los datos se vuelven "ralos": hay poquísimos registros por cada región del espacio y las distancias pierden sentido (la llamada **maldición de la dimensionalidad**). Se reduce eliminando atributos redundantes o irrelevantes, o transformándolos (técnicas como PCA, en el Módulo 6).`,
+          t`**Reducción de dimensionalidad**: la **dimensión** es el número de atributos. Con muchos atributos, los datos se vuelven "ralos": hay poquísimos registros por cada región del espacio y las distancias pierden sentido (la llamada **maldición de la dimensionalidad**). Se reduce eliminando atributos redundantes o irrelevantes, o combinándolos en un número menor de atributos nuevos.`,
           t`**Discretización**: convertir un atributo continuo en categorías. *Ejemplo:* edad → Joven (< 30), Adulto (30-59), Mayor (≥ 60).`,
           t`**Binarización y codificación *one-hot***: convertir una categoría en columnas 0/1. *Ejemplo:* el atributo "color" con valores {rojo, azul, verde} pasa a tres columnas "es_rojo", "es_azul", "es_verde", donde solo una vale 1. Muchos algoritmos exigen números, y asignar 1, 2, 3 a categorías sugeriría un orden que no existe.`,
           t`**Escalado de atributos**: poner variables en escalas comparables, importante en métodos basados en distancias.`,
@@ -107,7 +107,7 @@ export const module4Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`Cuando un modelo rinde muy bien en entrenamiento y mal en prueba, hay **sobreajuste** (*overfitting*): aprendió el ruido en lugar del patrón. Este tema se formaliza en el Módulo 6.`,
+        text: t`Cuando un modelo rinde muy bien en entrenamiento y mal en prueba, hay **sobreajuste** (*overfitting*): aprendió el ruido en lugar del patrón.`,
       },
       {
         type: 'paragraph',
@@ -265,7 +265,7 @@ export const module4Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`**No existe un umbral universalmente óptimo:** la elección es una decisión posterior al modelo y depende del **costo de cada error**. Si un falso negativo es muy caro (medicina: dejar pasar a un paciente enfermo), conviene un umbral más bajo para ganar recall. Si lo caro es el falso positivo (fraude: bloquear clientes legítimos), conviene uno más alto para ganar precisión y especificidad; en riesgo crediticio el corte equilibra la mora esperada con el negocio aprobado. El mejor punto de corte no es el que maximiza una métrica por definición, sino el que mejor representa el objetivo y el costo de los errores. **Buena práctica:** elegirlo con entrenamiento y validación (o validación cruzada) y reservar la **prueba** para la evaluación final.`,
+        text: t`**No existe un umbral universalmente óptimo:** la elección es una decisión posterior al modelo y depende del **costo de cada error**. Si un falso negativo es muy caro (medicina: dejar pasar a un paciente enfermo), conviene un umbral más bajo para ganar recall. Si lo caro es el falso positivo (fraude: bloquear clientes legítimos), conviene uno más alto para ganar precisión y especificidad; en riesgo crediticio el corte equilibra la mora esperada con el negocio aprobado. El mejor punto de corte no es el que maximiza una métrica por definición, sino el que mejor representa el objetivo y el costo de los errores. **Buena práctica:** elegirlo con entrenamiento y validación (o repitiendo la validación sobre distintas particiones de los datos) y reservar la **prueba** para la evaluación final.`,
       },
       { type: 'miniCheck', questionIds: ['m4-q15'] },
       {
@@ -365,7 +365,7 @@ export const module4Sections: Section[] = [
       {
         type: 'list',
         items: [
-          t`**Basados en prototipos** (como **K-Means**, Módulo 6.7): cada grupo se representa por un "centro", y cada punto va al centro más cercano. Funcionan bien con grupos compactos y redondeados, y exigen decidir de antemano **cuántos** grupos hay.`,
+          t`**Basados en prototipos** (como **K-Means**): cada grupo se representa por un "centro", y cada punto va al centro más cercano. Funcionan bien con grupos compactos y redondeados, y exigen decidir de antemano **cuántos** grupos hay.`,
           t`**Basados en densidad** (**DBSCAN**): un grupo es una **región continua de alta densidad** rodeada de regiones de baja densidad.`,
         ],
       },

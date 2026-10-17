@@ -83,11 +83,11 @@ export const module0Questions: Question[] = [
     moduleId: 0,
     guideQuestionRef: 'M0-Q7',
     sectionId: '0.3',
-    prompt: 'Si un conjunto de datos tiene las columnas "peso en kg" y "peso en gramos", ¿qué problema aparece al hacer una regresión?',
+    prompt: 'Si un conjunto de datos tiene las columnas "peso en kg" y "peso en gramos", ¿qué problema aparece al usar ambas para predecir con una combinación lineal?',
     options: [
       'Colinealidad perfecta: una columna es exactamente 1000 veces la otra y el modelo no puede separar sus efectos',
       'Sesgo de selección, porque se miden las mismas personas dos veces',
-      'Heterocedasticidad, porque los gramos tienen números más grandes',
+      'Un error de redondeo, porque los gramos tienen números más grandes',
       'Ningún problema, porque más variables siempre mejoran el ajuste',
     ],
     correctIndex: 0,

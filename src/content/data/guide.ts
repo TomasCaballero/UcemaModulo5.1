@@ -92,7 +92,7 @@ export const usageGuide = {
   intro:
     'Esta guía está pensada para alguien que parte de **conocimientos previos mínimos** (aritmética y álgebra de secundaria). Tiene tres reglas de diseño:',
   rules: [
-    '**Cada término se explica antes de usarse.** Cuando por necesidad aparece antes de su explicación (por ejemplo, un anticipo en el Módulo 0), se indica el módulo donde se desarrolla.',
+    '**Cada término se explica antes de usarse.** Cada módulo se apoya solo en los anteriores: nada de lo que se explica más adelante se da por sabido. Cuando un tema retoma algo ya visto, te dice dónde.',
     '**Cada idea tiene un ejemplo con números**, para que puedas rehacer la cuenta a mano.',
     '**Cada módulo termina con preguntas de autoevaluación** y sus respuestas. Intenta responder *antes* de mirar las respuestas: eso es lo que te protege de creer que sabes algo que no sabes (ver Módulo 1).',
   ] satisfies RichText[],
