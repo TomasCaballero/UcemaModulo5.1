@@ -49,6 +49,7 @@ describe('índice de preguntas', () => {
   it('consulta por id y por módulo', () => {
     expect(courseIndex.getQuestion('m2-q01')?.moduleId).toBe(2)
     expect(courseIndex.getQuestion('no-existe')).toBeUndefined()
-    expect(courseIndex.questionsOf(5)).toEqual([])
+    expect(courseIndex.questionsOf(5).length).toBeGreaterThanOrEqual(12)
+    expect(courseIndex.questionsOf(5).every((q) => q.moduleId === 5)).toBe(true)
   })
 })

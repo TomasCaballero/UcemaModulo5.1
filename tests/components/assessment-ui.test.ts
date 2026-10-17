@@ -3,6 +3,8 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createMemoryHistory } from 'vue-router'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import App from '@/App.vue'
+import { courseIndex } from '@/content'
+import type { ModuleId } from '@/content/types'
 import { createAppRouter } from '@/router'
 import { provideServices } from '@/services'
 import { useAttemptsStore } from '@/stores/attempts'
@@ -165,11 +167,13 @@ describe('módulo y acceso a la autoevaluación', () => {
     ])
   })
 
-  it('un módulo sin preguntas no ofrece evaluación y su ruta avisa', async () => {
-    const module = await openApp('/modulo/5')
-    expect(module.text()).not.toContain('Hacer la autoevaluación')
-    const assessment = await openApp('/modulo/5/evaluacion')
-    expect(assessment.text()).toContain('todavía no tiene preguntas cargadas')
+  it('todos los módulos ofrecen su autoevaluación con la cantidad de preguntas del banco', async () => {
+    for (const moduleId of [0, 1, 3, 4, 5, 6, 7]) {
+      const module = await openApp(`/modulo/${moduleId}`)
+      expect(module.text(), `Módulo ${moduleId}`).toContain(
+        `Hacer la autoevaluación (${courseIndex.questionsOf(moduleId as ModuleId).length} preguntas)`,
+      )
+    }
   })
 
   it('las secciones enlazan a la autoevaluación desde el índice', async () => {

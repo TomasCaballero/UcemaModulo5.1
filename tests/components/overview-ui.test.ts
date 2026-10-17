@@ -76,7 +76,7 @@ describe('cuadro síntesis', () => {
     expect(interval?.find('a').attributes('href')).toBe('/seccion/2.6')
     const causal = wrapper.findAll('.errors li')[0]
     expect(causal?.find('a').attributes('href')).toBe('/seccion/3.2')
-    expect(causal?.text()).toContain('(3.2)')
+    expect(causal?.find('a').text()).toContain('3.2')
     const mixed = wrapper.findAll('.errors li')[5]
     expect(mixed?.findAll('a').map((a) => a.attributes('href'))).toEqual(['/seccion/3.4', '/seccion/3.7'])
   })

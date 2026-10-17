@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { courseContent, courseIndex } from '@/content'
+import { sectionCatalog } from '@/content/data/concepts'
 import { findUnresolvedReferences } from '@/content/references'
 import type { CourseContent } from '@/content/types'
 import { validateContent } from '@/content/validate'
@@ -10,8 +11,12 @@ describe('contenido cargado', () => {
     expect(validateContent(courseContent)).toEqual([])
   })
 
-  it('tiene las secciones 2.1 a 2.7 en orden', () => {
-    expect(courseContent.sections.map((s) => s.id)).toEqual(['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7'])
+  it('tiene las 49 secciones del catálogo más el anexo opcional 1.7, en orden', () => {
+    const ids = courseContent.sections.map((s) => s.id)
+    expect(ids).toHaveLength(50)
+    expect(ids.filter((id) => id.startsWith('2.'))).toEqual(['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7'])
+    expect(courseContent.sections.filter((s) => s.optional).map((s) => s.id)).toEqual(['1.7'])
+    expect(ids.filter((id) => id !== '1.7')).toEqual(sectionCatalog.map((entry) => entry.id))
   })
 
   it('consulta secciones por id', () => {
@@ -26,13 +31,15 @@ describe('contenido cargado', () => {
     for (const type of used) expect(blockComponents[type], `bloque "${type}"`).toBeDefined()
   })
 
-  it('las referencias pendientes apuntan solo a módulos que todavía no se cargaron', () => {
-    const pending = findUnresolvedReferences(courseContent)
+  it('con los 8 módulos cargados no queda ninguna referencia sin resolver', () => {
+    expect(findUnresolvedReferences(courseContent)).toEqual([])
+  })
+
+  it('las referencias a módulos no cargados quedan pendientes', () => {
+    const upToModule2 = { ...courseContent, sections: courseContent.sections.filter((s) => s.moduleId >= 2) }
+    const pending = findUnresolvedReferences(upToModule2)
     expect(pending).toContain('2.6 → 0.5')
-    for (const reference of pending) {
-      const target = reference.split('→')[1]?.trim() ?? ''
-      expect(target.startsWith('2.'), reference).toBe(false) // el Módulo 2 sí está completo
-    }
+    for (const reference of pending) expect(reference.split('→')[1]?.trim().startsWith('2.'), reference).toBe(false)
   })
 })
 

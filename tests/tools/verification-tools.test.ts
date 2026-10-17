@@ -69,7 +69,7 @@ describe('RNF-17: equivalencia de encabezados', () => {
   it('la guía real tiene 81 encabezados y ninguno falta entre los módulos cargados', () => {
     expect(headings).toHaveLength(81)
     expect(summarize(checks).missing).toBe(0)
-    expect(summarize(checks)).toMatchObject({ covered: 24, pending: 57 })
+    expect(summarize(checks)).toMatchObject({ covered: 81, pending: 0 }) // curso completo: los 8 módulos
   })
 
   it('reconoce cada tipo de encabezado cubierto', () => {
@@ -87,9 +87,18 @@ describe('RNF-17: equivalencia de encabezados', () => {
   })
 
   it('lo de módulos sin cargar queda pendiente, no como faltante', () => {
-    expect(byHeading('3.3 Regresión lineal simple y mínimos cuadrados ordinarios (OLS)')?.status).toBe('pending')
-    expect(byHeading('Anexo opcional: muestreo de Nyquist-Shannon y la red de Eddington')?.status).toBe('pending')
-    expect(byHeading('Respuestas del Módulo 5')?.status).toBe('pending')
+    const soloModulo2: CourseContent = {
+      ...courseContent,
+      modules: courseContent.modules.filter((m) => m.id === 2),
+      sections: courseContent.sections.filter((s) => s.moduleId === 2),
+      questions: courseContent.questions.filter((q) => q.moduleId === 2),
+    }
+    const partial = checkHeadings(guide, headings, soloModulo2)
+    const status = (text: string) => partial.find((c) => c.heading === text)?.status
+    expect(status('3.3 Regresión lineal simple y mínimos cuadrados ordinarios (OLS)')).toBe('pending')
+    expect(status('Anexo opcional: muestreo de Nyquist-Shannon y la red de Eddington')).toBe('pending')
+    expect(status('Respuestas del Módulo 5')).toBe('pending')
+    expect(status('2.4 Distribuciones de probabilidad')).toBe('covered')
   })
 
   const empty: CourseContent = { modules: [], sections: [], glossary: [], questions: [], simulations: [] }
@@ -159,9 +168,16 @@ describe('RNF-19 y RNF-20: trazabilidad', () => {
     ])
   })
 
-  it('el Módulo 2 está completo y el resto pendiente', () => {
+  it('con el curso completo, los 8 módulos cubren las 82 preguntas de la guía', () => {
     const traces = checkTraceability(PRD_QUESTION_COUNTS, courseContent)
     expect(traces.find((t) => t.moduleId === 2)).toMatchObject({ status: 'ok', guideCount: 10, mapped: 10, bankSize: 12 })
+    expect(traces.filter((t) => t.status !== 'ok').map((t) => `${t.moduleId}: ${t.detail}`)).toEqual([])
+    expect(traces.reduce((sum, t) => sum + t.mapped, 0)).toBe(82)
+  })
+
+  it('un módulo sin banco cargado queda pendiente', () => {
+    const soloModulo2: CourseContent = { ...courseContent, questions: courseContent.questions.filter((q) => q.moduleId === 2) }
+    const traces = checkTraceability(PRD_QUESTION_COUNTS, soloModulo2)
     expect(traces.filter((t) => t.status === 'pending').map((t) => t.moduleId)).toEqual([0, 1, 3, 4, 5, 6, 7])
   })
 

@@ -90,6 +90,7 @@ const searched = computed(() => query.value.trim().length > 0)
 .results__item a {
   display: inline-flex;
   align-items: center;
+  min-width: var(--touch-min);
   min-height: var(--touch-min);
 }
 

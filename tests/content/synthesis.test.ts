@@ -42,12 +42,16 @@ describe('cuadro síntesis (AC-13)', () => {
 describe('catálogo de secciones', () => {
   it('los títulos de las secciones cargadas coinciden con el catálogo', () => {
     for (const section of courseIndex.sectionIds().map((id) => courseIndex.getSection(id))) {
+      if (section?.optional) continue // los anexos opcionales no tienen número en el catálogo
       const entry = sectionCatalog.find((s) => s.id === section?.id)
       expect(richTextToPlain(section?.title ?? ''), section?.id).toBe(entry?.title)
     }
   })
 
-  it('todas las secciones cargadas están en el catálogo', () => {
-    for (const id of courseIndex.sectionIds()) expect(sectionCatalog.some((s) => s.id === id), id).toBe(true)
+  it('todas las secciones cargadas están en el catálogo, salvo los anexos opcionales', () => {
+    for (const id of courseIndex.sectionIds()) {
+      if (courseIndex.getSection(id)?.optional) continue
+      expect(sectionCatalog.some((s) => s.id === id), id).toBe(true)
+    }
   })
 })

@@ -27,5 +27,5 @@ test('tras la primera visita todo funciona sin conexión (AC-45)', async ({ page
   await page.getByRole('button', { name: 'Empezar' }).click()
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('Pregunta 1 de 12')
   await page.goto('/#/glosario')
-  await expect(page.locator('.glossary__entry')).toHaveCount(80)
+  await expect(page.locator('.glossary__entry')).toHaveCount(87)
 })

@@ -1,5 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { courseContent } from '@/content'
 import { DATA_KEY } from '@/logic/persistence/repository'
 import { provideServices } from '@/services'
 import { useProgressStore } from '@/stores/progress'
@@ -32,7 +33,8 @@ describe('progreso', () => {
     const store = useProgressStore()
     store.markSectionCompleted('2.1')
     store.markSectionCompleted('2.2')
-    expect(store.overall).toEqual({ completed: 2, total: 7, percent: 29 })
+    const total = courseContent.sections.length
+    expect(store.overall).toEqual({ completed: 2, total, percent: Math.round((2 / total) * 100) })
   })
 
   it('ignora secciones que no existen', () => {
@@ -72,7 +74,7 @@ describe('progreso', () => {
 
   it('"continuar" ignora una última sección que ya no existe en el curso', () => {
     const { storage } = installTestServices()
-    storage.set(DATA_KEY, JSON.stringify({ version: 1, progress: { completedSections: [], lastSectionId: '5.1' } }))
+    storage.set(DATA_KEY, JSON.stringify({ version: 1, progress: { completedSections: [], lastSectionId: '9.9' } }))
     expect(reopen().continueSection).toBeUndefined()
   })
 })
