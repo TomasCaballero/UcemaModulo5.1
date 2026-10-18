@@ -44,6 +44,17 @@ export const module6Sections: Section[] = [
         type: 'extra',
         text: t`Aprender con respuestas conocidas es como estudiar con un libro de ejercicios con soluciones al final (supervisado: ves la "etiqueta" correcta). Ordenar tu discoteca por "parecido" sin que nadie te diga las categorías es no supervisado: tú descubres los grupos. Y un ejemplo de MSE: si la temperatura real fue $(20, 22, 25)$ y el modelo predijo $(19, 24, 22)$, los errores son $1, -2, 3$ y el MSE es $(1+4+9)/3 \approx 4.67$.`,
       },
+      {
+        type: 'intuition',
+        title: 'Estudiar con las respuestas al final del libro, o descubrir los grupos solo',
+        text: t`**1. Con respuestas y sin respuestas.** Aprendizaje **supervisado** es estudiar con un libro de ejercicios que trae las soluciones al final: para cada caso tenés la respuesta correcta y aprendés la relación. Aprendizaje **no supervisado** es ordenar tu discoteca por "parecido" sin que nadie te diga las categorías: descubrís los grupos por tu cuenta. Si lo que predecís es un número, es regresión; si es una categoría, clasificación.
+
+**2. El error que no se puede evitar.** Aun el mejor modelo del mundo no puede explicar todo, porque siempre hay variación que depende de cosas que no están en los datos. Ese piso se llama **error irreducible**.
+
+**3. Cómo se mide el error.** El error cuadrático medio (MSE) es el promedio de los errores elevados al cuadrado. Con temperaturas reales de $(20, 22, 25)$ y predicciones de $(19, 24, 22)$, los errores son $1, -2, 3$ y el MSE es aproximadamente $4.67$.
+
+**4. La trampa del examen con las mismas preguntas.** Hay dos errores. El **de entrenamiento**, medido con los mismos datos con que se armó el modelo, casi siempre es optimista: es como el puntaje que sacás repitiendo los ejercicios que ya estudiaste. El **de prueba**, medido con datos nuevos, es el que realmente importa. Un modelo más flexible casi siempre mejora el primero, pero el segundo no necesariamente.`,
+      },
     ],
   },
   {
@@ -106,6 +117,17 @@ export const module6Sections: Section[] = [
         type: 'extra',
         text: t`El clásico del tiro al blanco. Un tirador con **sesgo alto y varianza baja** agrupa todos los dardos en el mismo lugar, pero lejos del centro. Uno con **sesgo bajo y varianza alta** acierta en promedio al centro, pero sus dardos quedan esparcidos. Y quien se aprende de memoria las respuestas de los exámenes de años anteriores tiene error de entrenamiento casi cero, pero se desorienta ante preguntas nuevas: sobreajuste.`,
       },
+      {
+        type: 'intuition',
+        title: 'La regla de madera, la cuerda de hule y el tiro al blanco',
+        text: t`**1. Dos formas de fallar.** Un modelo puede errar por ser **demasiado simple** (sesgo) o por ser **demasiado sensible a los datos que vio** (varianza). Es como el tiro al blanco. Un tirador con **sesgo alto y varianza baja** pone todos los dardos juntos pero lejos del centro: es consistente, pero consistentemente equivocado. Uno con **sesgo bajo y varianza alta** acierta en promedio al centro, pero sus dardos quedan desparramados.
+
+**2. La regla y la cuerda.** Un modelo de sesgo alto es una **regla de madera**: no se dobla, y si el terreno es curvo, no lo sigue (subajuste). Uno de varianza alta es una **cuerda de hule** muy flexible: se amolda a cada grano de polvo y pierde la forma general (sobreajuste).
+
+**3. El que memoriza.** Quien se aprende de memoria las respuestas de exámenes de años anteriores tiene error casi cero en esos ejercicios y se desorienta con una pregunta nueva. En el ejemplo de la guía, un polinomio de grado 9 pasa por todos los puntos de entrenamiento (error $0.0$) pero falla con datos nuevos (error $25.0$). El de grado 3 es el mejor equilibrio: error de prueba de $3.1$.
+
+**4. Lo que importa de verdad.** El objetivo no es bajar el error con el que entrenaste, sino encontrar el punto de equilibrio entre ser demasiado simple y demasiado flexible. La curva del error de prueba tiene forma de U, y el mejor modelo está en el fondo. Las secciones que siguen son herramientas para encontrar ese punto.`,
+      },
     ],
   },
   {
@@ -151,6 +173,17 @@ export const module6Sections: Section[] = [
       {
         type: 'extra',
         text: t`El bootstrap es sacar bolillas de una bolsa devolviéndolas cada vez. Con 10 bolillas numeradas, una en particular queda fuera de una muestra de 10 extracciones con probabilidad $(1-1/10)^{10} = 0.9^{10} \approx 0.349$, ya muy cerca del límite de 0.368.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Ensayar con un amigo distinto cada vez, y sacar bolillas devolviéndolas',
+        text: t`**1. No siempre hay datos de sobra.** Si no podés apartar un grupo de prueba, hay una salida: reutilizar los mismos datos de forma inteligente.
+
+**2. Validación cruzada: rotar al evaluador.** Ensayás una presentación frente a cinco amigos. Un día la hacés frente a cuatro y la evalúa el quinto. Al día siguiente rotás, hasta que los cinco hayan sido evaluadores una vez. Promediando los cinco comentarios te formás una idea más justa que con un solo oyente. Con datos es igual: se divide en $k$ partes, se entrena con $k-1$ y se evalúa con la que queda, y se repite $k$ veces. Con 100 datos y $k = 5$, cada ajuste usa 80 para entrenar y 20 para evaluar. Sirve especialmente para elegir los "diales" del modelo (los hiperparámetros, que se fijan antes de entrenar), probando varios valores y quedándose con el de menor error.
+
+**3. Bootstrap: sacar bolillas devolviéndolas.** Imaginá una bolsa con bolillas numeradas. Sacás una, anotás el número y **la devolvés**; así hasta tener tantas como la bolsa original. Algunas bolillas aparecen más de una vez y otras no aparecen. De los datos $\{1,2,3,4,5\}$ podría salir $\{2,2,4,5,1\}$. Así se simulan "otras muestras" a partir de una sola, para ver cuánto varía cualquier número que calcules.
+
+**4. Un dato curioso.** La chance de que un dato quede fuera de una muestra así tiende a $0.368$. Eso significa que cada muestra contiene en promedio cerca del 63 % de los datos distintos y deja afuera el 37 %. Esa parte que queda afuera se aprovecha después, en los ensambles.`,
       },
     ],
   },
@@ -237,6 +270,19 @@ export const module6Sections: Section[] = [
       {
         type: 'extra',
         text: t`Los talles de ropa son una "primera componente" casual: en vez de dar altura, peso y contorno por separado, el talle (S, M, L) resume en una sola dimensión lo que más varía entre las personas. Se pierde algo (dos personas del mismo talle pueden tener proporciones distintas), pero se conserva lo esencial con mucho menos información.`,
+      },
+      {
+        type: 'intuition',
+        title: 'La valija con límite de peso: aceptar un poco de sesgo para ganar estabilidad',
+        text: t`**1. El problema.** Cuando tenés muchísimas variables, incluso más que observaciones, la recta del módulo 3 se vuelve inestable o directamente no tiene una solución única. La idea de la regularización es **aceptar perder algo de precisión a cambio de ganar estabilidad**, castigando los pesos demasiado grandes.
+
+**2. La valija.** Armar una valija con límite de peso. **Lasso** es dejar cosas en casa: decidís qué no llevar (el peso queda exactamente en cero) y el resto pasa tal cual. **Ridge** es llevar un poco menos de cada cosa: todo viaja, pero más liviano. Lasso sirve para elegir variables y hacer un modelo más fácil de leer; Ridge sirve para estabilizar sin descartar nada.
+
+**3. El dial $\lambda$.** Controla qué tan estricto es el límite de peso. Con $\lambda = 0$ no hay castigo y se vuelve a la recta común. Con $\lambda$ muy grande, todos los pesos tienden a cero. Se elige probando valores con validación cruzada. Antes de aplicar estos métodos conviene poner todas las variables en la misma escala, porque el castigo depende de la escala de cada una.
+
+**4. PCA: un talle en lugar de tres medidas.** Es una técnica distinta, que no mira la respuesta. Los talles de ropa son una "primera componente" casual: en vez de dar altura, peso y contorno por separado, el talle (S, M, L) resume en una sola dimensión lo que más varía entre las personas. Se pierde algo, pero se conserva lo esencial con mucho menos información. PCA arma nuevas variables que ya no se repiten entre sí, ordenadas de mayor a menor variación. En el ejemplo, la primera de cuatro variables ya explica el 70 % y las dos primeras el 92.5 %, así que se puede trabajar con 2 en vez de 4.
+
+**5. Una advertencia.** Como PCA no mira lo que se quiere predecir, la variable que más varía no tiene por qué ser la más útil para predecir.`,
       },
     ],
   },
@@ -362,6 +408,21 @@ export const module6Sections: Section[] = [
         type: 'extra',
         text: t`Boosting es como preparar un examen con simulacros: tras cada simulacro revisas solo lo que fallaste y estudias eso, sin repasar de nuevo lo que ya sabías. Cada ronda corrige los errores de la anterior y el conocimiento final es la suma de todas esas correcciones pequeñas. Y la varianza de un promedio de 10 árboles con $\sigma^2=4$ y $\rho=0.2$ es $0.2\cdot4 + 0.8\cdot4/10 = 1.12$: más cerca de lo que permite la correlación que del ideal $0.4$.`,
       },
+      {
+        type: 'intuition',
+        title: 'El comité de médicos, el simulacro de examen y la sabiduría de la multitud',
+        text: t`**1. Muchos modelos mediocres que se corrigen entre sí.** Un solo árbol de decisión es inestable: si cambian un poco los datos, puede cambiar mucho. Pero muchos árboles juntos pueden dar una respuesta firme. Es la sabiduría de las multitudes: en una feria, ninguna persona acertó el peso de un buey, pero el promedio de todas estuvo muy cerca. Funciona porque los errores individuales, si son independientes, se compensan.
+
+**2. La condición oculta.** Si todos copian la respuesta del vecino, el promedio es tan malo como cada uno. Lo que hace falta son modelos **distintos entre sí**. Con 100 modelos de varianza $4$, si fueran independientes, el promedio tendría varianza de $0.04$. Si se parecen mucho (correlación de $0.5$), la varianza del promedio queda en $2.02$: casi no ayudó.
+
+**3. Bagging: muchos árboles en paralelo.** Se arman muchas muestras como en el truco de las bolillas, se entrena un árbol profundo en cada una y se combinan: promedio (para números) o voto (para categorías). Reduce la varianza. A cambio, ya no se puede leer un solo árbol. Cada árbol deja cerca del 37 % de los datos sin ver, y esos datos sirven para estimar el error de prueba sin necesidad de validación cruzada (estimación *out-of-bag*).
+
+**4. Bosque aleatorio: un comité con consultas distintas.** Si en un panel de médicos hay un especialista muy dominante, todos los diagnósticos se parecen. Si a cada médico solo se le permite consultar un grupo aleatorio de síntomas, las opiniones se diversifican y el voto es más robusto. Eso es un bosque: en cada pregunta de cada árbol, solo se mira una parte de las variables. Agregar más árboles no causa sobreajuste. En el ejemplo, los cinco árboles dieron un promedio de $0.220$, por debajo del umbral $0.50$: la predicción es "no sobrevive".
+
+**5. Boosting: el simulacro de examen.** Tras cada simulacro revisás solo lo que fallaste y estudiás eso, sin repasar lo que ya sabías. Cada ronda corrige los errores de la anterior, y el conocimiento final es la suma de todas esas correcciones pequeñas. Con datos, se entrenan árboles pequeños **en secuencia**, cada uno ajustándose a lo que el anterior no explicó, y se suma una fracción de cada uno. En la caricatura numérica, el error baja de $100$ a $90$ y luego a $72.9$: avanza de a pasos chicos a propósito.
+
+**6. Cuál usar.** El bosque trabaja en paralelo, con árboles profundos, y es difícil de arruinar. El boosting trabaja en secuencia, con árboles chicos, es más sensible a los ajustes y sí puede sobreajustar si pones demasiados árboles. Y en el ejemplo del Titanic, qué modelo sale "mejor" depende de la métrica que elijas.`,
+      },
     ],
   },
   {
@@ -425,6 +486,19 @@ export const module6Sections: Section[] = [
       {
         type: 'extra',
         text: t`Para ver el truco en la vida real: en una pista circular de patinaje, los patinadores "buenos" van en el centro y los "novatos" en un anillo alrededor. Ninguna recta separa los dos grupos sobre el mapa. Pero si en lugar de la posición usas la distancia al centro de la pista (una variable nueva), los dos grupos quedan de un lado y del otro de un umbral. Eso es lo que logra un kernel sin tener que construir la variable a mano.`,
+      },
+      {
+        type: 'intuition',
+        title: 'El pasillo más ancho entre dos cursos, y el truco de mirar desde otra altura',
+        text: t`**1. La mejor frontera es la que deja más espacio.** Imaginá un salón con alumnos de dos cursos que deben quedar en lados opuestos. En vez de trazar el pasillo en cualquier lugar, buscás el pasillo **más ancho posible** entre los dos grupos. Los alumnos que quedan pegados al borde del pasillo son los **vectores de soporte**: si alguien del fondo se cambia de silla, el pasillo no se mueve; si se mueve uno de los pegados al borde, sí.
+
+**2. Cuando los grupos se mezclan un poco.** En la vida real los grupos se solapan. Entonces se tolera que algunos queden dentro del pasillo o del lado equivocado, con una tolerancia que se regula. Más tolerancia: pasillo ancho, más puntos "violan", más sesgo y menos varianza. Menos tolerancia: pasillo angosto, ajuste ceñido, menos sesgo y más varianza.
+
+**3. Cuidado con el nombre $C$.** En el libro del curso, $C$ es un "presupuesto" de violaciones (más $C$ = más tolerancia). En muchas librerías es el peso de la penalización (más $C$ = menos tolerancia). Son opuestos: verificá siempre la definición de tu herramienta.
+
+**4. El truco de mirar desde otra altura.** Imaginá una pista circular de patinaje con los buenos en el centro y los novatos en un anillo alrededor. Ninguna recta los separa sobre el mapa. Pero si, en vez de la posición, usás la **distancia al centro** de la pista, los dos grupos quedan de un lado y del otro de un umbral. Eso es el truco del *kernel*: cambiar la forma de mirar los datos para que una frontera recta sirva. En la guía, el ejemplo es poner $x^2$: los puntos de la clase $+$ en $\pm 3$ pasan a $(\pm 3, 9)$ y los otros a alturas de $0$ y $1$, y la recta $x^2 = 5$ los separa.
+
+**5. Lo notable.** El algoritmo no necesita construir esas variables nuevas: solo necesita medir "qué tan parecidos" son dos puntos, y una función llamada kernel lo calcula directamente. Por eso funciona incluso en espacios enormes. El kernel radial mide similitud local: con $\gamma$ grande la influencia de cada punto es muy local y la frontera se vuelve irregular (sobreajuste); con $\gamma$ pequeño, queda suave.`,
       },
     ],
   },
@@ -513,6 +587,19 @@ export const module6Sections: Section[] = [
       {
         type: 'extra',
         text: t`Un dendrograma se parece a un árbol genealógico o a la clasificación de los seres vivos: primero se juntan los individuos más parecidos (dos gatos domésticos), luego esos grupos se unen con otros cercanos (felinos), y así hasta que todo queda en un solo árbol. Elegir dónde cortar es elegir cuántos grupos quieres: un corte bajo da muchos grupos muy parecidos por dentro; uno alto, pocos grupos amplios.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Estaciones de servicio y árboles genealógicos: dos maneras de agrupar',
+        text: t`**1. K-Means: ubicar estaciones de servicio.** Elegís cuántos grupos querés ($K$) y ubicás $K$ "estaciones" (centroides) en la ciudad de datos. Cada conductor va a la más cercana. Después movés cada estación al centro de los conductores que la usan, y repetís hasta que nadie cambie de estación. El centro de cada grupo es el promedio de sus puntos, y se usa el promedio porque, como viste en el módulo 0, es el valor que minimiza la suma de los cuadrados de las distancias.
+
+**2. Con números.** Con los puntos $1, 2, 4, 10, 11, 13$ y dos estaciones iniciales en $1$ y $10$, quedan los grupos $\{1,2,4\}$ y $\{10,11,13\}$, con centros en $2.33$ y $11.33$. Al reasignar no cambia nadie y termina.
+
+**3. Sus límites.** Hay que decidir cuántos grupos de antemano. Como el error siempre baja al sumar grupos, se mira el "codo": el punto donde la mejora se aplana. El resultado depende del arranque (se prueban varios), prefiere grupos compactos y redondeados, y es sensible a los valores raros y a la escala (conviene estandarizar). Con clientes de una verdulería, si el gasto está en miles de pesos y la frecuencia en visitas por mes, el gasto dominaría las distancias si no estandarizás.
+
+**4. Clustering jerárquico: un árbol genealógico.** No hace falta decidir cuántos grupos antes. Cada punto empieza solo, y se van juntando los dos grupos más cercanos, una y otra vez, hasta formar uno solo. El historial se dibuja como un árbol (dendrograma), y **cortarlo a cierta altura** es elegir cuántos grupos querés: un corte bajo da muchos grupos muy parecidos por dentro; uno alto, pocos y amplios.
+
+**5. ¿Cuán cerca están dos grupos?** Hay que elegir cómo medirlo. Con los mismos puntos de antes, la distancia entre $\{1,2,4\}$ y $\{10,11,13\}$ es $6$ si se mide entre los más cercanos, $12$ si es entre los más lejanos y $9$ si se promedian todos los pares. La elección del criterio puede cambiar el resultado.`,
       },
     ],
   },

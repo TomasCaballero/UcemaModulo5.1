@@ -49,6 +49,25 @@ export const module0Sections: Section[] = [
         type: 'extra',
         text: t`Ticket del supermercado: pagaste 120, 80 y 200 pesos por tres productos. Esa es tu lista $x = (120, 80, 200)$ con $n = 3$. La sumatoria $\sum x_i = 400$ es el total del ticket y $\bar{x} = 400/3 \approx 133.33$ es lo que costó un producto en promedio. Y si el pronóstico del clima dijo 19 °C y la temperatura real fue $y = 21$ °C, la predicción es $\hat{y} = 19$ y el error es $y - \hat{y} = 2$.`,
       },
+      {
+        type: 'intuition',
+        title: 'Los símbolos son etiquetas de un ticket de compras',
+        text: t`**1. Cada símbolo es una abreviatura.** Pensá en el ticket del supermercado. Cada renglón tiene un precio, y $x_i$ es solo una forma corta de decir "el precio que está en el lugar $i$ de la lista". Si la lista es $(4, 7, 9)$, entonces $x_1 = 4$, $x_2 = 7$ y $x_3 = 9$. La letra $n$ cuenta cuántos renglones hay: acá, $n = 3$.
+
+**2. Sumar y promediar.** El símbolo $\sum$ (sumatoria) es la instrucción "sumá todos los renglones": $4 + 7 + 9 = 20$. Y $\bar{x}$ ("x barra") es el promedio: el total repartido en partes iguales, $20/3 \approx 6.67$.
+
+**3. El sombrero es una adivinanza.** El pronóstico del clima dice una temperatura y después llega la real. Cuando una letra lleva sombrero, como $\hat{y}$, es lo que el modelo **dijo**, no lo que **pasó**. Si el valor real fue $y = 10$ y el modelo dijo $9.2$, entonces $\hat{y} = 9.2$. La diferencia entre las dos es el error.
+
+**4. Letras de lo que vemos y letras de lo que no vemos.** Una regla fácil para no perderte:
+Letra común ($x$, $y$): un dato que realmente anotamos.
+
+Letra griega ($\beta$, $\mu$): algo verdadero de la realidad que no podemos ver directamente y queremos averiguar.
+
+Letra griega con sombrero ($\hat{\beta}$): nuestra mejor suposición de esa cantidad escondida.
+
+
+Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla: casi siempre es una de estas ideas.`,
+      },
     ],
   },
   {
@@ -163,6 +182,27 @@ export const module0Sections: Section[] = [
         type: 'paragraph',
         text: t`$E(Y \mid X)$ es el valor promedio de $Y$ **entre quienes tienen un valor dado de $X$**. *Ejemplo:* $E(\text{salario} \mid \text{15 años de estudio})$ es el salario promedio de quienes estudiaron 15 años. Es un promedio, pero restringido al grupo que cumple una condición, igual que $P(A \mid B)$ restringe la probabilidad a los casos donde ocurrió $B$.`,
       },
+      {
+        type: 'intuition',
+        title: 'La probabilidad con monedas, dados y mil personas en una plaza',
+        text: t`**1. La probabilidad es una escala de 0 a 1.** El 0 significa "imposible" y el 1 significa "seguro". Si todos los resultados tienen la misma chance, alcanza con contar: casos que te sirven sobre casos posibles. En un dado, la chance de que salga par es $3/6 = 0.5$. Y lo que **no** ocurre es lo que falta para llegar a 1: si llover tiene chance $0.3$, no llover tiene $0.7$.
+
+**2. Independientes quiere decir que no se influyen.** Una moneda no se acuerda de lo que salió antes. Para pedir que pasen **las dos cosas**, se multiplican las chances: dos caras seguidas es $0.5 \times 0.5 = 0.25$. Se multiplica porque cada vez que se cumple la primera, solo una parte de esos casos cumple también la segunda.
+
+**3. Condicional quiere decir "ya sé algo".** $P(A \mid B)$ es la chance de $A$ **una vez que te enteraste** de que $B$ pasó. Es como achicar el mundo: ya no mirás todas las cartas de la baraja, sino solo las de oros, y adentro de ese grupo calculás la chance.
+
+**4. Bayes: mirar el test con mil personas.** Imaginá mil personas en una plaza. La enfermedad afecta al 1 %: son **10 enfermas** y **990 sanas**.
+De las 10 enfermas, el test detecta al 90 %: **9 dan positivo**.
+
+De las 990 sanas, el test se equivoca con el 5 %: unas **49.5 dan positivo**.
+
+
+Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/58.5 \approx 0.154$, es decir **15.4 %**. El test parece muy bueno, pero hay tantos sanos que sus pocos errores se juntan y superan a los aciertos. Por eso importa saber **qué tan frecuente es la enfermedad antes de testear**.
+
+**5. Esperanza y varianza.** La esperanza es el "promedio de largo plazo": si tirás un dado muchísimas veces, el promedio se acerca a $3.5$ aunque nunca salga ese número. Es el punto de equilibrio, como el centro de una balanza. La varianza mide qué tan **desparramados** están los resultados alrededor de ese centro. Se eleva al cuadrado para que los desvíos hacia arriba y hacia abajo no se cancelen entre sí.
+
+**6. Esperanza condicional.** Es un promedio, pero solo dentro de un grupo. El salario promedio de **quienes estudiaron 15 años** es el mismo tipo de idea que la probabilidad condicional: primero elegís el grupo y después calculás.`,
+      },
     ],
   },
   {
@@ -222,6 +262,21 @@ export const module0Sections: Section[] = [
         type: 'paragraph',
         text: t`Cuando tienes varias variables, se resume su variabilidad en una tabla cuadrada: en la **diagonal** están las varianzas de cada variable, y fuera de la diagonal las **covarianzas** (cuánto tienden a moverse juntas dos variables). Si dos variables tienen covarianza positiva (por ejemplo, años de estudio y salario), tienden a subir juntas; si es negativa, una sube cuando la otra baja.`,
       },
+      {
+        type: 'intuition',
+        title: 'Listas, planillas y recetas con precios: el álgebra lineal sin miedo',
+        text: t`**1. Vector = la ficha de una persona.** Una ficha con tres datos, por ejemplo $(2, 5, 1)$, es un vector: una lista ordenada de números. **Matriz = la planilla entera.** Si cada fila es una persona y cada columna es un dato (edad, años de estudio), tenés la matriz de datos $X$. Es, literalmente, una tabla de Excel.
+
+**2. Producto interno: multiplicar y sumar.** Se multiplica cada número de una lista por el que está en la misma posición de la otra y se suma todo: $(1,2,3) \cdot (4,5,6) = 4 + 10 + 18 = 32$. Es lo mismo que calcular una factura: cantidad por precio, renglón por renglón, y al final el total.
+
+**3. Combinación lineal: una receta con pesos.** Es una suma donde cada ingrediente se multiplica por un número que dice "cuánto pesa". Con $1000$ de base, $50$ por cada año de edad y $200$ por cada año de estudio, para una persona de 30 años con 12 de estudio queda $1000 + 50 \cdot 30 + 200 \cdot 12 = 4900$. Los números $\beta$ son los precios; el resultado es el total de la cuenta.
+
+**4. Colinealidad: pedir lo mismo dos veces.** Si la planilla tiene "edad en años" y "edad en meses", una columna es siempre 12 veces la otra. Es información repetida. Si el resultado final sube con la edad, no hay forma de saber cuánto se lo debemos a una columna y cuánto a la otra, porque se mueven exactamente juntas.
+
+**5. Hiperplano: una línea que parte en dos.** Una recta divide un dibujo plano en dos lados, un plano divide el espacio en dos lados y el hiperplano es lo mismo con más datos. Para decidir, alcanza con ver de qué lado cae cada persona. Es una regla del tipo "de este lado, sí; del otro, no".
+
+**6. Covarianza: quiénes se mueven juntos.** Es una tabla que anota si dos datos tienden a subir juntos (más años de estudio y más salario) o a moverse en sentidos opuestos (cuando uno sube, el otro baja).`,
+      },
     ],
   },
   {
@@ -274,6 +329,17 @@ export const module0Sections: Section[] = [
       {
         type: 'extra',
         text: t`Con la función de antes, $f(b) = (b-3)^2 + 1$, partimos de $b = 0$ y damos pasos de tamaño $0.25$ contra la derivada $2(b-3)$. Primer paso: la derivada vale $-6$, así que $b = 0 - 0.25\cdot(-6) = 1.5$. Segundo paso: la derivada vale $-3$ y $b = 1.5 - 0.25\cdot(-3) = 2.25$. Cada paso se acerca al mínimo en $b = 3$, y los pasos se achican porque la pendiente se aplana.`,
+      },
+      {
+        type: 'intuition',
+        title: 'La derivada es el velocímetro y el error es un valle',
+        text: t`**1. La derivada es la pendiente.** Imaginá que caminás por una cuesta. Si sube, la pendiente es positiva; si baja, negativa; y si el piso está plano, la pendiente es **cero**. Un lugar plano solo puede ser una cima o el fondo de un valle. La derivada es lo mismo que el velocímetro del auto: te dice cuánto cambia algo por cada pequeño paso que das.
+
+**2. Minimizar es buscar el fondo del valle.** En todo el curso vamos a querer que el error sea lo más chico posible. Si dibujás el error como un paisaje, el mejor punto es el fondo del valle, y ahí el suelo es plano. Por eso se busca el punto donde la derivada vale cero. En el ejemplo $f(b) = (b-3)^2 + 1$, el fondo está en $b = 3$, y ahí vale $1$.
+
+**3. Por qué el promedio es un buen resumen.** Si te piden un único número que represente a todos tus datos, y querés que quede lo más cerca posible de todos al mismo tiempo (midiendo las distancias al cuadrado), el que mejor funciona es el **promedio**. Es el punto de encuentro que deja al grupo menos incómodo. Por eso el promedio no es solo una costumbre: es la mejor respuesta a esa pregunta.
+
+**4. Bajar la montaña con niebla.** Cuando hay muchos números que ajustar no se puede despejar el fondo con una fórmula. Entonces se hace como alguien perdido en una montaña con niebla: no ve el valle, pero siente hacia dónde baja el suelo bajo los pies, y da un paso en esa dirección, y otro, y otro. Esa lista de pendientes (una por cada número a ajustar) se llama **gradiente**, y repetir los pasos es el **descenso por gradiente**. Cuanto más cerca del fondo, más plano está el suelo y más cortos son los pasos.`,
       },
     ],
   },

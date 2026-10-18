@@ -53,6 +53,19 @@ export const module4Sections: Section[] = [
         type: 'extra',
         text: t`Es como preparar una comida para invitados. Primero compras, lavas, pelas y cortas los ingredientes (preprocesamiento: casi siempre lo que más tiempo lleva). Después cocinas (minería de datos). Y al final pruebas el plato, ajustas la sal y decides si está listo para servir (postprocesamiento). Si omites la primera etapa, el mejor cocinero no salva la comida.`,
       },
+      {
+        type: 'intuition',
+        title: 'Cocinar con datos: comprar, preparar, cocinar y probar',
+        text: t`**1. No es "apretar un botón".** Sacar conocimiento de los datos es un proceso con tres etapas, y se parece mucho a preparar una comida para invitados.
+
+**Primero, preparar los ingredientes:** comprar, lavar, pelar y cortar. Con datos es limpiar, unir tablas, corregir errores y rellenar lo que falta. Casi siempre es lo que **más tiempo lleva**, y si se saltea, el mejor cocinero no salva la comida.
+
+**Segundo, cocinar:** aplicar los algoritmos que encuentran patrones. Es la parte que todos imaginan, pero es la más corta.
+
+**Tercero, probar y ajustar:** ver si el plato sirve. Con datos es interpretar los resultados y decidir si los patrones son útiles, nuevos y válidos.
+
+**2. Un ejemplo.** Un banco quiere detectar fraudes. Primero junta las tablas de transacciones y de clientes, y arregla errores. Después entrena un modelo. Al final revisa cuántos fraudes detecta y cuántas falsas alarmas genera, y se lo presenta al equipo de riesgo. Ninguna de las tres etapas sobra.`,
+      },
     ],
   },
   {
@@ -82,6 +95,17 @@ export const module4Sections: Section[] = [
       {
         type: 'extra',
         text: t`Si comparas dos personas por altura (en metros: 1.70 y 1.80) y peso (en kilos: 60 y 90), la diferencia de peso (30) aplasta a la de altura (0.10) al calcular distancias, solo por las unidades. Con min-max, si las alturas van de 1.50 a 2.00 y los pesos de 50 a 100, la altura 1.70 pasa a $(1.70-1.50)/0.50 = 0.4$ y el peso 60 a $(60-50)/50 = 0.2$: ahora ambas variables pesan parecido. Y para one-hot, el "estado civil" {soltero, casado, viudo} se vuelve tres columnas 0/1; si lo codificaras 1, 2, 3, el modelo creería que viudo "vale el triple" que soltero.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Dejar los datos listos para que cualquier algoritmo los entienda',
+        text: t`**1. Limpiar y simplificar.** Antes de nada se quitan duplicados, errores y faltantes. Después, si hay demasiado, se pueden juntar registros (ventas por día en vez de por ticket) o trabajar con una muestra bien elegida, aleatoria, para que conserve la composición del total.
+
+**2. Demasiadas columnas estorban.** Con muchísimos atributos, los datos quedan "ralos": hay muy pocos registros para cada rincón del espacio y las distancias pierden sentido. Es como buscar a una persona en una ciudad enorme con muy pocos datos de cada una. Por eso se reducen atributos eliminando los repetidos o inútiles, o combinándolos en menos.
+
+**3. Traducir a números sin inventar órdenes.** Muchos algoritmos solo entienden números. Si asignás 1, 2, 3 al estado civil (soltero, casado, viudo), el modelo creería que "viudo" vale el triple que "soltero". La solución es una columna de sí/no para cada categoría (*one-hot*): solo una vale 1. También se puede agrupar un número continuo en categorías: edad en Joven, Adulto o Mayor.
+
+**4. Poner todo en la misma escala.** Si comparás a dos personas por altura en metros (1.70 y 1.80) y por peso en kilos (60 y 90), la diferencia de peso (30) aplasta a la de altura (0.10) solo por las unidades. El escalado lo corrige para que ambas pesen parecido. Una forma (min-max) lleva todo a una escala de 0 a 1: un ingreso de 20 000 entre 10 000 y 50 000 pasa a $0.25$. Otra (estandarización) deja la media en 0 y la dispersión en 1.`,
       },
     ],
   },
@@ -272,6 +296,27 @@ export const module4Sections: Section[] = [
         type: 'extra',
         text: t`Un filtro de spam sobre 100 correos, de los cuales 20 son spam: detecta 15 ($VP=15$), deja pasar 5 ($FN=5$), marca por error 4 correos buenos ($FP=4$) y acierta 76 correos buenos ($VN=76$). Exactitud $=(15+76)/100 = 0.91$; precisión $=15/19 \approx 0.79$ (de lo que marcó como spam, el 79 % lo era); recall $=15/20 = 0.75$ (detectó tres cuartos del spam); $F_1 = 2\cdot15/(2\cdot15+4+5) \approx 0.77$. Aquí un falso positivo duele (perder un correo importante), así que se cuida la precisión.`,
       },
+      {
+        type: 'intuition',
+        title: 'Enseñarle a la máquina con ejemplos, y tomarle examen con preguntas que no vio',
+        text: t`**1. Aprender de ejemplos con respuesta.** Clasificar es asignar cada caso a una categoría que ya conocemos (¿paga el crédito o no?). Se aprende de casos pasados, cuya respuesta se sabe, y se aplica a casos nuevos.
+
+**2. No se evalúa con lo que ya estudió.** Si estudiás con los mismos ejercicios que después te toman, sacás 10 aunque hayas memorizado las respuestas, y te va mal con ejercicios nuevos. Por eso los datos se separan en un grupo de **entrenamiento** y un grupo de **prueba** que el modelo nunca vio. Cuando rinde muy bien en el primero y mal en el segundo, hay **sobreajuste**: aprendió el ruido en vez del patrón. Y si se separan los grupos, conviene que ambos mantengan la misma proporción de cada clase (partición estratificada). Además, cualquier ajuste que se aprende de los datos (como rellenar edades con la mediana) debe calcularse solo con el entrenamiento, para que información de la prueba no se "filtre".
+
+**3. Árbol de decisión: el juego de las veinte preguntas.** Para adivinar un animal, la primera pregunta eficiente no es "¿es un caniche?", sino "¿es un vertebrado?", porque separa el conjunto en grupos muy distintos. El árbol hace lo mismo: elige la pregunta que deja los grupos lo más **"puros"** posible, es decir, donde casi todos son de la misma clase. Las medidas de pureza (entropía y Gini) valen cero en un grupo puro. En el ejemplo de la guía, partir 10 clientes con 6 que pagan y 4 que no, en dos grupos, reduce la entropía de $0.971$ a $0.847$: una ganancia de aproximadamente $0.12$. Se prueban todas las preguntas y se queda con la mejor.
+
+**4. El caso del Titanic.** La mejor primera pregunta resultó ser "¿es mujer?", porque deja los dos grupos más puros que otras opciones. Para clasificar a un pasajero se sigue un único camino de preguntas hasta una hoja, y la predicción es la proporción de sobrevivientes del entrenamiento que cayó ahí.
+
+**5. Un árbol más grande no es mejor.** Si dejás que pregunte hasta tener una pregunta por registro, memoriza. En el ejemplo de clase, el rendimiento en entrenamiento sube siempre al agrandar el árbol, pero en prueba el mejor resultado aparece con profundidad 3 y después empeora. Se evita limitando la profundidad, exigiendo un mínimo de casos por hoja o podando ramas.
+
+**6. Cómo medir los aciertos y errores.** Hay cuatro tipos de respuesta: acertar enfermos (VP), acertar sanos (VN), decir "enfermo" a un sano (FP) y decir "sano" a un enfermo (FN). De ahí salen varias medidas, y cada una responde una pregunta distinta:
+
+**Exactitud:** ¿cuántas veces acerté en total? **Precisión:** de todos los que marqué como positivos, ¿cuántos lo eran? **Recall:** de todos los positivos reales, ¿a cuántos encontré? **Especificidad:** de todos los negativos reales, ¿a cuántos identifiqué bien?
+
+**7. Por qué la exactitud puede engañar.** Con 100 pacientes y 10 enfermos, un modelo que dice "nadie está enfermo" acierta 90 de 100 (exactitud de 90 %) pero no detecta a nadie (recall igual a 0). Cuando lo que buscás es raro, la exactitud es mala medida. En el ejemplo de la guía, la precisión baja ($0.31$) es el mismo fenómeno que viste con el test médico del módulo 0: cuando hay pocos positivos, hasta un buen test genera muchos falsos positivos en proporción.
+
+**8. Qué cuidar depende de qué cuesta más.** Si no detectar un cáncer es gravísimo, importa el recall. Si bloquear a un cliente legítimo es lo caro, importa la precisión. Y el **umbral** (qué tan seguro debe estar el modelo para decir "positivo") se elige según ese costo: subirlo lo vuelve más exigente, bajarlo lo vuelve más permisivo. Es una decisión posterior al modelo, no una propiedad del modelo.`,
+      },
     ],
   },
   {
@@ -350,6 +395,25 @@ export const module4Sections: Section[] = [
         type: 'paragraph',
         text: t`Con los conjuntos frecuentes se generan reglas y se filtran por confianza y lift. *Advertencia:* una regla describe **co-ocurrencia**, no causalidad: no implica que comprar pañales cause comprar cerveza.`,
       },
+      {
+        type: 'intuition',
+        title: 'Lo que se compra junto: cuando la confianza engaña',
+        text: t`**1. La pregunta del supermercado.** ¿Qué cosas suelen aparecer juntas en el mismo ticket? Eso es analizar "la cesta de la compra". Una regla como "pañales → cerveza" dice: quienes compran pañales suelen comprar también cerveza.
+
+**2. Tres medidas, con palabras de todos los días.**
+
+**Soporte:** qué tan frecuente es un combo. Si 3 de 5 tickets llevan pañales y cerveza, el soporte es $3/5 = 0.6$.
+
+**Confianza:** de los que compraron lo primero, ¿qué fracción compró también lo segundo? De 4 tickets con pañales, 3 llevan cerveza: $0.75$.
+
+**Lift:** compara esa confianza con lo que pasaría si las dos cosas no tuvieran nada que ver. Mayor que 1, hay asociación real; igual a 1, son independientes; menor que 1, se evitan entre sí.
+
+**3. Por qué la confianza sola engaña.** Si casi todos compran pan, cualquier regla que termine en "pan" va a tener confianza alta, sin aportar información: aunque el queso no tenga nada que ver con el pan, casi todos los que compran queso llevan pan simplemente porque el pan está en casi todos los carritos. El lift pone la confianza en contexto. En el ejemplo de la guía, "pan → leche" tiene confianza $0.75$ pero un lift de $0.94$, ligeramente por debajo de 1: no hay asociación real.
+
+**4. El truco para no revisar millones de combinaciones.** Con 1000 productos hay más de $2^{1000}$ combos posibles: es imposible mirarlos todos. El algoritmo Apriori usa una idea lógica: **si un combo es raro, cualquier combo más grande que lo incluya también lo es**. Si pocos compran pan y cerveza juntos, menos aún comprarán pan, cerveza y pañales. Entonces se avanza por niveles: primero productos sueltos, se descarta lo infrecuente y solo se arman combos con lo que sobrevivió.
+
+**5. Una advertencia.** Las reglas describen cosas que ocurren juntas, no que una cause la otra. Comprar pañales no hace comprar cerveza.`,
+      },
     ],
   },
   {
@@ -409,6 +473,23 @@ export const module4Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`**Ventajas:** encuentra grupos de **formas arbitrarias** (anillos, espirales), **no necesita fijar** el número de grupos y **separa el ruido** en lugar de forzarlo a pertenecer a un grupo. **Limitaciones:** es sensible a la elección de Eps y MinPts; tiene dificultades cuando los grupos tienen **densidades muy distintas**; y en dimensiones altas las distancias pierden significado.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Agrupar sin etiquetas: manchas de luces en un mapa nocturno',
+        text: t`**1. Sin respuestas conocidas.** Acá nadie te dice qué grupo es cuál: la máquina tiene que descubrir qué registros se parecen. Para eso necesita una forma de medir cercanía. La más común es la distancia en línea recta entre dos puntos: entre $(1,2)$ y $(4,6)$ es $5$.
+
+**2. Dos maneras de pensar un grupo.** Una es elegir un "centro" por grupo y mandar cada punto al más cercano (hay que decidir de antemano cuántos grupos hay). La otra, la de DBSCAN, mira **densidad**: un grupo es una región llena de puntos rodeada de zonas casi vacías.
+
+**3. El mapa nocturno.** Imaginá una región de noche vista desde el espacio. Las ciudades se ven como manchas densas de luces, separadas por oscuridad, y alguna casa aislada en el campo. Las manchas son los grupos; la casa suelta es el ruido. Y no necesitás saber cuántas ciudades hay para verlas.
+
+**4. Cómo decide DBSCAN, con dos perillas.** Una es el radio de "vecindad" (qué tan cerca es cerca) y la otra es la cantidad mínima de vecinos para considerar que una zona es densa. Con eso clasifica cada punto en uno de tres tipos:
+
+**Núcleo:** tiene suficientes vecinos a su alrededor, está en el centro de una zona densa. **Borde:** no tiene suficientes vecinos, pero está al alcance de un núcleo, en la frontera del grupo. **Ruido:** no es ninguno de los anteriores, está aislado.
+
+**5. Ejemplo.** Con los puntos de la guía, $1, 1.5, 2$ y $2.5$ son núcleo y forman un grupo. El $3.4$ solo está cerca de $2.5$: es borde de ese grupo. $8, 8.4$ y $9$ forman otro grupo. El $20$ no tiene a nadie cerca: es ruido.
+
+**6. Fortalezas y límites.** Encuentra grupos de cualquier forma, no necesita saber cuántos hay y deja el ruido afuera en lugar de forzarlo a un grupo. Pero es sensible a cómo elijas las dos perillas, le cuesta cuando los grupos tienen densidades muy distintas y, con muchísimas columnas, las distancias pierden significado.`,
       },
     ],
   },
