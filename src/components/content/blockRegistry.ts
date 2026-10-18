@@ -6,6 +6,7 @@ import AnalogyBlock from './AnalogyBlock.vue'
 import CalloutBlock from './CalloutBlock.vue'
 import ExtraExampleBlock from './ExtraExampleBlock.vue'
 import FormulaBlock from './FormulaBlock.vue'
+import IntuitionBlock from './IntuitionBlock.vue'
 import ListBlock from './ListBlock.vue'
 import ParagraphBlock from './ParagraphBlock.vue'
 import SubheadingBlock from './SubheadingBlock.vue'
@@ -24,6 +25,7 @@ export const blockComponents: Record<BlockType, Component> = {
   callout: CalloutBlock,
   analogy: AnalogyBlock,
   extra: ExtraExampleBlock,
+  intuition: IntuitionBlock,
   table: TableBlock,
   miniCheck: MiniCheckBlock,
   simulation: SimulationBlock,

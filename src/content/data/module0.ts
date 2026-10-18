@@ -311,8 +311,19 @@ export const module0Sections: Section[] = [
         text: t`*Ejemplo de uso:* $e^{0.693} \approx 2$. Es decir, sumar $0.693$ en la escala logarítmica equivale a **multiplicar por 2** en la escala original.`,
       },
       {
-        type: 'extra',
-        text: t`Con la tabla a mano: $\ln(8) = \ln(2 \cdot 4) = 0.693 + 1.386 = 2.079$, y efectivamente $e^{2.079} \approx 8$. Otro uso cotidiano: si una inversión crece 10 % por año, cada año se multiplica por 1.10 y $\ln(1.10) \approx 0.0953$. Para duplicarse hace falta $\ln(2)/\ln(1.10) = 0.693/0.0953 \approx 7.3$ años; es la razón de la "regla del 72" ($72/10 = 7.2$).`,
+        type: 'intuition',
+        title: 'El decodificador secreto, la máquina inversa y la alcancía mágica',
+        text: t`**1. El decodificador secreto (los logaritmos):** multiplicar a mano lleva tiempo, pero sumar es muy fácil. La tabla de logaritmos ($\ln$) funciona como una libreta de "códigos secretos" con una propiedad especial: *para multiplicar dos números, solo sumás sus códigos*.
+
+Por ejemplo, para calcular $2 \times 4 = 8$ buscás en la libreta el código del $2$ (es $0.693$) y el del $4$ (es $1.386$). En lugar de multiplicar, sumás los códigos: $0.693 + 1.386 = 2.079$. Después buscás de qué número es el código $2.079$ y la libreta te dice que es el **8**.
+
+**2. La máquina inversa ($e$):** la función $e^x$ deshace el código: si le das $2.079$, te devuelve el número original ($e^{2.079} \approx 8$).
+
+**3. La alcancía que crece sola (interés compuesto):** si tu dinero crece 10 % por año, cada año se multiplica por $1.10$. Para saber cuántos años tarda en **duplicarse**, la pregunta es: ¿cuántas veces seguidas hay que multiplicar por $1.10$ para llegar a $2$?
+
+Acá vuelven los códigos: el código de la meta (duplicar) es $\ln(2) \approx 0.693$ y el del paso anual es $\ln(1.10) \approx 0.0953$. Los pasos necesarios son la meta dividida por el paso: $0.693 / 0.0953 \approx 7.3$ años.
+
+**4. El atajo: la "regla del 72":** dividir decimales de memoria es incómodo. Con una tasa chica, $\ln(1+r) \approx r$, así que los años son aproximadamente $69.3$ dividido por la tasa en porcentaje. Se usa $72$ en lugar de $69.3$ porque se divide exacto por muchos números ($2, 3, 4, 6, 8, 9, 12$). Al 10 %: $72/10 = 7.2$ años, muy cerca del $7.3$ exacto.`,
       },
     ],
   },

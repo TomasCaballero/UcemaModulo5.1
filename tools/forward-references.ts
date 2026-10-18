@@ -94,6 +94,7 @@ function blockTexts(block: ContentBlock): string[] {
     case 'callout':
     case 'analogy':
     case 'extra':
+    case 'intuition':
       return [block.text]
     case 'list':
       return block.items

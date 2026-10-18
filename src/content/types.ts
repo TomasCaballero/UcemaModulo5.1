@@ -25,6 +25,8 @@ export type ContentBlock =
    * guía: se muestra rotulado y no entra en las verificaciones de fidelidad (RNF-17/18).
    */
   | { type: 'extra'; text: RichText }
+  /** Explicación intuitiva o modelo mental cotidiano presentado en acordeón desplegable. */
+  | { type: 'intuition'; title?: string; text: RichText }
   | { type: 'workedExample'; title: RichText; steps: RichText[]; result: RichText }
   | { type: 'miniCheck'; questionIds: string[] }
   | { type: 'simulation'; simulationId: string }
