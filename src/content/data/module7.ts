@@ -39,17 +39,17 @@ export const module7Sections: Section[] = [
         text: t`*Ejemplo:* una "función memoria" que, si ve un punto del entrenamiento, devuelve su etiqueta, y en cualquier otro caso devuelve 0. Su error en el entrenamiento es **cero**, pero con datos nuevos se limita a decir "0" siempre.`,
       },
       {
-        type: 'extra',
-        text: t`Un chico que se aprende de memoria la tabla del 7 hasta $7\times10$ puede responder "¿cuánto es $7\times8$?" sin dudar, pero no sabe qué hacer con $7\times11$. Otro que entendió que multiplicar es sumar repetidamente el mismo número resuelve también las cuentas que nunca vio. El primero memorizó; el segundo indujo la regla.`,
-      },
-      {
         type: 'intuition',
         title: 'Aprenderse la tabla de memoria o entender cómo se multiplica',
-        text: t`**1. Dos formas de "saber" la tabla del 7.** Un chico se aprende de memoria las respuestas hasta $7 \times 10$. Si le preguntan $7 \times 8$, contesta enseguida. Pero con $7 \times 11$ no sabe qué hacer. Otro chico entendió que multiplicar es sumar el mismo número varias veces, y resuelve incluso las cuentas que nunca vio. El primero **memorizó**; el segundo **indujo** la regla.
+        text: t`**Dos formas de "saber" la tabla del 7.** Un chico se aprende de memoria las respuestas hasta $7 \times 10$. Si le preguntan $7 \times 8$, contesta enseguida. Pero con $7 \times 11$ no sabe qué hacer. Otro chico entendió que multiplicar es sumar el mismo número varias veces, y resuelve incluso las cuentas que nunca vio. El primero **memorizó**; el segundo **indujo** la regla.
 
-**2. En el mundo de los modelos.** Un algoritmo que memoriza guarda todos los datos de entrenamiento y responde bien si le preguntan por uno de ellos, pero no tiene nada que decir de un dato nuevo. En el ejemplo de la guía, una "función memoria" devuelve la respuesta correcta para lo que ya vio y cero para todo lo demás: error de entrenamiento cero, pero útil para nada.
+**En el mundo de los modelos.** Un algoritmo que memoriza guarda todos los datos de entrenamiento y responde bien si le preguntan por uno de ellos, pero no tiene nada que decir de un dato nuevo. En el ejemplo de la guía, una "función memoria" devuelve la respuesta correcta para lo que ya vio y cero para todo lo demás: error de entrenamiento cero, pero útil para nada.
 
-**3. Aprender de verdad es generalizar.** Es sacar reglas generales de los ejemplos para acertar en casos que todavía no viste. Todo este módulo trata de cuándo y por qué eso es posible.`,
+**Aprender de verdad es generalizar.** Es sacar reglas generales de los ejemplos para acertar en casos que todavía no viste. Todo este módulo trata de cuándo y por qué eso es posible.`,
+      },
+      {
+        type: 'extra',
+        text: t`Un chico que se aprende de memoria la tabla del 7 hasta $7\times10$ puede responder "¿cuánto es $7\times8$?" sin dudar, pero no sabe qué hacer con $7\times11$. Otro que entendió que multiplicar es sumar repetidamente el mismo número resuelve también las cuentas que nunca vio. El primero memorizó; el segundo indujo la regla.`,
       },
     ],
   },
@@ -70,6 +70,11 @@ export const module7Sections: Section[] = [
       { type: 'formula', latex: t`L_S(h) = \frac{1}{m}\,\bigl|\{\, i : h(x_i) \neq y_i \,\}\bigr|` },
       { type: 'paragraph', text: t`Es lo único que se puede medir (es el "error de entrenamiento" del Módulo 6.1).` },
       {
+        type: 'intuition',
+        title: 'La nota del simulacro y la nota del examen real',
+        text: t`**Dos errores distintos.** Un alumno que sacó 10 en todos los simulacros porque tenía las respuestas tiene un error de simulacro de cero (el **riesgo empírico**: el error que medimos con los datos que tenemos). El día del examen real le tocan preguntas distintas y su nota refleja lo que realmente entendió (el **riesgo real**: el error con datos nuevos). Lo que importa es el examen real, pero solo podemos medir los simulacros.`,
+      },
+      {
         type: 'paragraph',
         text: t`**ERM (*Empirical Risk Minimization*)**: elegir la hipótesis de $\mathcal{H}$ con **menor riesgo empírico**. Es la estrategia más natural, **pero si $\mathcal{H}$ es demasiado flexible, falla**:`,
       },
@@ -78,8 +83,18 @@ export const module7Sections: Section[] = [
         text: t`*Ejemplo:* los datos se distribuyen uniformemente en un cuadrado, y la etiqueta real es 1 dentro de un cuadrado interior que ocupa **la mitad** del área, y 0 afuera. La "función memoria" del 7.1 tiene $L_S = 0$ pero $L_{\mathcal{D}} = 1/2$: dice 0 en todos los puntos nuevos y se equivoca en toda la región interior. **El mejor ajuste en entrenamiento puede ser inútil en el mundo real.**`,
       },
       {
+        type: 'intuition',
+        title: 'Elegir el que mejor se ajusta puede ser un error',
+        text: t`**Elegir el que mejor se ajusta puede ser un error.** La idea más natural es quedarse con el modelo que menos falla en lo que ya vimos (ERM). Pero si el conjunto de modelos posibles es demasiado flexible, falla. La guía lo muestra con la función memoria: error cero en el entrenamiento, pero error real de $1/2$, porque dice cero en todos los puntos nuevos y se equivoca en toda la región interior.`,
+      },
+      {
         type: 'paragraph',
         text: t`**Solución:** **restringir la clase $\mathcal{H}$** (por ejemplo, solo rectángulos, solo rectas, solo árboles de profundidad limitada). Esa restricción es una **suposición previa sobre cómo es el mundo**, el llamado **sesgo inductivo**, y es la que permite generalizar (ver 7.5).`,
+      },
+      {
+        type: 'intuition',
+        title: 'La solución es limitar las opciones',
+        text: t`**La solución es limitar las opciones.** Se restringe el conjunto de modelos posibles (solo rectas, solo árboles de profundidad limitada). Esa restricción es una suposición previa sobre cómo es el mundo, y se llama **sesgo inductivo**. Sin ella no se puede generalizar.`,
       },
       {
         type: 'extra',
@@ -100,6 +115,11 @@ export const module7Sections: Section[] = [
         text: t`*Ejemplo:* $|\mathcal{H}| = 1000$, $\epsilon = 0.05$, $\delta = 0.01$: $m \ge \ln(1000/0.01)/0.05 = 11.51/0.05 \approx 231$ ejemplos. Dos observaciones: **más datos permiten error menor**, y una clase **más grande** requiere más datos, pero solo en forma **logarítmica**.`,
       },
       {
+        type: 'intuition',
+        title: 'Cuántos datos hacen falta',
+        text: t`**Cuántos datos hacen falta.** Si el conjunto de modelos posibles es finito, hay una fórmula para saber cuántos ejemplos alcanzan. Con 1000 modelos posibles, un error máximo de $0.05$ y una confianza de $0.01$ de fallar, alcanzan unos $231$ ejemplos. Lo notable: una lista de candidatos mucho más grande no pide proporcionalmente más datos, sino solo un poco más (crece de forma logarítmica). Más datos permiten un error menor.`,
+      },
+      {
         type: 'extra',
         text: t`Si el acertijo es adivinar la regla entre $|\mathcal{H}| = 100$ reglas candidatas, con $\epsilon = 0.1$ y $\delta = 0.05$: $m \ge \ln(100/0.05)/0.1 = \ln(2000)/0.1 \approx 7.60/0.1 \approx 76.01$, o sea, 77 ejemplos. Y si la lista de candidatas fuera cien veces más grande ($|\mathcal{H}|=10\,000$), harían falta $\ln(200\,000)/0.1 \approx 122$: cien veces más reglas no piden cien veces más datos, solo unos 46 más.`,
       },
@@ -115,16 +135,8 @@ export const module7Sections: Section[] = [
       },
       {
         type: 'intuition',
-        title: 'La nota del simulacro y la nota del examen real',
-        text: t`**1. Dos errores distintos.** Un alumno que sacó 10 en todos los simulacros porque tenía las respuestas tiene un error de simulacro de cero (el **riesgo empírico**: el error que medimos con los datos que tenemos). El día del examen real le tocan preguntas distintas y su nota refleja lo que realmente entendió (el **riesgo real**: el error con datos nuevos). Lo que importa es el examen real, pero solo podemos medir los simulacros.
-
-**2. Elegir el que mejor se ajusta puede ser un error.** La idea más natural es quedarse con el modelo que menos falla en lo que ya vimos (ERM). Pero si el conjunto de modelos posibles es demasiado flexible, falla. La guía lo muestra con la función memoria: error cero en el entrenamiento, pero error real de $1/2$, porque dice cero en todos los puntos nuevos y se equivoca en toda la región interior.
-
-**3. La solución es limitar las opciones.** Se restringe el conjunto de modelos posibles (solo rectas, solo árboles de profundidad limitada). Esa restricción es una suposición previa sobre cómo es el mundo, y se llama **sesgo inductivo**. Sin ella no se puede generalizar.
-
-**4. Cuántos datos hacen falta.** Si el conjunto de modelos posibles es finito, hay una fórmula para saber cuántos ejemplos alcanzan. Con 1000 modelos posibles, un error máximo de $0.05$ y una confianza de $0.01$ de fallar, alcanzan unos $231$ ejemplos. Lo notable: una lista de candidatos mucho más grande no pide proporcionalmente más datos, sino solo un poco más (crece de forma logarítmica). Más datos permiten un error menor.
-
-**5. Contar errores es difícil; la pérdida "hinge".** Contar cuántas veces te equivocaste es difícil de minimizar con computadora. Se reemplaza por una medida más suave que castiga más cuanto peor clasificás. Vale $0$ si el punto está bien clasificado con margen y crece al empeorar. Es la pérdida que usan las máquinas de vectores de soporte del módulo 6.`,
+        title: 'Contar errores es difícil: la pérdida hinge',
+        text: t`**Contar errores es difícil; la pérdida "hinge".** Contar cuántas veces te equivocaste es difícil de minimizar con computadora. Se reemplaza por una medida más suave que castiga más cuanto peor clasificás. Vale $0$ si el punto está bien clasificado con margen y crece al empeorar. Es la pérdida que usan las máquinas de vectores de soporte del módulo 6.`,
       },
     ],
   },
@@ -142,6 +154,11 @@ export const module7Sections: Section[] = [
         ],
       },
       {
+        type: 'intuition',
+        title: 'Las dos tolerancias, como en una encuesta electoral',
+        text: t`**Las dos tolerancias.** Las encuestas dicen: "margen de error de ±3 puntos con 95 % de confianza". Eso son dos cosas distintas. El margen de error ($\epsilon$) dice **cuán cerca** de la verdad queda el resultado. La confianza ($\delta$) reconoce que, por mala suerte, una encuesta de cada veinte puede tocar una muestra poco representativa y errar por más. El aprendizaje PAC usa exactamente esas dos ideas: **aproximadamente correcto** (error menor que $\epsilon$) y **probablemente** (con probabilidad de fallo menor que $\delta$).`,
+      },
+      {
         type: 'extra',
         text: t`Las encuestas electorales usan exactamente estas dos tolerancias: "margen de error de ±3 puntos con 95 % de confianza" significa $\epsilon = 0.03$ y $\delta = 0.05$. El margen de error dice cuán cerca está el resultado de la verdad; el 95 % reconoce que, por mala suerte, una de cada veinte encuestas puede tocar una muestra poco representativa y errar por más.`,
       },
@@ -153,6 +170,11 @@ export const module7Sections: Section[] = [
         type: 'paragraph',
         text: t`Puntos clave: la garantía vale **sin importar cuál sea $\mathcal{D}$** (no hay que conocerla) y el número de datos depende de $\epsilon$, $\delta$ y de la clase, pero **no de $\mathcal{D}$**.`,
       },
+      {
+        type: 'intuition',
+        title: 'Qué significa que algo "se pueda aprender"',
+        text: t`**Qué significa que algo "se pueda aprender".** Una clase de modelos es PAC-aprendible si existe un algoritmo que, con suficientes ejemplos, logra esas dos cosas para **cualquier** forma en la que el mundo reparta los datos. Es decir, la garantía no depende de que conozcas cómo se generan los datos. La cantidad de datos necesarios depende de lo que exijas ($\epsilon$ y $\delta$) y de la clase, pero no de esa distribución.`,
+      },
       { type: 'paragraph', text: '**Caso realizable vs. agnóstico:**' },
       {
         type: 'list',
@@ -160,6 +182,11 @@ export const module7Sections: Section[] = [
           t`**Realizable:** se supone que **en $\mathcal{H}$ existe** una hipótesis con error real 0 (la regla verdadera está en la clase).`,
           t`**PAC agnóstico:** versión **realista**, sin esa suposición. Los datos pueden tener ruido o la regla real puede no estar en $\mathcal{H}$. Entonces no se exige error $\le\epsilon$, sino error **cercano al mejor posible dentro de $\mathcal{H}$**: $L_{\mathcal{D}}(h) \le \min_{h'\in\mathcal{H}} L_{\mathcal{D}}(h') + \epsilon$. Para clase finita basta con $m \ge 2\ln(2|\mathcal{H}|/\delta)/\epsilon^2$ (con los números del ejemplo anterior, unos 9765 datos; exigir menos supuestos **cuesta más datos**).`,
         ],
+      },
+      {
+        type: 'intuition',
+        title: 'Con trampa o sin trampa',
+        text: t`**Con trampa o sin trampa.** En el caso **realizable** se supone que la regla verdadera está dentro de las opciones (suposición cómoda). En el caso **agnóstico**, más realista, puede haber ruido o la regla real puede no estar. Entonces ya no se exige error pequeño, sino quedar **cerca del mejor posible dentro de las opciones**. Exigir menos supuestos cuesta más datos: para los números del ejemplo anterior, unos $9765$ en lugar de $231$.`,
       },
       { type: 'paragraph', text: t`**Descomposición del error (conexión con el sesgo-varianza del Módulo 6.2):**` },
       {
@@ -176,14 +203,8 @@ export const module7Sections: Section[] = [
       { type: 'paragraph', text: t`Elegir $\mathcal{H}$ es **equilibrar** ambos. Es exactamente el mismo dilema que sesgo-varianza.` },
       {
         type: 'intuition',
-        title: 'Probablemente aproximadamente correcto: las encuestas electorales de la teoría',
-        text: t`**1. Las dos tolerancias.** Las encuestas dicen: "margen de error de ±3 puntos con 95 % de confianza". Eso son dos cosas distintas. El margen de error ($\epsilon$) dice **cuán cerca** de la verdad queda el resultado. La confianza ($\delta$) reconoce que, por mala suerte, una encuesta de cada veinte puede tocar una muestra poco representativa y errar por más. El aprendizaje PAC usa exactamente esas dos ideas: **aproximadamente correcto** (error menor que $\epsilon$) y **probablemente** (con probabilidad de fallo menor que $\delta$).
-
-**2. Qué significa que algo "se pueda aprender".** Una clase de modelos es PAC-aprendible si existe un algoritmo que, con suficientes ejemplos, logra esas dos cosas para **cualquier** forma en la que el mundo reparta los datos. Es decir, la garantía no depende de que conozcas cómo se generan los datos. La cantidad de datos necesarios depende de lo que exijas ($\epsilon$ y $\delta$) y de la clase, pero no de esa distribución.
-
-**3. Con trampa o sin trampa.** En el caso **realizable** se supone que la regla verdadera está dentro de las opciones (suposición cómoda). En el caso **agnóstico**, más realista, puede haber ruido o la regla real puede no estar. Entonces ya no se exige error pequeño, sino quedar **cerca del mejor posible dentro de las opciones**. Exigir menos supuestos cuesta más datos: para los números del ejemplo anterior, unos $9765$ en lugar de $231$.
-
-**4. Dos fuentes de error, otra vez.** El error total se parte en dos: el **de aproximación** (lo mejor que se puede lograr con las opciones elegidas, que baja si las opciones son más ricas) y el **de estimación** (cuánto te alejás de ese mejor por tener pocos datos, que sube si las opciones son más ricas). Elegir las opciones es equilibrar ambas. Es el mismo dilema de sesgo y varianza que ya conocés.`,
+        title: 'Dos fuentes de error, otra vez',
+        text: t`**Dos fuentes de error, otra vez.** El error total se parte en dos: el **de aproximación** (lo mejor que se puede lograr con las opciones elegidas, que baja si las opciones son más ricas) y el **de estimación** (cuánto te alejás de ese mejor por tener pocos datos, que sube si las opciones son más ricas). Elegir las opciones es equilibrar ambas. Es el mismo dilema de sesgo y varianza que ya conocés.`,
       },
     ],
   },
@@ -204,6 +225,11 @@ export const module7Sections: Section[] = [
         type: 'paragraph',
         text: t`**Dimensión VC** de $\mathcal{H}$: el tamaño del **mayor conjunto de puntos** que $\mathcal{H}$ puede fragmentar (infinita si no hay tope). Para probar que $\text{VCdim}=d$ hay que (i) **exhibir un conjunto de $d$ puntos** fragmentado y (ii) **demostrar que ningún conjunto de $d+1$ puntos** lo puede ser.`,
       },
+      {
+        type: 'intuition',
+        title: 'Medir la flexibilidad de un modelo',
+        text: t`**Medir la flexibilidad.** Con infinitas opciones (todas las rectas del plano), no podés medir la flexibilidad contándolas. La **dimensión VC** la mide con un juego: ¿cuántos puntos puede "dominar" el modelo, acomodándose para reproducir **cualquier** combinación de sí y no que le pidas? Ese tamaño máximo es la dimensión.`,
+      },
       { type: 'miniCheck', questionIds: ['m7-q14'] },
       { type: 'paragraph', text: '**Ejemplos en una dimensión:**' },
       {
@@ -212,6 +238,11 @@ export const module7Sections: Section[] = [
           t`**Umbrales** ("1 si $x \ge a$, 0 en caso contrario"). Con **1 punto** se logran las dos etiquetas posibles. Con **2 puntos** $x_1 < x_2$, es imposible la combinación "$x_1$ positivo y $x_2$ negativo". $\Rightarrow \text{VCdim} = 1$.`,
           t`**Intervalos** ("1 si $a \le x \le b$"). Con 2 puntos se logran las 4 combinaciones. Con **3 puntos**, la combinación "positivo, negativo, positivo" es imposible (un intervalo es continuo). $\Rightarrow \text{VCdim} = 2$.`,
         ],
+      },
+      {
+        type: 'intuition',
+        title: 'Un cartel en una puerta',
+        text: t`**Un cartel en una puerta.** Un cartel que dice "se admiten personas entre $a$ y $b$ años" es un intervalo. Con dos personas (de 30 y 50 años) podés lograr cualquiera de las cuatro combinaciones sí/no ajustando $a$ y $b$. Pero con tres personas de 20, 40 y 60 no podés admitir a la de 20 y a la de 60 y dejar afuera a la de 40, porque un rango continuo no tiene huecos. Por eso la dimensión de los intervalos es $2$. Con un umbral ("sí si $x$ es mayor que $a$") solo se domina un punto: dimensión $1$.`,
       },
       {
         type: 'extra',
@@ -229,9 +260,19 @@ export const module7Sections: Section[] = [
         ],
       },
       {
+        type: 'intuition',
+        title: 'Más flexible, más datos',
+        text: t`**Más flexible, más datos.** La flexibilidad tiene un precio. Una recta en el plano tiene dimensión $3$; en general, un clasificador lineal con $d$ variables tiene $d+1$, y crece con las variables. Una función que acepta cualquier cosa (como la función memoria) tiene dimensión infinita. Cuidado: la dimensión VC **no** es el número de parámetros; existe una familia con un solo parámetro y dimensión infinita.`,
+      },
+      {
         type: 'callout',
         kind: 'salvedad',
         text: t`**Teorema Fundamental del Aprendizaje Estadístico** (clasificación binaria, pérdida 0-1): una clase $\mathcal{H}$ es PAC-aprendible **si y solo si su dimensión VC es finita**. Además, la ERM la aprende, y el número de datos necesarios crece en **proporción a $d$** (la dimensión VC), del orden de $d/\epsilon$ (realizable) o $d/\epsilon^2$ (agnóstico), más un término que depende de $\delta$.`,
+      },
+      {
+        type: 'intuition',
+        title: 'El teorema central',
+        text: t`**El teorema central.** Una clase se puede aprender (en el sentido PAC) **si y solo si su dimensión VC es finita**. Además, los datos que hacen falta crecen en proporción a esa dimensión.`,
       },
       {
         type: 'paragraph',
@@ -239,16 +280,8 @@ export const module7Sections: Section[] = [
       },
       {
         type: 'intuition',
-        title: 'Cuántas "formas de etiquetar" puede reproducir un modelo',
-        text: t`**1. Medir la flexibilidad.** Con infinitas opciones (todas las rectas del plano), no podés medir la flexibilidad contándolas. La **dimensión VC** la mide con un juego: ¿cuántos puntos puede "dominar" el modelo, acomodándose para reproducir **cualquier** combinación de sí y no que le pidas? Ese tamaño máximo es la dimensión.
-
-**2. Un cartel en una puerta.** Un cartel que dice "se admiten personas entre $a$ y $b$ años" es un intervalo. Con dos personas (de 30 y 50 años) podés lograr cualquiera de las cuatro combinaciones sí/no ajustando $a$ y $b$. Pero con tres personas de 20, 40 y 60 no podés admitir a la de 20 y a la de 60 y dejar afuera a la de 40, porque un rango continuo no tiene huecos. Por eso la dimensión de los intervalos es $2$. Con un umbral ("sí si $x$ es mayor que $a$") solo se domina un punto: dimensión $1$.
-
-**3. Más flexible, más datos.** La flexibilidad tiene un precio. Una recta en el plano tiene dimensión $3$; en general, un clasificador lineal con $d$ variables tiene $d+1$, y crece con las variables. Una función que acepta cualquier cosa (como la función memoria) tiene dimensión infinita. Cuidado: la dimensión VC **no** es el número de parámetros; existe una familia con un solo parámetro y dimensión infinita.
-
-**4. El teorema central.** Una clase se puede aprender (en el sentido PAC) **si y solo si su dimensión VC es finita**. Además, los datos que hacen falta crecen en proporción a esa dimensión.
-
-**5. Qué significa para vos.** Cuanto más flexible el modelo, más datos hacen falta para confiar en él. Eso explica por qué conviene tener muchas más observaciones que variables, y por qué los modelos muy flexibles sobreajustan con pocos datos. Algunos métodos modernos, con dimensión infinita, se justifican con otras garantías, basadas en el margen.`,
+        title: 'Qué significa para vos',
+        text: t`**Qué significa para vos.** Cuanto más flexible el modelo, más datos hacen falta para confiar en él. Eso explica por qué conviene tener muchas más observaciones que variables, y por qué los modelos muy flexibles sobreajustan con pocos datos. Algunos métodos modernos, con dimensión infinita, se justifican con otras garantías, basadas en el margen.`,
       },
     ],
   },
@@ -262,12 +295,27 @@ export const module7Sections: Section[] = [
         text: t`**Enunciado informal:** **ningún algoritmo de aprendizaje es el mejor para todos los problemas.** Para cualquier algoritmo y cualquier tamaño de muestra menor a la mitad del dominio, existe una distribución y una regla verdadera (aprendible con error 0) para las cuales el algoritmo **falla con probabilidad apreciable** (el resultado formal: con probabilidad al menos $1/7$ el error real es al menos $1/8$).`,
       },
       {
+        type: 'intuition',
+        title: 'Qué dice el teorema',
+        text: t`**Qué dice el teorema.** Ningún algoritmo es el mejor para todos los problemas. Para cualquier algoritmo existe algún problema, aprendible con error cero, donde falla con probabilidad apreciable. Por eso se llama "sin almuerzo gratis".`,
+      },
+      {
         type: 'paragraph',
         text: t`*Intuición.* Te dan $2, 4, 6, 8$ y te piden el siguiente. Hay infinitas reglas compatibles con esos datos (pares ascendentes, un polinomio extraño que da 7…). Elegir "10" requiere una **preferencia previa por reglas simples**. Sin ella, los datos solos no deciden.`,
       },
       {
+        type: 'intuition',
+        title: 'El acertijo de la serie',
+        text: t`**El acertijo de la serie.** Te dan $2, 4, 6, 8$ y te piden el siguiente. Casi todos dicen $10$. Pero existen infinitas reglas compatibles con esos números, entre ellas un polinomio extraño que da $7$. Elegir $10$ implica una **preferencia previa por reglas simples**: los datos por sí solos no la imponen.`,
+      },
+      {
         type: 'extra',
         text: t`Un clásico: te dan $1, 2, 4, 8$ y te piden el siguiente. "16", responde casi todo el mundo (se duplica). Pero hay un problema geométrico real cuyos primeros términos son exactamente $1, 2, 4, 8, 16$ y luego da $31$: es el número máximo de regiones en que quedan divididos un círculo al unir con cuerdas $n$ puntos de su borde. Los datos eran compatibles con las dos reglas; elegir "16" fue una preferencia por la regla simple.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Otro caso famoso',
+        text: t`**Otro caso famoso.** Si te dan $1, 2, 4, 8$ y te piden el siguiente, casi todos dicen $16$. Pero hay un problema real de geometría, el de las regiones que se forman al unir puntos de un círculo con cuerdas, cuyos primeros términos son $1, 2, 4, 8, 16$ y el siguiente es $31$. Las dos reglas eran compatibles con los datos. Elegir $16$ fue una preferencia nuestra, no una deducción.`,
       },
       { type: 'paragraph', text: '**Consecuencias:**' },
       {
@@ -281,14 +329,8 @@ export const module7Sections: Section[] = [
       },
       {
         type: 'intuition',
-        title: 'Los datos solos no deciden: siempre hace falta una preferencia previa',
-        text: t`**1. El acertijo de la serie.** Te dan $2, 4, 6, 8$ y te piden el siguiente. Casi todos dicen $10$. Pero existen infinitas reglas compatibles con esos números, entre ellas un polinomio extraño que da $7$. Elegir $10$ implica una **preferencia previa por reglas simples**: los datos por sí solos no la imponen.
-
-**2. Otro caso famoso.** Si te dan $1, 2, 4, 8$ y te piden el siguiente, casi todos dicen $16$. Pero hay un problema real de geometría, el de las regiones que se forman al unir puntos de un círculo con cuerdas, cuyos primeros términos son $1, 2, 4, 8, 16$ y el siguiente es $31$. Las dos reglas eran compatibles con los datos. Elegir $16$ fue una preferencia nuestra, no una deducción.
-
-**3. Qué dice el teorema.** Ningún algoritmo es el mejor para todos los problemas. Para cualquier algoritmo existe algún problema, aprendible con error cero, donde falla con probabilidad apreciable. Por eso se llama "sin almuerzo gratis".
-
-**4. Qué hacer con esto.** Aprender exige un sesgo inductivo: una preferencia basada en lo que sabés del problema. No existe un "mejor modelo universal"; un modelo anda bien cuando su preferencia coincide con la estructura del problema. Por eso se comparan varios modelos con validación cruzada, y por eso el conocimiento del tema importa tanto como el algoritmo.`,
+        title: 'Qué hacer con esto',
+        text: t`**Qué hacer con esto.** Aprender exige un sesgo inductivo: una preferencia basada en lo que sabés del problema. No existe un "mejor modelo universal"; un modelo anda bien cuando su preferencia coincide con la estructura del problema. Por eso se comparan varios modelos con validación cruzada, y por eso el conocimiento del tema importa tanto como el algoritmo.`,
       },
     ],
   },
@@ -307,6 +349,11 @@ export const module7Sections: Section[] = [
         type: 'paragraph',
         text: t`El caso típico es **Ridge**: $L_S(w) + \lambda\lVert w\rVert^2$ (Módulo 6.4). La penalización **inclina la balanza** hacia modelos simples y **controla el sobreajuste**. $\lambda$ regula el equilibrio entre ajuste (sesgo) y simplicidad (varianza).`,
       },
+      {
+        type: 'intuition',
+        title: 'Un freno en vez de una pared',
+        text: t`**Un freno en vez de una pared.** En lugar de prohibir de entrada ciertos modelos, se pueden permitir todos pero **cobrar una multa por complejidad**: se elige el que minimiza el error más una penalización. Es lo que hace Ridge con el parámetro $\lambda$, que regula el equilibrio entre ajustarse a los datos y mantenerse simple.`,
+      },
       { type: 'subheading', text: 'Estabilidad algorítmica' },
       {
         type: 'paragraph',
@@ -316,6 +363,11 @@ export const module7Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`La **regularización produce estabilidad**: con $\lambda$ **grande** el modelo apenas cambia al modificar un dato (menos varianza), pero se ajusta peor (más sesgo). Otra vez el mismo equilibrio.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Un modelo estable no memoriza',
+        text: t`**Un modelo estable no memoriza.** Un algoritmo es estable si cambiar un solo dato de entrenamiento casi no altera su predicción. Si el modelo no depende de ningún dato individual, no puede haber memorizado ninguno, y por eso generaliza. La regularización lo logra: con $\lambda$ grande el modelo apenas cambia al modificar un dato (menos varianza), pero se ajusta peor (más sesgo). Otra vez el mismo equilibrio.`,
       },
       { type: 'subheading', text: 'Navaja de Ockham y longitud de descripción mínima (MDL)' },
       {
@@ -327,8 +379,18 @@ export const module7Sections: Section[] = [
         latex: t`L_{\mathcal{D}}(h) \;\le\; L_S(h) + \sqrt{\frac{|h| + \ln(2/\delta)}{2m}}`,
       },
       {
+        type: 'intuition',
+        title: 'Tu auto no arranca: la navaja de Ockham',
+        text: t`**Tu auto no arranca.** Una explicación: "la batería está descargada". Otra: "falló el motor de arranque, a la vez se cortó un cable y además hay un problema en la bomba de combustible". Si ambas explican igual de bien los síntomas, conviene empezar por la corta. Es la **navaja de Ockham**, y la teoría la vuelve precisa: cuanto más cortos sean los bits que hacen falta para describir una regla, mejor es la garantía de que generalice.`,
+      },
+      {
         type: 'paragraph',
         text: t`*Ejemplo numérico* ($m=1000$, $\delta=0.05$): una hipótesis de **50 bits** tiene un margen de error de $\sqrt{(50+3.69)/2000} \approx 0.16$; una de **500 bits**, de $\sqrt{(500+3.69)/2000} \approx 0.50$. Con igual error en entrenamiento, **la más simple tiene una garantía mucho mejor**.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Con números',
+        text: t`**Con números.** Con $m = 1000$ casos y una confianza de $0.05$, una regla de $50$ bits tiene un margen de error de aproximadamente $0.16$, mientras que una de $500$ bits tiene aproximadamente $0.50$. Con igual error de entrenamiento, la regla simple tiene una garantía mucho mejor.`,
       },
       {
         type: 'paragraph',
@@ -339,21 +401,13 @@ export const module7Sections: Section[] = [
         text: t`*Salvedad:* la longitud de descripción depende del **lenguaje** elegido; no existe una noción absoluta de "simplicidad". Esa elección es otra forma de sesgo inductivo.`,
       },
       {
-        type: 'extra',
-        text: t`Tu auto no arranca. Una explicación: "la batería está descargada" (corta y simple). Otra: "falló el motor de arranque, a la vez se cortó un cable y además hay un problema en la bomba de combustible" (larga y compleja). Si ambas explican igual de bien los síntomas, conviene empezar por la corta: es la navaja de Ockham, y la cota dice por qué: con $m=1000$ casos, una regla de apenas 10 bits tiene un margen de error de $\sqrt{(10+3.69)/2000} \approx 0.083$, mucho mejor que el $0.16$ de una de 50 bits.`,
+        type: 'intuition',
+        title: 'Una salvedad honesta',
+        text: t`**Una salvedad honesta.** Qué es "corto" depende del lenguaje con que se describen las reglas. No existe una noción absoluta de simplicidad, y esa elección es otra forma de sesgo inductivo.`,
       },
       {
-        type: 'intuition',
-        title: 'La navaja de Ockham: entre dos explicaciones iguales, la más corta',
-        text: t`**1. Un freno en vez de una pared.** En lugar de prohibir de entrada ciertos modelos, se pueden permitir todos pero **cobrar una multa por complejidad**: se elige el que minimiza el error más una penalización. Es lo que hace Ridge con el parámetro $\lambda$, que regula el equilibrio entre ajustarse a los datos y mantenerse simple.
-
-**2. Un modelo estable no memoriza.** Un algoritmo es estable si cambiar un solo dato de entrenamiento casi no altera su predicción. Si el modelo no depende de ningún dato individual, no puede haber memorizado ninguno, y por eso generaliza. La regularización lo logra: con $\lambda$ grande el modelo apenas cambia al modificar un dato (menos varianza), pero se ajusta peor (más sesgo). Otra vez el mismo equilibrio.
-
-**3. Tu auto no arranca.** Una explicación: "la batería está descargada". Otra: "falló el motor de arranque, a la vez se cortó un cable y además hay un problema en la bomba de combustible". Si ambas explican igual de bien los síntomas, conviene empezar por la corta. Es la **navaja de Ockham**, y la teoría la vuelve precisa: cuanto más cortos sean los bits que hacen falta para describir una regla, mejor es la garantía de que generalice.
-
-**4. Con números.** Con $m = 1000$ casos y una confianza de $0.05$, una regla de $50$ bits tiene un margen de error de aproximadamente $0.16$, mientras que una de $500$ bits tiene aproximadamente $0.50$. Con igual error de entrenamiento, la regla simple tiene una garantía mucho mejor.
-
-**5. Una salvedad honesta.** Qué es "corto" depende del lenguaje con que se describen las reglas. No existe una noción absoluta de simplicidad, y esa elección es otra forma de sesgo inductivo.`,
+        type: 'extra',
+        text: t`Tu auto no arranca. Una explicación: "la batería está descargada" (corta y simple). Otra: "falló el motor de arranque, a la vez se cortó un cable y además hay un problema en la bomba de combustible" (larga y compleja). Si ambas explican igual de bien los síntomas, conviene empezar por la corta: es la navaja de Ockham, y la cota dice por qué: con $m=1000$ casos, una regla de apenas 10 bits tiene un margen de error de $\sqrt{(10+3.69)/2000} \approx 0.083$, mucho mejor que el $0.16$ de una de 50 bits.`,
       },
     ],
   },
@@ -378,12 +432,12 @@ export const module7Sections: Section[] = [
       },
       {
         type: 'intuition',
-        title: 'Todo lo que aprendiste, un solo mapa',
-        text: t`**1. Un mismo dilema con muchos nombres.** Casi todo lo que viste en este módulo es una versión del mismo problema: ajustarse a los datos que tenés sin pasarte de flexible. En el módulo 6 lo viste como sesgo y varianza; acá lo ves como error de aproximación y error de estimación.
+        title: 'Un mismo dilema con muchos nombres',
+        text: t`**Un mismo dilema con muchos nombres.** Casi todo lo que viste en este módulo es una versión del mismo problema: ajustarse a los datos que tenés sin pasarte de flexible. En el módulo 6 lo viste como sesgo y varianza; acá lo ves como error de aproximación y error de estimación.
 
-**2. Qué conecta con qué.** Pensá en la tabla como un diccionario que traduce la teoría a lo que ya hiciste. Quedarte con el modelo que mejor se ajusta a lo que viste, si es demasiado flexible, es el sobreajuste. El riesgo real es el error de prueba que estimás con validación cruzada. La dimensión VC es la flexibilidad del modelo y dice cuántos datos necesitás. Ridge, Lasso y la poda de árboles son formas de cobrar una multa por complejidad. Probar varios modelos y usar el conocimiento del dominio es la respuesta práctica al "sin almuerzo gratis". Y preferir el modelo más simple cuando todo lo demás es igual es la navaja de Ockham.
+**Qué conecta con qué.** Pensá en la tabla como un diccionario que traduce la teoría a lo que ya hiciste. Quedarte con el modelo que mejor se ajusta a lo que viste, si es demasiado flexible, es el sobreajuste. El riesgo real es el error de prueba que estimás con validación cruzada. La dimensión VC es la flexibilidad del modelo y dice cuántos datos necesitás. Ridge, Lasso y la poda de árboles son formas de cobrar una multa por complejidad. Probar varios modelos y usar el conocimiento del dominio es la respuesta práctica al "sin almuerzo gratis". Y preferir el modelo más simple cuando todo lo demás es igual es la navaja de Ockham.
 
-**3. Lo que te llevás.** Un modelo bueno no es el que mejor explica lo que ya pasó, sino el que mejor se prepara para lo que todavía no viste. Todo el curso, desde la nota del simulacro hasta la regularización, trata de eso.`,
+**Lo que te llevás.** Un modelo bueno no es el que mejor explica lo que ya pasó, sino el que mejor se prepara para lo que todavía no viste. Todo el curso, desde la nota del simulacro hasta la regularización, trata de eso.`,
       },
     ],
   },

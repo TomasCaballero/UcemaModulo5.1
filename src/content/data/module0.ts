@@ -42,23 +42,22 @@ export const module0Sections: Section[] = [
         ],
       },
       {
+        type: 'intuition',
+        title: 'Los símbolos como las etiquetas de un ticket de compras',
+        text: t`**Cada símbolo es una abreviatura.** Pensá en el ticket del supermercado. Cada renglón tiene un precio, y $x_i$ es solo una forma corta de decir "el precio que está en el lugar $i$ de la lista". Si la lista es $(4, 7, 9)$, entonces $x_1 = 4$, $x_2 = 7$ y $x_3 = 9$. La letra $n$ cuenta cuántos renglones hay: acá, $n = 3$.
+
+**Sumar y promediar.** El símbolo $\sum$ (sumatoria) es la instrucción "sumá todos los renglones": $4 + 7 + 9 = 20$. Y $\bar{x}$ ("x barra") es el promedio: el total repartido en partes iguales, $20/3 \approx 6.67$.
+
+**El sombrero es una adivinanza.** El pronóstico del clima dice una temperatura y después llega la real. Cuando una letra lleva sombrero, como $\hat{y}$, es lo que el modelo **dijo**, no lo que **pasó**. Si el valor real fue $y = 10$ y el modelo dijo $9.2$, entonces $\hat{y} = 9.2$. La diferencia entre las dos es el error.`,
+      },
+      {
         type: 'paragraph',
         text: t`**Regla útil:** letra latina ($x$, $y$) suele ser un dato observado; letra griega ($\beta$, $\mu$) suele ser algo desconocido de la realidad; letra con sombrero ($\hat{\beta}$) es nuestra **estimación** de esa cantidad desconocida.`,
       },
       {
-        type: 'extra',
-        text: t`Ticket del supermercado: pagaste 120, 80 y 200 pesos por tres productos. Esa es tu lista $x = (120, 80, 200)$ con $n = 3$. La sumatoria $\sum x_i = 400$ es el total del ticket y $\bar{x} = 400/3 \approx 133.33$ es lo que costó un producto en promedio. Y si el pronóstico del clima dijo 19 °C y la temperatura real fue $y = 21$ °C, la predicción es $\hat{y} = 19$ y el error es $y - \hat{y} = 2$.`,
-      },
-      {
         type: 'intuition',
-        title: 'Los símbolos son etiquetas de un ticket de compras',
-        text: t`**1. Cada símbolo es una abreviatura.** Pensá en el ticket del supermercado. Cada renglón tiene un precio, y $x_i$ es solo una forma corta de decir "el precio que está en el lugar $i$ de la lista". Si la lista es $(4, 7, 9)$, entonces $x_1 = 4$, $x_2 = 7$ y $x_3 = 9$. La letra $n$ cuenta cuántos renglones hay: acá, $n = 3$.
-
-**2. Sumar y promediar.** El símbolo $\sum$ (sumatoria) es la instrucción "sumá todos los renglones": $4 + 7 + 9 = 20$. Y $\bar{x}$ ("x barra") es el promedio: el total repartido en partes iguales, $20/3 \approx 6.67$.
-
-**3. El sombrero es una adivinanza.** El pronóstico del clima dice una temperatura y después llega la real. Cuando una letra lleva sombrero, como $\hat{y}$, es lo que el modelo **dijo**, no lo que **pasó**. Si el valor real fue $y = 10$ y el modelo dijo $9.2$, entonces $\hat{y} = 9.2$. La diferencia entre las dos es el error.
-
-**4. Letras de lo que vemos y letras de lo que no vemos.** Una regla fácil para no perderte:
+        title: 'Letras de lo que vemos y letras de lo que no vemos',
+        text: t`**Letras de lo que vemos y letras de lo que no vemos.** Una regla fácil para no perderte:
 Letra común ($x$, $y$): un dato que realmente anotamos.
 
 Letra griega ($\beta$, $\mu$): algo verdadero de la realidad que no podemos ver directamente y queremos averiguar.
@@ -67,6 +66,10 @@ Letra griega con sombrero ($\hat{\beta}$): nuestra mejor suposición de esa cant
 
 
 Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla: casi siempre es una de estas ideas.`,
+      },
+      {
+        type: 'extra',
+        text: t`Ticket del supermercado: pagaste 120, 80 y 200 pesos por tres productos. Esa es tu lista $x = (120, 80, 200)$ con $n = 3$. La sumatoria $\sum x_i = 400$ es el total del ticket y $\bar{x} = 400/3 \approx 133.33$ es lo que costó un producto en promedio. Y si el pronóstico del clima dijo 19 °C y la temperatura real fue $y = 21$ °C, la predicción es $\hat{y} = 19$ y el error es $y - \hat{y} = 2$.`,
       },
     ],
   },
@@ -92,6 +95,11 @@ Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla:
           t`**Complemento**: la probabilidad de que $A$ **no** ocurra es $1 - P(A)$. Si llover tiene probabilidad 0.3, no llover tiene 0.7.`,
         ],
       },
+      {
+        type: 'intuition',
+        title: 'La probabilidad es una escala de 0 a 1',
+        text: t`**La probabilidad es una escala de 0 a 1.** El 0 significa "imposible" y el 1 significa "seguro". Si todos los resultados tienen la misma chance, alcanza con contar: casos que te sirven sobre casos posibles. En un dado, la chance de que salga par es $3/6 = 0.5$. Y lo que **no** ocurre es lo que falta para llegar a 1: si llover tiene chance $0.3$, no llover tiene $0.7$.`,
+      },
       { type: 'miniCheck', questionIds: ['m0-q02'] },
       { type: 'subheading', text: 'Independencia' },
       {
@@ -100,6 +108,11 @@ Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla:
       },
       { type: 'formula', latex: t`P(A \text{ y } B) = P(A) \cdot P(B)` },
       { type: 'paragraph', text: t`*Ejemplo:* dos caras seguidas: $0.5 \times 0.5 = 0.25$.` },
+      {
+        type: 'intuition',
+        title: 'Independientes: cuando una cosa no influye en la otra',
+        text: t`**Independientes quiere decir que no se influyen.** Una moneda no se acuerda de lo que salió antes. Para pedir que pasen **las dos cosas**, se multiplican las chances: dos caras seguidas es $0.5 \times 0.5 = 0.25$. Se multiplica porque cada vez que se cumple la primera, solo una parte de esos casos cumple también la segunda.`,
+      },
       {
         type: 'extra',
         text: t`Si la probabilidad de que llueva el sábado es 0.3 y la de que llueva el domingo es 0.3, y suponemos que un día no influye en el otro, la probabilidad de que llueva los dos días es $0.3 \times 0.3 = 0.09$ (9 %). En la realidad el clima de dos días seguidos no suele ser independiente: multiplicar solo vale si de verdad lo son.`,
@@ -113,6 +126,11 @@ Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla:
       {
         type: 'paragraph',
         text: t`*Ejemplo:* en una baraja española de 40 cartas, ¿cuál es la probabilidad de que una carta sea un as, sabiendo que es de oros? Hay 10 cartas de oros y 1 es el as: $P = 1/10$. (Sin saber el palo sería $4/40 = 1/10$: el palo y el número son independientes en la baraja.)`,
+      },
+      {
+        type: 'intuition',
+        title: 'Condicional: cuando ya sabés algo',
+        text: t`**Condicional quiere decir "ya sé algo".** $P(A \mid B)$ es la chance de $A$ **una vez que te enteraste** de que $B$ pasó. Es como achicar el mundo: ya no mirás todas las cartas de la baraja, sino solo las de oros, y adentro de ese grupo calculás la chance.`,
       },
       { type: 'subheading', text: 'Teorema de Bayes (la idea más importante de esta sección)' },
       {
@@ -133,6 +151,17 @@ Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla:
       {
         type: 'paragraph',
         text: t`**Solo 15.4 %**, aunque el test parezca "bueno". La razón: hay muchísimos más sanos que enfermos, y el 5 % de una población enorme de sanos genera más positivos que el 90 % de unos pocos enfermos. Es el error típico de mirar solo el resultado del test e ignorar cuán frecuente es la enfermedad antes de testear: ese $P(A)$ de la fórmula pesa tanto como la calidad del test.`,
+      },
+      {
+        type: 'intuition',
+        title: 'El test médico, explicado con mil personas en una plaza',
+        text: t`**Bayes: mirar el test con mil personas.** Imaginá mil personas en una plaza. La enfermedad afecta al 1 %: son **10 enfermas** y **990 sanas**.
+De las 10 enfermas, el test detecta al 90 %: **9 dan positivo**.
+
+De las 990 sanas, el test se equivoca con el 5 %: unas **49.5 dan positivo**.
+
+
+Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/58.5 \approx 0.154$, es decir **15.4 %**. El test parece muy bueno, pero hay tantos sanos que sus pocos errores se juntan y superan a los aciertos. Por eso importa saber **qué tan frecuente es la enfermedad antes de testear**.`,
       },
       { type: 'simulation', simulationId: 'IN-03' },
       {
@@ -174,6 +203,11 @@ Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla:
         text: t`*¿Por qué al cuadrado?* Porque si no, las desviaciones positivas y negativas se cancelarían y el promedio daría 0.`,
       },
       {
+        type: 'intuition',
+        title: 'Esperanza y varianza: el centro y el desparramo',
+        text: t`**Esperanza y varianza.** La esperanza es el "promedio de largo plazo": si tirás un dado muchísimas veces, el promedio se acerca a $3.5$ aunque nunca salga ese número. Es el punto de equilibrio, como el centro de una balanza. La varianza mide qué tan **desparramados** están los resultados alrededor de ese centro. Se eleva al cuadrado para que los desvíos hacia arriba y hacia abajo no se cancelen entre sí.`,
+      },
+      {
         type: 'extra',
         text: t`Una rifa de 1000 números en la que el único premio es de 50 000 pesos y cada número cuesta 100. La ganancia de un número es una variable aleatoria: con probabilidad $1/1000$ ganas 50 000 y con probabilidad $999/1000$ ganas 0. Su esperanza es $E = 50\,000 \times \tfrac{1}{1000} = 50$ pesos, menos que los 100 que pagaste: en promedio, cada número "pierde" 50 pesos.`,
       },
@@ -184,24 +218,8 @@ Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla:
       },
       {
         type: 'intuition',
-        title: 'La probabilidad con monedas, dados y mil personas en una plaza',
-        text: t`**1. La probabilidad es una escala de 0 a 1.** El 0 significa "imposible" y el 1 significa "seguro". Si todos los resultados tienen la misma chance, alcanza con contar: casos que te sirven sobre casos posibles. En un dado, la chance de que salga par es $3/6 = 0.5$. Y lo que **no** ocurre es lo que falta para llegar a 1: si llover tiene chance $0.3$, no llover tiene $0.7$.
-
-**2. Independientes quiere decir que no se influyen.** Una moneda no se acuerda de lo que salió antes. Para pedir que pasen **las dos cosas**, se multiplican las chances: dos caras seguidas es $0.5 \times 0.5 = 0.25$. Se multiplica porque cada vez que se cumple la primera, solo una parte de esos casos cumple también la segunda.
-
-**3. Condicional quiere decir "ya sé algo".** $P(A \mid B)$ es la chance de $A$ **una vez que te enteraste** de que $B$ pasó. Es como achicar el mundo: ya no mirás todas las cartas de la baraja, sino solo las de oros, y adentro de ese grupo calculás la chance.
-
-**4. Bayes: mirar el test con mil personas.** Imaginá mil personas en una plaza. La enfermedad afecta al 1 %: son **10 enfermas** y **990 sanas**.
-De las 10 enfermas, el test detecta al 90 %: **9 dan positivo**.
-
-De las 990 sanas, el test se equivoca con el 5 %: unas **49.5 dan positivo**.
-
-
-Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/58.5 \approx 0.154$, es decir **15.4 %**. El test parece muy bueno, pero hay tantos sanos que sus pocos errores se juntan y superan a los aciertos. Por eso importa saber **qué tan frecuente es la enfermedad antes de testear**.
-
-**5. Esperanza y varianza.** La esperanza es el "promedio de largo plazo": si tirás un dado muchísimas veces, el promedio se acerca a $3.5$ aunque nunca salga ese número. Es el punto de equilibrio, como el centro de una balanza. La varianza mide qué tan **desparramados** están los resultados alrededor de ese centro. Se eleva al cuadrado para que los desvíos hacia arriba y hacia abajo no se cancelen entre sí.
-
-**6. Esperanza condicional.** Es un promedio, pero solo dentro de un grupo. El salario promedio de **quienes estudiaron 15 años** es el mismo tipo de idea que la probabilidad condicional: primero elegís el grupo y después calculás.`,
+        title: 'Esperanza condicional: un promedio dentro de un grupo',
+        text: t`**Esperanza condicional.** Es un promedio, pero solo dentro de un grupo. El salario promedio de **quienes estudiaron 15 años** es el mismo tipo de idea que la probabilidad condicional: primero elegís el grupo y después calculás.`,
       },
     ],
   },
@@ -220,11 +238,21 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
       },
       { type: 'formula', latex: t`X = \begin{pmatrix} 25 & 12 \\ 40 & 16 \\ 31 & 14 \end{pmatrix}` },
       { type: 'paragraph', text: '(3 personas × 2 variables: edad y años de estudio).' },
+      {
+        type: 'intuition',
+        title: 'Vector y matriz: la ficha y la planilla',
+        text: t`**Vector = la ficha de una persona.** Una ficha con tres datos, por ejemplo $(2, 5, 1)$, es un vector: una lista ordenada de números. **Matriz = la planilla entera.** Si cada fila es una persona y cada columna es un dato (edad, años de estudio), tenés la matriz de datos $X$. Es, literalmente, una tabla de Excel.`,
+      },
       { type: 'miniCheck', questionIds: ['m0-q10'] },
       { type: 'subheading', text: 'Producto interno (producto punto)' },
       { type: 'paragraph', text: 'Se multiplican los componentes uno a uno y se suman:' },
       { type: 'formula', latex: t`\langle a, b \rangle = a_1 b_1 + a_2 b_2 + \dots + a_k b_k` },
       { type: 'paragraph', text: t`*Ejemplo:* $(1,2,3) \cdot (4,5,6) = 4 + 10 + 18 = 32$.` },
+      {
+        type: 'intuition',
+        title: 'Producto interno: multiplicar y sumar, como una factura',
+        text: t`**Producto interno: multiplicar y sumar.** Se multiplica cada número de una lista por el que está en la misma posición de la otra y se suma todo: $(1,2,3) \cdot (4,5,6) = 4 + 10 + 18 = 32$. Es lo mismo que calcular una factura: cantidad por precio, renglón por renglón, y al final el total.`,
+      },
       { type: 'subheading', text: 'Combinación lineal (una suma con "pesos")' },
       {
         type: 'paragraph',
@@ -240,6 +268,11 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`*Ejemplo:* si $\beta_0 = 1000$, $\beta_1 = 50$ (por año de edad) y $\beta_2 = 200$ (por año de estudio), para una persona de 30 años con 12 de estudio: $1000 + 50\cdot30 + 200\cdot12 = 4900$.`,
       },
       {
+        type: 'intuition',
+        title: 'Combinación lineal: una receta con precios',
+        text: t`**Combinación lineal: una receta con pesos.** Es una suma donde cada ingrediente se multiplica por un número que dice "cuánto pesa". Con $1000$ de base, $50$ por cada año de edad y $200$ por cada año de estudio, para una persona de 30 años con 12 de estudio queda $1000 + 50 \cdot 30 + 200 \cdot 12 = 4900$. Los números $\beta$ son los precios; el resultado es el total de la cuenta.`,
+      },
+      {
         type: 'extra',
         text: t`El costo de un envío a domicilio es una combinación lineal: 300 pesos de base, más 40 por kilómetro, más 25 por kilo. Para un paquete de 2 kg que viaja 5 km: $300 + 40\cdot5 + 25\cdot2 = 550$ pesos. Es un producto interno entre los coeficientes $(300, 40, 25)$ y los datos del pedido $(1, 5, 2)$.`,
       },
@@ -248,10 +281,20 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         type: 'paragraph',
         text: t`Si una columna de $X$ se puede obtener combinando otras columnas, la información es **redundante**. *Ejemplo:* si incluyes "edad en años" y "edad en meses", una columna es 12 veces la otra. Eso se llama **colinealidad perfecta** y hace imposible repartir el efecto de forma única: cualquier combinación lineal que use las dos columnas puede reproducirse con solo una de ellas, así que no hay manera de decidir cuánto corresponde a cada columna.`,
       },
+      {
+        type: 'intuition',
+        title: 'Colinealidad: pedir lo mismo dos veces',
+        text: t`**Colinealidad: pedir lo mismo dos veces.** Si la planilla tiene "edad en años" y "edad en meses", una columna es siempre 12 veces la otra. Es información repetida. Si el resultado final sube con la edad, no hay forma de saber cuánto se lo debemos a una columna y cuánto a la otra, porque se mueven exactamente juntas.`,
+      },
       { type: 'subheading', text: 'Hiperplano' },
       {
         type: 'paragraph',
         text: t`En 2 dimensiones, una **recta** ($w_1 x_1 + w_2 x_2 + b = 0$) divide el plano en dos mitades. En 3 dimensiones lo hace un plano. En $k$ dimensiones, la misma idea se llama **hiperplano**: una superficie plana que parte el espacio en dos lados. Sirve para separar casos en dos grupos con una regla lineal, como en el ejemplo que sigue.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Hiperplano: una línea que parte en dos',
+        text: t`**Hiperplano: una línea que parte en dos.** Una recta divide un dibujo plano en dos lados, un plano divide el espacio en dos lados y el hiperplano es lo mismo con más datos. Para decidir, alcanza con ver de qué lado cae cada persona. Es una regla del tipo "de este lado, sí; del otro, no".`,
       },
       {
         type: 'extra',
@@ -264,18 +307,8 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
       },
       {
         type: 'intuition',
-        title: 'Listas, planillas y recetas con precios: el álgebra lineal sin miedo',
-        text: t`**1. Vector = la ficha de una persona.** Una ficha con tres datos, por ejemplo $(2, 5, 1)$, es un vector: una lista ordenada de números. **Matriz = la planilla entera.** Si cada fila es una persona y cada columna es un dato (edad, años de estudio), tenés la matriz de datos $X$. Es, literalmente, una tabla de Excel.
-
-**2. Producto interno: multiplicar y sumar.** Se multiplica cada número de una lista por el que está en la misma posición de la otra y se suma todo: $(1,2,3) \cdot (4,5,6) = 4 + 10 + 18 = 32$. Es lo mismo que calcular una factura: cantidad por precio, renglón por renglón, y al final el total.
-
-**3. Combinación lineal: una receta con pesos.** Es una suma donde cada ingrediente se multiplica por un número que dice "cuánto pesa". Con $1000$ de base, $50$ por cada año de edad y $200$ por cada año de estudio, para una persona de 30 años con 12 de estudio queda $1000 + 50 \cdot 30 + 200 \cdot 12 = 4900$. Los números $\beta$ son los precios; el resultado es el total de la cuenta.
-
-**4. Colinealidad: pedir lo mismo dos veces.** Si la planilla tiene "edad en años" y "edad en meses", una columna es siempre 12 veces la otra. Es información repetida. Si el resultado final sube con la edad, no hay forma de saber cuánto se lo debemos a una columna y cuánto a la otra, porque se mueven exactamente juntas.
-
-**5. Hiperplano: una línea que parte en dos.** Una recta divide un dibujo plano en dos lados, un plano divide el espacio en dos lados y el hiperplano es lo mismo con más datos. Para decidir, alcanza con ver de qué lado cae cada persona. Es una regla del tipo "de este lado, sí; del otro, no".
-
-**6. Covarianza: quiénes se mueven juntos.** Es una tabla que anota si dos datos tienden a subir juntos (más años de estudio y más salario) o a moverse en sentidos opuestos (cuando uno sube, el otro baja).`,
+        title: 'Covarianza: quiénes se mueven juntos',
+        text: t`**Covarianza: quiénes se mueven juntos.** Es una tabla que anota si dos datos tienden a subir juntos (más años de estudio y más salario) o a moverse en sentidos opuestos (cuando uno sube, el otro baja).`,
       },
     ],
   },
@@ -290,6 +323,11 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`La **derivada** de una función en un punto es la **pendiente** de la curva en ese punto: cuánto cambia la salida si mueves un poquito la entrada. Si la derivada es positiva, la función sube; si es negativa, baja; si es **cero**, estás en una cima o en un valle (un punto donde la curva se aplana).`,
       },
       {
+        type: 'intuition',
+        title: 'La derivada es la pendiente de una cuesta',
+        text: t`**La derivada es la pendiente.** Imaginá que caminás por una cuesta. Si sube, la pendiente es positiva; si baja, negativa; y si el piso está plano, la pendiente es **cero**. Un lugar plano solo puede ser una cima o el fondo de un valle. La derivada es lo mismo que el velocímetro del auto: te dice cuánto cambia algo por cada pequeño paso que das.`,
+      },
+      {
         type: 'extra',
         text: t`El velocímetro del auto es una derivada: marca cuánto cambia tu posición por cada hora que pasa. Si a las 10:00 estás en el kilómetro 100 y a las 10:30 en el 145, la velocidad media fue $(145-100)/0.5 = 90$ km/h. Con velocidad positiva avanzas; con velocidad cero, estás detenido (o justo en el punto donde cambias de sentido).`,
       },
@@ -302,6 +340,11 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
       {
         type: 'paragraph',
         text: t`*Ejemplo:* $f(b) = (b - 3)^2 + 1$. Su derivada es $2(b-3)$. Igualando a cero: $b = 3$. Ahí está el mínimo: $f(3) = 1$.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Minimizar es buscar el fondo del valle',
+        text: t`**Minimizar es buscar el fondo del valle.** En todo el curso vamos a querer que el error sea lo más chico posible. Si dibujás el error como un paisaje, el mejor punto es el fondo del valle, y ahí el suelo es plano. Por eso se busca el punto donde la derivada vale cero. En el ejemplo $f(b) = (b-3)^2 + 1$, el fondo está en $b = 3$, y ahí vale $1$.`,
       },
       { type: 'subheading', text: 'Ejemplo central: por qué el promedio es "el mejor resumen"' },
       {
@@ -318,6 +361,11 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`**El promedio es la solución de mínimos cuadrados** cuando el modelo es solo "una constante": un único número que resume todos los datos. La idea es general: elegir el resumen que minimice la suma de los errores al cuadrado.`,
       },
       {
+        type: 'intuition',
+        title: 'Por qué el promedio es un buen resumen',
+        text: t`**Por qué el promedio es un buen resumen.** Si te piden un único número que represente a todos tus datos, y querés que quede lo más cerca posible de todos al mismo tiempo (midiendo las distancias al cuadrado), el que mejor funciona es el **promedio**. Es el punto de encuentro que deja al grupo menos incómodo. Por eso el promedio no es solo una costumbre: es la mejor respuesta a esa pregunta.`,
+      },
+      {
         type: 'extra',
         text: t`Tres compañeros de oficina prefieren el aire acondicionado a 20, 22 y 27 °C. ¿Qué temperatura incomoda menos al grupo, medido como suma de las diferencias al cuadrado? A 23 °C (el promedio): $3^2 + 1^2 + 4^2 = 26$. A 22 °C: $2^2 + 0^2 + 5^2 = 29$. A 24 °C: $4^2 + 2^2 + 3^2 = 29$. Cualquier otro valor da más que 26: el mínimo está en el promedio, $\bar{y} = 23$.`,
       },
@@ -327,19 +375,13 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`Cuando hay varios parámetros, se calcula una derivada para cada uno; el vector de todas ellas es el **gradiente**. Apunta hacia donde la función **sube más rápido**, así que para bajar se avanza en dirección contraria. Repetir esto paso a paso es el **descenso por gradiente**: la analogía es bajar una montaña con niebla, dando cada paso hacia donde el suelo desciende más. Es la forma habitual de buscar un mínimo cuando no se puede despejar con una fórmula.`,
       },
       {
-        type: 'extra',
-        text: t`Con la función de antes, $f(b) = (b-3)^2 + 1$, partimos de $b = 0$ y damos pasos de tamaño $0.25$ contra la derivada $2(b-3)$. Primer paso: la derivada vale $-6$, así que $b = 0 - 0.25\cdot(-6) = 1.5$. Segundo paso: la derivada vale $-3$ y $b = 1.5 - 0.25\cdot(-3) = 2.25$. Cada paso se acerca al mínimo en $b = 3$, y los pasos se achican porque la pendiente se aplana.`,
+        type: 'intuition',
+        title: 'Bajar la montaña con niebla',
+        text: t`**Bajar la montaña con niebla.** Cuando hay muchos números que ajustar no se puede despejar el fondo con una fórmula. Entonces se hace como alguien perdido en una montaña con niebla: no ve el valle, pero siente hacia dónde baja el suelo bajo los pies, y da un paso en esa dirección, y otro, y otro. Esa lista de pendientes (una por cada número a ajustar) se llama **gradiente**, y repetir los pasos es el **descenso por gradiente**. Cuanto más cerca del fondo, más plano está el suelo y más cortos son los pasos.`,
       },
       {
-        type: 'intuition',
-        title: 'La derivada es el velocímetro y el error es un valle',
-        text: t`**1. La derivada es la pendiente.** Imaginá que caminás por una cuesta. Si sube, la pendiente es positiva; si baja, negativa; y si el piso está plano, la pendiente es **cero**. Un lugar plano solo puede ser una cima o el fondo de un valle. La derivada es lo mismo que el velocímetro del auto: te dice cuánto cambia algo por cada pequeño paso que das.
-
-**2. Minimizar es buscar el fondo del valle.** En todo el curso vamos a querer que el error sea lo más chico posible. Si dibujás el error como un paisaje, el mejor punto es el fondo del valle, y ahí el suelo es plano. Por eso se busca el punto donde la derivada vale cero. En el ejemplo $f(b) = (b-3)^2 + 1$, el fondo está en $b = 3$, y ahí vale $1$.
-
-**3. Por qué el promedio es un buen resumen.** Si te piden un único número que represente a todos tus datos, y querés que quede lo más cerca posible de todos al mismo tiempo (midiendo las distancias al cuadrado), el que mejor funciona es el **promedio**. Es el punto de encuentro que deja al grupo menos incómodo. Por eso el promedio no es solo una costumbre: es la mejor respuesta a esa pregunta.
-
-**4. Bajar la montaña con niebla.** Cuando hay muchos números que ajustar no se puede despejar el fondo con una fórmula. Entonces se hace como alguien perdido en una montaña con niebla: no ve el valle, pero siente hacia dónde baja el suelo bajo los pies, y da un paso en esa dirección, y otro, y otro. Esa lista de pendientes (una por cada número a ajustar) se llama **gradiente**, y repetir los pasos es el **descenso por gradiente**. Cuanto más cerca del fondo, más plano está el suelo y más cortos son los pasos.`,
+        type: 'extra',
+        text: t`Con la función de antes, $f(b) = (b-3)^2 + 1$, partimos de $b = 0$ y damos pasos de tamaño $0.25$ contra la derivada $2(b-3)$. Primer paso: la derivada vale $-6$, así que $b = 0 - 0.25\cdot(-6) = 1.5$. Segundo paso: la derivada vale $-3$ y $b = 1.5 - 0.25\cdot(-3) = 2.25$. Cada paso se acerca al mínimo en $b = 3$, y los pasos se achican porque la pendiente se aplana.`,
       },
     ],
   },
@@ -373,23 +415,26 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`Por eso se usa tanto: sumar es mucho más fácil que multiplicar (y derivar una suma es mucho más simple que derivar un producto).`,
       },
       {
+        type: 'intuition',
+        title: 'El decodificador secreto: los logaritmos convierten productos en sumas',
+        text: t`**El decodificador secreto (los logaritmos):** multiplicar a mano lleva tiempo, pero sumar es muy fácil. La tabla de logaritmos ($\ln$) funciona como una libreta de "códigos secretos" con una propiedad especial: *para multiplicar dos números, solo sumás sus códigos*.
+
+Por ejemplo, para calcular $2 \times 4 = 8$ buscás en la libreta el código del $2$ (es $0.693$) y el del $4$ (es $1.386$). En lugar de multiplicar, sumás los códigos: $0.693 + 1.386 = 2.079$. Después buscás de qué número es el código $2.079$ y la libreta te dice que es el **8**.`,
+      },
+      {
         type: 'paragraph',
         text: t`*Ejemplo de uso:* $e^{0.693} \approx 2$. Es decir, sumar $0.693$ en la escala logarítmica equivale a **multiplicar por 2** en la escala original.`,
       },
       {
         type: 'intuition',
-        title: 'El decodificador secreto, la máquina inversa y la alcancía mágica',
-        text: t`**1. El decodificador secreto (los logaritmos):** multiplicar a mano lleva tiempo, pero sumar es muy fácil. La tabla de logaritmos ($\ln$) funciona como una libreta de "códigos secretos" con una propiedad especial: *para multiplicar dos números, solo sumás sus códigos*.
+        title: 'La máquina inversa, la alcancía que crece sola y el atajo del 72',
+        text: t`**La máquina inversa ($e$):** la función $e^x$ deshace el código: si le das $2.079$, te devuelve el número original ($e^{2.079} \approx 8$).
 
-Por ejemplo, para calcular $2 \times 4 = 8$ buscás en la libreta el código del $2$ (es $0.693$) y el del $4$ (es $1.386$). En lugar de multiplicar, sumás los códigos: $0.693 + 1.386 = 2.079$. Después buscás de qué número es el código $2.079$ y la libreta te dice que es el **8**.
-
-**2. La máquina inversa ($e$):** la función $e^x$ deshace el código: si le das $2.079$, te devuelve el número original ($e^{2.079} \approx 8$).
-
-**3. La alcancía que crece sola (interés compuesto):** si tu dinero crece 10 % por año, cada año se multiplica por $1.10$. Para saber cuántos años tarda en **duplicarse**, la pregunta es: ¿cuántas veces seguidas hay que multiplicar por $1.10$ para llegar a $2$?
+**La alcancía que crece sola (interés compuesto):** si tu dinero crece 10 % por año, cada año se multiplica por $1.10$. Para saber cuántos años tarda en **duplicarse**, la pregunta es: ¿cuántas veces seguidas hay que multiplicar por $1.10$ para llegar a $2$?
 
 Acá vuelven los códigos: el código de la meta (duplicar) es $\ln(2) \approx 0.693$ y el del paso anual es $\ln(1.10) \approx 0.0953$. Los pasos necesarios son la meta dividida por el paso: $0.693 / 0.0953 \approx 7.3$ años.
 
-**4. El atajo: la "regla del 72":** dividir decimales de memoria es incómodo. Con una tasa chica, $\ln(1+r) \approx r$, así que los años son aproximadamente $69.3$ dividido por la tasa en porcentaje. Se usa $72$ en lugar de $69.3$ porque se divide exacto por muchos números ($2, 3, 4, 6, 8, 9, 12$). Al 10 %: $72/10 = 7.2$ años, muy cerca del $7.3$ exacto.`,
+**El atajo: la "regla del 72":** dividir decimales de memoria es incómodo. Con una tasa chica, $\ln(1+r) \approx r$, así que los años son aproximadamente $69.3$ dividido por la tasa en porcentaje. Se usa $72$ en lugar de $69.3$ porque se divide exacto por muchos números ($2, 3, 4, 6, 8, 9, 12$). Al 10 %: $72/10 = 7.2$ años, muy cerca del $7.3$ exacto.`,
       },
     ],
   },
