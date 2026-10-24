@@ -3,9 +3,11 @@ import { ref } from 'vue'
 import ConfirmPanel from '@/components/common/ConfirmPanel.vue'
 import { InvalidDataError, type StoredData } from '@/logic/persistence/schema'
 import { downloadTextFile } from '@/platform/download'
+import { useAuthStore } from '@/stores/auth'
 import { useUserDataStore } from '@/stores/userData'
 
 const userData = useUserDataStore()
+const auth = useAuthStore()
 
 type Pending = { kind: 'reset' } | { kind: 'import'; data: StoredData }
 
@@ -63,7 +65,12 @@ function cancelPending(): void {
 <template>
   <section aria-labelledby="datos" class="data-management">
     <h2 id="datos">Tu progreso</h2>
-    <p>Se guarda solo en este dispositivo. Exportalo para llevarlo a otro.</p>
+    <p v-if="auth.isAuthenticated">
+      Conectado como <strong>{{ auth.userEmail }}</strong>. Tu progreso se sincroniza con la nube y también se guarda en este dispositivo.
+    </p>
+    <p v-else>
+      Se guarda en este dispositivo. Accede con Google para sincronizarlo entre tu computadora y celular, o exportalo para llevarlo a otro equipo.
+    </p>
     <div class="data-management__actions">
       <button type="button" class="button" @click="exportProgress">Exportar progreso</button>
       <button type="button" class="button" @click="fileInput?.click()">Importar progreso</button>
@@ -73,7 +80,7 @@ function cancelPending(): void {
 
     <ConfirmPanel
       v-if="pending?.kind === 'reset'"
-      message="Se borrará todo tu progreso de este dispositivo. No se puede deshacer."
+      message="Se borrará todo tu progreso de este dispositivo y de la nube si tienes sesión iniciada. No se puede deshacer."
       confirm-label="Sí, borrar todo"
       @confirm="confirmPending"
       @cancel="cancelPending"

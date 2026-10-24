@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import AuthButton from '@/components/auth/AuthButton.vue'
 
 const router = useRouter()
 const query = ref('')
@@ -20,11 +21,14 @@ function search(): void {
       <RouterLink :to="{ name: 'concepts' }">Mapa</RouterLink>
       <RouterLink :to="{ name: 'review' }">Repaso</RouterLink>
     </nav>
-    <form role="search" class="app-header__search" @submit.prevent="search">
-      <label class="visually-hidden" for="header-search">Buscar en secciones y glosario</label>
-      <input id="header-search" v-model="query" type="search" placeholder="Buscar…" autocomplete="off" />
-      <button type="submit" class="button">Buscar</button>
-    </form>
+    <div class="app-header__actions">
+      <form role="search" class="app-header__search" @submit.prevent="search">
+        <label class="visually-hidden" for="header-search">Buscar en secciones y glosario</label>
+        <input id="header-search" v-model="query" type="search" placeholder="Buscar…" autocomplete="off" />
+        <button type="submit" class="button">Buscar</button>
+      </form>
+      <AuthButton />
+    </div>
   </header>
 </template>
 
@@ -54,11 +58,18 @@ function search(): void {
   font-weight: 600;
 }
 
+.app-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .app-header__search {
   display: flex;
-  flex: 1 1 14rem;
+  flex: 1 1 12rem;
   gap: 0.5rem;
-  max-width: 24rem;
+  max-width: 20rem;
 }
 
 .app-header__search input {
