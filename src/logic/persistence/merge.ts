@@ -1,4 +1,5 @@
 import type { AttemptRecord } from '../assessment/attempt'
+import type { ProgressData } from '../progress/progress'
 import type { ReviewItem } from '../review/scheduler'
 import { DATA_VERSION, type StoredData } from './schema'
 
@@ -8,18 +9,52 @@ function attemptKey(attempt: AttemptRecord): string {
 }
 
 /**
+ * Une las secciones vistas. Cada sección con fecha de cambio manual se decide por el lado
+ * que la cambió más tarde (marcada o no); un lado sin fecha cuenta como más viejo, y si
+ * ninguno tiene fecha vale la unión de siempre.
+ */
+function mergeSections(
+  local: ProgressData,
+  remote: ProgressData,
+): { completedSections: string[]; sectionMarks: Record<string, string> | undefined } {
+  const ids = new Set([
+    ...local.completedSections,
+    ...remote.completedSections,
+    ...Object.keys(local.sectionMarks ?? {}),
+    ...Object.keys(remote.sectionMarks ?? {}),
+  ])
+  const completedSections: string[] = []
+  const sectionMarks: Record<string, string> = {}
+
+  for (const id of ids) {
+    const sides = [local, remote].map((side) => ({
+      present: side.completedSections.includes(id),
+      at: side.sectionMarks?.[id],
+      time: side.sectionMarks?.[id] === undefined ? -Infinity : Date.parse(side.sectionMarks[id]),
+    }))
+    const newest = Math.max(...sides.map((side) => side.time))
+    const winners = sides.filter((side) => side.time === newest)
+    if (winners.some((side) => side.present)) completedSections.push(id)
+
+    const stamped = sides.find((side) => side.time === newest && side.at !== undefined)
+    if (stamped?.at !== undefined) sectionMarks[id] = stamped.at
+  }
+
+  return {
+    completedSections,
+    sectionMarks: Object.keys(sectionMarks).length > 0 ? sectionMarks : undefined,
+  }
+}
+
+/**
  * Fusiona de forma determinística dos conjuntos de datos (`local` y `remote`).
  * Aplica unión de secciones completadas, mezcla y deduplicación de intentos de
  * evaluación cronológicos, y preservación del estado de repaso espaciado más reciente
  * para cada pregunta.
  */
 export function mergeStoredData(local: StoredData, remote: StoredData): StoredData {
-  // 1. Secciones completadas: unión sin repetidos
-  const completedSectionsSet = new Set([
-    ...local.progress.completedSections,
-    ...remote.progress.completedSections,
-  ])
-  const completedSections = Array.from(completedSectionsSet)
+  // 1. Secciones completadas: unión, salvo que un cambio manual más reciente las haya desmarcado
+  const { completedSections, sectionMarks } = mergeSections(local.progress, remote.progress)
 
   // Última sección: si el usuario está en el dispositivo local y tiene una, se prioriza local;
   // de lo contrario, se usa la remota.
@@ -66,6 +101,7 @@ export function mergeStoredData(local: StoredData, remote: StoredData): StoredDa
     progress: {
       completedSections,
       lastSectionId,
+      ...(sectionMarks && { sectionMarks }),
     },
     attempts: mergedAttempts,
     reviews: mergedReviews,

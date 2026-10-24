@@ -78,3 +78,46 @@ describe('progreso', () => {
     expect(reopen().continueSection).toBeUndefined()
   })
 })
+
+describe('desmarcar secciones', () => {
+  it('"Marcar como no vista" quita la sección y baja el avance del módulo', () => {
+    const store = useProgressStore()
+    store.markSectionCompleted('2.1')
+    store.markSectionCompleted('2.2')
+    store.unmarkSectionCompleted('2.1')
+    expect(store.isCompleted('2.1')).toBe(false)
+    expect(store.moduleCompletion(2).completed).toBe(1)
+  })
+
+  it('el marcado automático no vuelve a marcar una sección desmarcada', () => {
+    const store = useProgressStore()
+    store.markSectionCompleted('2.1', { auto: true })
+    store.unmarkSectionCompleted('2.1')
+    store.markSectionCompleted('2.1', { auto: true })
+    expect(store.isCompleted('2.1')).toBe(false)
+  })
+
+  it('el botón manual sí puede volver a marcarla', () => {
+    const store = useProgressStore()
+    store.markSectionCompleted('2.1')
+    store.unmarkSectionCompleted('2.1')
+    store.markSectionCompleted('2.1')
+    expect(store.isCompleted('2.1')).toBe(true)
+  })
+
+  it('el desmarcado sobrevive a cerrar y abrir la app', () => {
+    const store = useProgressStore()
+    store.markSectionCompleted('2.1')
+    store.unmarkSectionCompleted('2.1')
+    const reopened = reopen()
+    expect(reopened.isCompleted('2.1')).toBe(false)
+    reopened.markSectionCompleted('2.1', { auto: true })
+    expect(reopened.isCompleted('2.1')).toBe(false)
+  })
+
+  it('ignora secciones que no existen', () => {
+    const store = useProgressStore()
+    store.unmarkSectionCompleted('9.9')
+    expect(store.overall.completed).toBe(0)
+  })
+})

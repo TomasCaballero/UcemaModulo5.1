@@ -46,7 +46,21 @@ function parseProgress(value: unknown): ProgressData {
   if (lastSectionId !== null && (typeof lastSectionId !== 'string' || !SECTION_ID.test(lastSectionId))) {
     throw new InvalidDataError(`Última sección inválida: ${String(lastSectionId)}`)
   }
-  return { completedSections: [...new Set(ids)], lastSectionId }
+  const sectionMarks = parseSectionMarks(value.sectionMarks)
+  return { completedSections: [...new Set(ids)], lastSectionId, ...(sectionMarks && { sectionMarks }) }
+}
+
+function parseSectionMarks(value: unknown): Record<string, string> | undefined {
+  // Los documentos guardados antes de poder desmarcar secciones no traen el campo.
+  if (value === undefined) return undefined
+  if (!isRecord(value)) throw new InvalidDataError('Las marcas de secciones deben ser un objeto')
+  const marks: Record<string, string> = {}
+  for (const [id, at] of Object.entries(value)) {
+    if (!SECTION_ID.test(id)) throw new InvalidDataError(`Id de sección inválido en las marcas: ${id}`)
+    if (!isValidDate(at)) throw new InvalidDataError(`Fecha inválida en la marca de ${id}`)
+    marks[id] = at
+  }
+  return Object.keys(marks).length > 0 ? marks : undefined
 }
 
 function parseAttempt(value: unknown): AttemptRecord {

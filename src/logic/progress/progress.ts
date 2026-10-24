@@ -3,6 +3,11 @@ export interface ProgressData {
   completedSections: string[]
   /** Última sección visitada, para "Continuar". */
   lastSectionId: string | null
+  /**
+   * Fecha (ISO) del último cambio manual de cada sección: marcarla o desmarcarla.
+   * Permite que un desmarcado gane al sincronizar con otro dispositivo. Se omite si no hay.
+   */
+  sectionMarks?: Record<string, string>
 }
 
 export interface Completion {
@@ -16,9 +21,27 @@ export function emptyProgress(): ProgressData {
   return { completedSections: [], lastSectionId: null }
 }
 
-export function markCompleted(progress: ProgressData, sectionId: string): ProgressData {
+/** Marca la sección como vista; con `at` deja registrada la fecha del cambio. */
+export function markCompleted(progress: ProgressData, sectionId: string, at?: string): ProgressData {
   if (progress.completedSections.includes(sectionId)) return progress
-  return { ...progress, completedSections: [...progress.completedSections, sectionId] }
+  const next = { ...progress, completedSections: [...progress.completedSections, sectionId] }
+  return at === undefined ? next : withMark(next, sectionId, at)
+}
+
+/** Marca la sección como no vista y registra cuándo, para que el cambio se imponga al sincronizar. */
+export function unmarkCompleted(progress: ProgressData, sectionId: string, at: string): ProgressData {
+  if (!progress.completedSections.includes(sectionId)) return progress
+  const completedSections = progress.completedSections.filter((id) => id !== sectionId)
+  return withMark({ ...progress, completedSections }, sectionId, at)
+}
+
+/** El usuario la desmarcó a propósito: el marcado automático no debe volver a marcarla. */
+export function isExplicitlyUnmarked(progress: ProgressData, sectionId: string): boolean {
+  return progress.sectionMarks?.[sectionId] !== undefined && !progress.completedSections.includes(sectionId)
+}
+
+function withMark(progress: ProgressData, sectionId: string, at: string): ProgressData {
+  return { ...progress, sectionMarks: { ...progress.sectionMarks, [sectionId]: at } }
 }
 
 export function visitSection(progress: ProgressData, sectionId: string): ProgressData {

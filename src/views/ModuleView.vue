@@ -28,7 +28,7 @@ const sections = computed(() => (module.value ? courseIndex.sectionsOf(module.va
     <SectionRenderer v-if="module.intro" :blocks="module.intro" />
 
     <h2>Secciones</h2>
-    <SectionIndex :sections="sections" :completed-ids="progress.completedIds" :assessment-module-id="questionCount > 0 ? module.id : undefined" />
+    <SectionIndex :sections="sections" :completed-ids="progress.completedIds" :assessment-module-id="questionCount > 0 ? module.id : undefined" @unmark="progress.unmarkSectionCompleted" />
     <section v-if="simulations.length > 0" aria-labelledby="simulaciones">
       <h2 id="simulaciones">Simulaciones</h2>
       <ul class="simulation-list">

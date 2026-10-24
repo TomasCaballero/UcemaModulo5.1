@@ -10,7 +10,12 @@ const seen = computed(() => progress.isCompleted(props.sectionId))
 
 <template>
   <div class="mark-seen" aria-live="polite">
-    <p v-if="seen" class="mark-seen__done">✓ Sección vista</p>
+    <template v-if="seen">
+      <p class="mark-seen__done">✓ Sección vista</p>
+      <button type="button" class="button" @click="progress.unmarkSectionCompleted(sectionId)">
+        Marcar como no vista
+      </button>
+    </template>
     <button v-else type="button" class="button" @click="progress.markSectionCompleted(sectionId)">
       Marcar como vista
     </button>
@@ -19,6 +24,10 @@ const seen = computed(() => progress.isCompleted(props.sectionId))
 
 <style scoped>
 .mark-seen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
   margin-top: 2rem;
 }
 

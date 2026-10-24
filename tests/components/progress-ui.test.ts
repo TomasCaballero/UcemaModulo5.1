@@ -47,6 +47,32 @@ const buttonByText = (wrapper: VueWrapper, text: string) => {
   return button
 }
 
+describe('marcar como no vista', () => {
+  it('el botón de la sección la desmarca y vuelve a ofrecer "Marcar como vista"', async () => {
+    installTestServices()
+    const section = await openApp('/seccion/2.1')
+    await buttonByText(section, 'Marcar como vista').trigger('click')
+    await buttonByText(section, 'Marcar como no vista').trigger('click')
+    expect(section.find('.mark-seen__done').exists()).toBe(false)
+    expect(buttonByText(section, 'Marcar como vista').exists()).toBe(true)
+
+    const module = await openApp('/modulo/2')
+    expect(module.find('.progress__text').text()).toBe('0 de 7 secciones (0 %)')
+  })
+
+  it('el índice del módulo permite desmarcar una sección sin entrar a ella', async () => {
+    installTestServices()
+    const section = await openApp('/seccion/2.1')
+    await buttonByText(section, 'Marcar como vista').trigger('click')
+
+    const module = await openApp('/modulo/2')
+    expect(module.find('.progress__text').text()).toBe('1 de 7 secciones (14 %)')
+    await module.find('.section-index__unmark').trigger('click')
+    expect(module.find('.progress__text').text()).toBe('0 de 7 secciones (0 %)')
+    expect(module.find('.section-index__unmark').exists()).toBe(false)
+  })
+})
+
 describe('marcar como vista', () => {
   it('el botón marca la sección y el módulo suma uno (AC-32)', async () => {
     installTestServices()

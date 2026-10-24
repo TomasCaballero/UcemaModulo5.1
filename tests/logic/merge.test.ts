@@ -141,4 +141,44 @@ describe('mergeStoredData', () => {
     const serialized = serializeStoredData(merged)
     expect(() => parseStoredData(serialized)).not.toThrow()
   })
+
+  describe('secciones desmarcadas', () => {
+    const doc = (completedSections: string[], sectionMarks?: Record<string, string>): StoredData => ({
+      ...emptyStoredData(),
+      progress: { completedSections, lastSectionId: null, ...(sectionMarks && { sectionMarks }) },
+    })
+
+    it('un desmarcado más reciente gana a una marca vieja de otro dispositivo', () => {
+      const local = doc(['1.1'], { '1.2': '2026-10-24T12:00:00.000Z' }) // 1.2 desmarcada
+      const remote = doc(['1.1', '1.2'], { '1.2': '2026-10-20T12:00:00.000Z' })
+      const merged = mergeStoredData(local, remote)
+      expect(merged.progress.completedSections).toEqual(['1.1'])
+      expect(merged.progress.sectionMarks).toEqual({ '1.2': '2026-10-24T12:00:00.000Z' })
+    })
+
+    it('un desmarcado gana a una marca sin fecha de un documento anterior', () => {
+      const local = doc([], { '1.2': '2026-10-24T12:00:00.000Z' })
+      const remote = doc(['1.2'])
+      expect(mergeStoredData(local, remote).progress.completedSections).toEqual([])
+      expect(mergeStoredData(remote, local).progress.completedSections).toEqual([])
+    })
+
+    it('volver a marcar después de desmarcar se impone', () => {
+      const local = doc(['1.2'], { '1.2': '2026-10-25T12:00:00.000Z' })
+      const remote = doc([], { '1.2': '2026-10-24T12:00:00.000Z' })
+      expect(mergeStoredData(local, remote).progress.completedSections).toEqual(['1.2'])
+      expect(mergeStoredData(remote, local).progress.completedSections).toEqual(['1.2'])
+    })
+
+    it('sin fechas sigue siendo la unión de siempre y no agrega sectionMarks', () => {
+      const merged = mergeStoredData(doc(['1.1']), doc(['1.2']))
+      expect(merged.progress.completedSections.sort()).toEqual(['1.1', '1.2'])
+      expect(merged.progress).not.toHaveProperty('sectionMarks')
+    })
+
+    it('el resultado pasa la validación y se conserva al guardar y leer', () => {
+      const merged = mergeStoredData(doc([], { '1.2': '2026-10-24T12:00:00.000Z' }), doc(['1.2']))
+      expect(parseStoredData(serializeStoredData(merged))).toEqual(merged)
+    })
+  })
 })

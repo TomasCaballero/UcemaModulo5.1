@@ -35,13 +35,13 @@ const neighbors = computed(() => courseIndex.neighbors(props.sectionId))
       <!-- Escritorio: barra lateral fija. Celular: menú desplegable. -->
       <nav class="layout__sidebar" :aria-label="`Secciones del módulo ${module.id}`">
         <p class="layout__module">Módulo {{ module.id }}: {{ module.title }}</p>
-        <SectionIndex :sections="moduleSections" :current-id="section.id" :completed-ids="progress.completedIds" :assessment-module-id="assessmentModuleId" />
+        <SectionIndex :sections="moduleSections" :current-id="section.id" :completed-ids="progress.completedIds" :assessment-module-id="assessmentModuleId" @unmark="progress.unmarkSectionCompleted" />
       </nav>
 
       <details class="layout__menu">
         <summary>Secciones del módulo {{ module.id }}</summary>
         <nav :aria-label="`Secciones del módulo ${module.id} (menú)`">
-          <SectionIndex :sections="moduleSections" :current-id="section.id" :completed-ids="progress.completedIds" :assessment-module-id="assessmentModuleId" />
+          <SectionIndex :sections="moduleSections" :current-id="section.id" :completed-ids="progress.completedIds" :assessment-module-id="assessmentModuleId" @unmark="progress.unmarkSectionCompleted" />
         </nav>
       </details>
 
@@ -52,7 +52,7 @@ const neighbors = computed(() => courseIndex.neighbors(props.sectionId))
         </h1>
         <SectionRenderer :blocks="section.blocks" />
         <!-- `key`: cada sección estrena su marcador de fin, para no heredar el estado de la anterior. -->
-        <EndSentinel :key="section.id" @reached="progress.markSectionCompleted(section.id)" />
+        <EndSentinel :key="section.id" @reached="progress.markSectionCompleted(section.id, { auto: true })" />
         <MarkAsSeen :section-id="section.id" />
         <SectionPager :previous="neighbors.previous" :next="neighbors.next" />
       </article>
