@@ -32,21 +32,17 @@ export const useUserDataStore = defineStore('userData', () => {
   const lastSyncedAt = ref<string | null>(null)
   let syncTimeout: ReturnType<typeof setTimeout> | undefined
 
-  /** Sincroniza el documento con la nube en segundo plano (con debounce de 1s). */
-  function scheduleCloudPush(next: StoredData): void {
-    const supabase = getSupabase()
-    if (!supabase || !auth.user) return
+  /** Sincroniza (trae, fusiona y sube) en segundo plano con debounce de 1s. */
+  function scheduleCloudPush(): void {
+    if (!getSupabase() || !auth.user) return
 
     if (syncTimeout !== undefined) {
       clearTimeout(syncTimeout)
     }
     syncStatus.value = 'syncing'
-    syncTimeout = setTimeout(async () => {
+    syncTimeout = setTimeout(() => {
       syncTimeout = undefined
-      if (!auth.user) return
-      const ok = await saveRemoteData(supabase, auth.user.id, next)
-      syncStatus.value = ok ? 'synced' : 'error'
-      if (ok) lastSyncedAt.value = new Date().toISOString()
+      void syncWithCloud()
     }, 1000)
   }
 
@@ -54,7 +50,7 @@ export const useUserDataStore = defineStore('userData', () => {
   function commit(next: StoredData): void {
     data.value = next
     saveFailed.value = !repository.save(next)
-    scheduleCloudPush(next)
+    scheduleCloudPush()
   }
 
   /** Aplica `change` al documento; si devuelve el mismo objeto, no hay nada que guardar. */
@@ -71,10 +67,15 @@ export const useUserDataStore = defineStore('userData', () => {
       return
     }
     syncStatus.value = 'syncing'
-    const { data: merged, success } = await syncDataWithRemote(supabase, auth.user.id, data.value)
+    const snapshot = data.value
+    const { data: merged, success } = await syncDataWithRemote(supabase, auth.user.id, snapshot)
     if (success) {
-      data.value = merged
-      repository.save(merged)
+      // Si el usuario cambió algo mientras se sincronizaba, ese cambio ya programó otra
+      // sincronización que lo fusionará; no se pisa el documento local con una versión vieja.
+      if (data.value === snapshot) {
+        data.value = merged
+        repository.save(merged)
+      }
       syncStatus.value = 'synced'
       lastSyncedAt.value = new Date().toISOString()
     } else {
@@ -126,6 +127,10 @@ export const useUserDataStore = defineStore('userData', () => {
 
   /** Borra todo (RF-41); la confirmación es responsabilidad de la interfaz. */
   function resetData(): void {
+    if (syncTimeout !== undefined) {
+      clearTimeout(syncTimeout)
+      syncTimeout = undefined
+    }
     repository.clear()
     unreadableData.value = false
     saveFailed.value = false

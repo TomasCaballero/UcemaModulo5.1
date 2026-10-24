@@ -10,6 +10,23 @@ export async function fetchRemoteData(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<StoredData | null> {
+  const result = await fetchRemoteState(supabase, userId)
+  return result.status === 'ok' ? result.data : null
+}
+
+export type RemoteState =
+  | { status: 'ok'; data: StoredData }
+  | { status: 'empty' }
+  | { status: 'error' }
+
+/**
+ * Como `fetchRemoteData`, pero distingue "no hay fila" (`empty`) de "no se pudo leer"
+ * (`error`: red, permisos o JSON inválido) para no pisar la nube ante un fallo de lectura.
+ */
+export async function fetchRemoteState(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<RemoteState> {
   try {
     const { data, error } = await supabase
       .from('user_progress')
@@ -17,12 +34,14 @@ export async function fetchRemoteData(
       .eq('user_id', userId)
       .maybeSingle()
 
-    if (error || !data || !data.data) return null
+    if (error) return { status: 'error' }
+    if (!data || !data.data) return { status: 'empty' }
 
     const raw = typeof data.data === 'string' ? data.data : JSON.stringify(data.data)
-    return parseStoredData(raw)
+    const parsed = parseStoredData(raw)
+    return parsed ? { status: 'ok', data: parsed } : { status: 'error' }
   } catch {
-    return null
+    return { status: 'error' }
   }
 }
 
@@ -52,7 +71,8 @@ export async function saveRemoteData(
  * 1. Lee los datos remotos de Supabase.
  * 2. Si existen, los fusiona determinísticamente con los datos locales.
  * 3. Si no existen, inicializa la nube con los datos locales.
- * 4. Guarda el resultado fusionado en la nube y lo devuelve para el almacenamiento local.
+ * 4. Si la lectura falla, no escribe nada (evita pisar la nube con datos desactualizados).
+ * 5. Guarda el resultado fusionado en la nube y lo devuelve para el almacenamiento local.
  */
 export async function syncDataWithRemote(
   supabase: SupabaseClient,
@@ -60,12 +80,13 @@ export async function syncDataWithRemote(
   localData: StoredData,
 ): Promise<{ data: StoredData; success: boolean }> {
   try {
-    const remote = await fetchRemoteData(supabase, userId)
-    if (!remote) {
+    const remote = await fetchRemoteState(supabase, userId)
+    if (remote.status === 'error') return { data: localData, success: false }
+    if (remote.status === 'empty') {
       const saved = await saveRemoteData(supabase, userId, localData)
       return { data: localData, success: saved }
     }
-    const merged = mergeStoredData(localData, remote)
+    const merged = mergeStoredData(localData, remote.data)
     const saved = await saveRemoteData(supabase, userId, merged)
     return { data: merged, success: saved }
   } catch {

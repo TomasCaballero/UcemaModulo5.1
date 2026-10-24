@@ -84,4 +84,54 @@ describe('cloudSync', () => {
     // La nube se actualizó con la fusión
     expect((getStored() as StoredData).progress.completedSections.sort()).toEqual(['1.1', '1.2'].sort())
   })
+
+  it('syncDataWithRemote no escribe si la lectura remota falla', async () => {
+    const upsert = vi.fn().mockResolvedValue({ error: null })
+    const mock = {
+      from: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            maybeSingle: vi.fn().mockResolvedValue({ data: null, error: { message: 'network' } }),
+          }),
+        }),
+        upsert,
+      }),
+    } as unknown as SupabaseClient
+
+    const res = await syncDataWithRemote(mock, 'user-123', emptyStoredData())
+    expect(res.success).toBe(false)
+    expect(upsert).not.toHaveBeenCalled()
+  })
+
+  it('syncDataWithRemote no escribe si el JSON remoto es inválido', async () => {
+    const upsert = vi.fn().mockResolvedValue({ error: null })
+    const mock = {
+      from: vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            maybeSingle: vi.fn().mockResolvedValue({ data: { data: { basura: true } }, error: null }),
+          }),
+        }),
+        upsert,
+      }),
+    } as unknown as SupabaseClient
+
+    const res = await syncDataWithRemote(mock, 'user-123', emptyStoredData())
+    expect(res.success).toBe(false)
+    expect(upsert).not.toHaveBeenCalled()
+  })
+
+  it('un dispositivo desactualizado no pisa lo que otro subió', async () => {
+    const remoteData: StoredData = {
+      ...emptyStoredData(),
+      progress: { completedSections: ['1.1', '1.2', '1.3'], lastSectionId: '1.3' },
+    }
+    const stale: StoredData = {
+      ...emptyStoredData(),
+      progress: { completedSections: ['1.1'], lastSectionId: '1.1' },
+    }
+    const { mock, getStored } = createMockSupabase(remoteData)
+    await syncDataWithRemote(mock, 'user-123', stale)
+    expect((getStored() as StoredData).progress.completedSections.sort()).toEqual(['1.1', '1.2', '1.3'])
+  })
 })
