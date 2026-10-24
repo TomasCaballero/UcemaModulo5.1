@@ -13,6 +13,11 @@ export interface ExportedFile {
 
 export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error'
 
+const SYNC_DEBOUNCE_MS = 1000
+const RETRY_BASE_MS = 2000
+const RETRY_MAX_MS = 60_000
+const MAX_RETRIES = 6
+
 /**
  * Dueño único del documento de datos del usuario (progreso, historial…): carga,
  * guarda, exporta, importa y borra. Los demás stores solo leen y cambian su parte
@@ -31,19 +36,57 @@ export const useUserDataStore = defineStore('userData', () => {
   const syncStatus = ref<SyncStatus>('idle')
   const lastSyncedAt = ref<string | null>(null)
   let syncTimeout: ReturnType<typeof setTimeout> | undefined
+  let retryTimeout: ReturnType<typeof setTimeout> | undefined
+  let retries = 0
+  let inFlight = false
+  let rerun = false
+  /** Se borró el progreso y la nube todavía no lo sabe: hay que subir el local sin fusionar. */
+  let pendingReset = false
+
+  function clearTimers(): void {
+    if (syncTimeout !== undefined) clearTimeout(syncTimeout)
+    if (retryTimeout !== undefined) clearTimeout(retryTimeout)
+    syncTimeout = undefined
+    retryTimeout = undefined
+  }
 
   /** Sincroniza (trae, fusiona y sube) en segundo plano con debounce de 1s. */
   function scheduleCloudPush(): void {
     if (!getSupabase() || !auth.user) return
 
-    if (syncTimeout !== undefined) {
-      clearTimeout(syncTimeout)
-    }
+    clearTimers()
+    retries = 0
     syncStatus.value = 'syncing'
     syncTimeout = setTimeout(() => {
       syncTimeout = undefined
-      void syncWithCloud()
-    }, 1000)
+      void runSync()
+    }, SYNC_DEBOUNCE_MS)
+  }
+
+  /** Reintenta tras un fallo con espera creciente, hasta `MAX_RETRIES` veces. */
+  function scheduleRetry(): void {
+    if (retries >= MAX_RETRIES || retryTimeout !== undefined) return
+    const delay = Math.min(RETRY_BASE_MS * 2 ** retries, RETRY_MAX_MS)
+    retries += 1
+    retryTimeout = setTimeout(() => {
+      retryTimeout = undefined
+      void runSync()
+    }, delay)
+  }
+
+  /** Sube ya lo que esté esperando el debounce (la pestaña se oculta o se cierra). */
+  function flushPending(): void {
+    if (syncTimeout === undefined) return
+    clearTimeout(syncTimeout)
+    syncTimeout = undefined
+    void runSync()
+  }
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') flushPending()
+    })
+    window.addEventListener('pagehide', flushPending)
   }
 
   /** Aplica el cambio en memoria, lo guarda localmente y programa sincronización en la nube. */
@@ -59,28 +102,68 @@ export const useUserDataStore = defineStore('userData', () => {
     if (next !== data.value) commit(next)
   }
 
-  /** Sincronización bidireccional inmediata con Supabase (al iniciar sesión). */
-  async function syncWithCloud(): Promise<void> {
+  /** Una pasada de sincronización; una sola a la vez (si llega otra pedido, se repite al terminar). */
+  async function runSync(): Promise<void> {
     const supabase = getSupabase()
-    if (!supabase || !auth.user) {
+    const user = auth.user
+    if (!supabase || !user) {
       syncStatus.value = 'idle'
       return
     }
+    if (inFlight) {
+      rerun = true
+      return
+    }
+    inFlight = true
+    if (retryTimeout !== undefined) {
+      clearTimeout(retryTimeout)
+      retryTimeout = undefined
+    }
     syncStatus.value = 'syncing'
-    const snapshot = data.value
-    const { data: merged, success } = await syncDataWithRemote(supabase, auth.user.id, snapshot)
-    if (success) {
-      // Si el usuario cambió algo mientras se sincronizaba, ese cambio ya programó otra
-      // sincronización que lo fusionará; no se pisa el documento local con una versión vieja.
-      if (data.value === snapshot) {
-        data.value = merged
-        repository.save(merged)
+
+    let ok = false
+    try {
+      const snapshot = data.value
+      if (pendingReset) {
+        // Tras borrar, el local manda: se sube tal cual para que la nube no lo reviva.
+        ok = await saveRemoteData(supabase, user.id, snapshot)
+        if (ok) pendingReset = false
+      } else {
+        const { data: merged, success } = await syncDataWithRemote(supabase, user.id, snapshot)
+        ok = success
+        // Si el usuario cambió algo mientras se sincronizaba, ese cambio ya programó otra
+        // sincronización que lo fusionará; no se pisa el documento local con una versión vieja.
+        if (ok && data.value === snapshot) {
+          data.value = merged
+          repository.save(merged)
+        }
       }
+    } finally {
+      inFlight = false
+    }
+
+    if (auth.user?.id !== user.id) {
+      // Se cerró la sesión (o cambió de cuenta) durante la sincronización.
+      syncStatus.value = 'idle'
+    } else if (ok) {
+      retries = 0
       syncStatus.value = 'synced'
-      lastSyncedAt.value = new Date().toISOString()
+      lastSyncedAt.value = new Date(clock.now()).toISOString()
     } else {
       syncStatus.value = 'error'
+      scheduleRetry()
     }
+
+    if (rerun) {
+      rerun = false
+      void runSync()
+    }
+  }
+
+  /** Sincronización bidireccional inmediata (al iniciar sesión o con "Sincronizar ahora"). */
+  async function syncWithCloud(): Promise<void> {
+    retries = 0
+    await runSync()
   }
 
   // Al cambiar la sesión (login), sincronizar automáticamente
@@ -90,6 +173,8 @@ export const useUserDataStore = defineStore('userData', () => {
       if (newUser) {
         void syncWithCloud()
       } else {
+        clearTimers()
+        pendingReset = false
         syncStatus.value = 'idle'
       }
     },
@@ -127,19 +212,16 @@ export const useUserDataStore = defineStore('userData', () => {
 
   /** Borra todo (RF-41); la confirmación es responsabilidad de la interfaz. */
   function resetData(): void {
-    if (syncTimeout !== undefined) {
-      clearTimeout(syncTimeout)
-      syncTimeout = undefined
-    }
+    clearTimers()
     repository.clear()
     unreadableData.value = false
     saveFailed.value = false
-    const empty = emptyStoredData()
-    data.value = empty
+    data.value = emptyStoredData()
 
-    const supabase = getSupabase()
-    if (supabase && auth.user) {
-      void saveRemoteData(supabase, auth.user.id, empty)
+    if (getSupabase() && auth.user) {
+      pendingReset = true
+      retries = 0
+      void runSync()
     }
   }
 
