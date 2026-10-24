@@ -16,6 +16,7 @@ import {
 } from '@/logic/classification/classification'
 import { bayes } from '@/logic/simulations/bayes'
 import { assignLabels, sse, updateCentroids, GUIDE_POINTS, GUIDE_START_INDEXES, type Point } from '@/logic/simulations/kmeans'
+import { cumulativeVariance, eigenvalueFromShare, kaiserCount } from '@/logic/statistics/pca'
 import { mean, sampleStdDev, sampleVariance } from '@/logic/statistics/descriptive'
 import { binomialPmf, normalCdf, poissonPmf, tCritical, tTwoTailedPValue, zScore } from '@/logic/statistics/distributions'
 import {
@@ -157,6 +158,13 @@ export const numericExamples: NumericExample[] = [
   { id: 'titanic-raiz-sobreviven', section: '4.3', snippet: r`(239 sobrevivieron, $38.4\,\%$)`, expected: 38.4, precision: 1, actual: () => (239 / 623) * 100 },
 
   // 6.5 Bosque aleatorio: promedio de probabilidades
+  { id: 'pca-pizzas-l1', section: '6.8', snippet: r`\lambda_1 \approx 0.65 \times 8 = 5.2`, expected: 5.2, precision: 1, actual: () => eigenvalueFromShare(0.65, 8) },
+  { id: 'pca-pizzas-l2', section: '6.8', snippet: r`\lambda_2 \approx 0.29 \times 8 = 2.32`, expected: 2.32, precision: 2, actual: () => eigenvalueFromShare(0.29, 8) },
+  { id: 'pca-pizzas-resto', section: '6.8', snippet: r`restante ($0.48$)`, expected: 0.48, precision: 2, actual: () => eigenvalueFromShare(1 - 0.94, 8) },
+  { id: 'pca-gorriones-l1', section: '6.8', snippet: r`\lambda_1 \approx 0.72 \times 5 = 3.6`, expected: 3.6, precision: 1, actual: () => eigenvalueFromShare(0.72, 5) },
+  { id: 'pca-gorriones-l2', section: '6.8', snippet: r`\lambda_2 \approx (0.83 - 0.72) \times 5 = 0.55`, expected: 0.55, precision: 2, actual: () => eigenvalueFromShare(0.83 - 0.72, 5) },
+  { id: 'pca-kaiser-6-4', section: '6.8', snippet: r`Kaiser retiene solo el primero ($2.8>1$)`, expected: 1, precision: 0, actual: () => kaiserCount([2.8, 0.9, 0.2, 0.1]) },
+  { id: 'pca-acumulada-2', section: '6.8', snippet: r`$92.5\,\%$ con dos`, expected: 0.925, precision: 3, actual: () => cumulativeVariance([2.8, 0.9, 0.2, 0.1])[1] as number },
   { id: 'bosque-promedio', section: '6.5', snippet: r`promedio $= 1.101/5 \approx 0.220$`, expected: 0.22, precision: 3, actual: () => forestProbability([0.125, 0.5, 0.333, 0.143, 0]) },
 ]
 

@@ -6,10 +6,10 @@ defineProps<{ block: BlockOf<'extra'> }>()
 </script>
 
 <template>
-  <aside class="extra" aria-label="Ejemplo extra">
+  <div class="extra" role="note" aria-label="Ejemplo extra">
     <p class="extra__label">Ejemplo extra · no es de la guía</p>
     <p class="extra__text"><RichText :text="block.text" /></p>
-  </aside>
+  </div>
 </template>
 
 <style scoped>

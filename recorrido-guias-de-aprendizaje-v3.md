@@ -883,6 +883,8 @@ Entropía ponderada de los hijos: $0.5\times0.722 + 0.5\times0.971 \approx 0.847
 
 Como $0.329 < 0.427$, el árbol abre con "¿es mujer?": la división que deja los hijos más puros.
 
+**Variables categóricas y continuas.** El árbol también decide *cómo* cortar cada tipo de variable. Con una variable **categórica** de varias categorías (clase 1, 2 o 3), prueba separaciones binarias de las categorías: por ejemplo, {1.ª y 2.ª} contra {3.ª}, o {1.ª} contra {2.ª y 3.ª}. Con una variable **continua** (edad), ordena los valores y prueba los **puntos de corte** posibles (por ejemplo, 10, 24.5 o 38.5 años); se queda con el umbral que deja los grupos más puros.
+
 **El árbol del Titanic (ejemplo de clase, profundidad 3).** La raíz contiene los 623 pasajeros de entrenamiento (239 sobrevivieron, $38.4\,\%$) y pregunta "¿es mujer?". Para clasificar a un pasajero se sigue **un único camino** desde la raíz hasta una hoja: por ejemplo, un hombre de 3.ª clase responde "¿es mujer?" $\to$ no, "¿clase = 3?" $\to$ sí, y llega a una hoja con **baja** probabilidad de sobrevivir; una mujer de 1.ª clase llega a una hoja con probabilidad alta. Los componentes son el **nodo raíz** (primera pregunta), los **nodos internos**, las **ramas** (respuestas) y las **hojas** (predicción: la proporción de sobrevivientes del entrenamiento que cayó en ellas). Un árbol no usa una fórmula única: toma decisiones a partir de preguntas sucesivas.
 
 **Sobreajuste y poda.** Si el árbol sigue dividiendo hasta que cada hoja tenga un solo registro, memoriza el entrenamiento. Se controla **limitando la profundidad**, exigiendo un mínimo de registros por hoja, o **podando** ramas que no mejoran el rendimiento en datos de validación.
@@ -1373,6 +1375,22 @@ Agregar más árboles **no causa sobreajuste**: la varianza se estabiliza.
 
 **Comparación final (ejemplo de clase, Titanic, prueba).** Con la misma partición y las mismas variables (sexo, edad imputada y clase), los tres modelos dieron: regresión logística, AUC $0.838$, accuracy $0.780$, precisión $0.700$, recall $0.748$; árbol de decisión (`max_depth=None`, `min_samples_leaf=5`), AUC $0.837$, accuracy $0.813$, precisión $0.752$, recall $0.767$; bosque aleatorio, AUC $0.856$, accuracy $0.802$, precisión $0.755$, recall $0.718$. **Si se prioriza el AUC, el mejor fue el bosque; si se miran accuracy y recall, el árbol tuvo los valores más altos:** el "mejor" modelo depende de la métrica elegida.
 
+#### Explicabilidad frente a capacidad predictiva
+Al elegir una técnica hay que equilibrar dos fuerzas contrapuestas: **explicabilidad** (poder decir *por qué* el modelo decidió algo) y **capacidad predictiva**. Con los tres modelos de la comparación anterior:
+* **Regresión logística** (modelo "blanco"): es transparente. Entrega una ecuación con coeficientes interpretables (*odds ratios*, Módulo 5.2) y permite inferencia formal (p-valores, intervalos de confianza).
+* **Árbol de decisión**: si se mantiene pequeño (profundidad de hasta 3), se puede seguir el camino gráfico de la decisión y presentarlo a directivos o reguladores.
+* **Bosque aleatorio** ("caja negra"): es un enjambre de cientos de árboles promediados. Suele predecir mejor con grandes volúmenes de datos, pero **no hay una ecuación única ni un gráfico sencillo** que explique por qué se clasificó a un cliente de cierta manera.
+
+> **Analogía de la receta y el comité:** la regresión logística es una receta con cantidades exactas: puedes explicar cada ingrediente. El árbol chico es un diagrama de flujo que se sigue con el dedo. El bosque es un comité de cien médicos que vota: acierta más, pero nadie puede resumir en una frase por qué votó así el comité.
+
+**SHAP.** En sectores muy regulados (banca, seguros, salud) hay que justificar, por ejemplo, por qué se rechazó un crédito. Como no se puede mostrar el cálculo de 500 árboles, se usan herramientas de explicabilidad válidas para cualquier modelo, como **SHAP** (*SHapley Additive exPlanations*): analizan cómo cambia la predicción al alterar las variables de un individuo, para medir qué variables aportaron más a su decisión.
+
+**Deriva de datos y de concepto (*drift*).** Los modelos basados en árboles afinan patrones muy finos; si la realidad cambia, su rendimiento puede deteriorarse rápido (la regresión logística suele ser más estable en el tiempo). Hay dos tipos de cambio:
+* **Deriva de datos (*data drift*):** cambia la distribución de las variables de entrada (por ejemplo, los clientes pasan de comprar por la web a comprar por la aplicación móvil).
+* **Deriva de concepto (*concept drift*):** cambia la relación entre las variables y la respuesta (por ejemplo, tras una crisis económica, un nivel de ingresos que antes era seguro pasa a ser de alto riesgo).
+
+Por eso, en empresas de gran escala (bancos, tarjetas de crédito, plataformas de comercio electrónico) estos modelos se **monitorean** y se **reentrenan periódicamente** (en la clase se mencionó cada 6 a 12 meses).
+
 #### Boosting
 A diferencia del bagging (árboles independientes en paralelo), el **boosting** entrena árboles **en secuencia**, cada uno **corrigiendo los errores del anterior**:
 
@@ -1461,6 +1479,110 @@ Falta definir qué es "distancia entre grupos". Es el criterio de **enlace (*lin
 * **Ward**: fusiona los grupos cuya unión **aumenta menos la varianza interna total**.
 
 *Ejemplo con los mismos puntos:* tras fusionar $\{1,2,4\}$ y $\{10,11,13\}$, la distancia entre ambos grupos es **6** con enlace simple ($10-4$), **12** con enlace completo ($13-1$) y **9** con enlace promedio (promedio de las 9 distancias entre pares). La elección del enlace puede cambiar el resultado.
+
+### 6.8 PCA en profundidad y análisis de correspondencias
+
+Amplía el PCA del Módulo 6.4 con lo trabajado en la clase de aprendizaje no supervisado: por qué hace falta, cómo se interpreta, cuántos componentes conservar y qué hacer cuando las variables son categóricas.
+
+#### Por qué hace falta: variabilidad y multicolinealidad
+En la clase se mostró, con un archivo de departamentos (se quería explicar el precio), qué pasa cuando las columnas no aportan información, en cuatro pasos:
+1. **Columnas constantes.** Si todos los departamentos tienen 10 años de antigüedad y el mismo código de tipo (99), el modelo da $R^2 = 0$, pendiente cero y se reduce al promedio del precio. **Sin variabilidad no hay información:** una columna que no cambia (varianza $=0$) no distingue entre observaciones.
+2. **Constante más variable.** Al sumar la superficie en $m^2$ (que sí varía) a la antigüedad constante, $R^2 = 0.69$ y la antigüedad recibe coeficiente cero: agregarla es peso muerto.
+3. **Variables idénticas.** Con dos predictoras iguales ($X_1 = X_2$) hay dependencia lineal perfecta: no se puede invertir la matriz y el programa anula una de las dos (coeficiente $0$).
+4. **Variables casi iguales.** Con la superficie real y la superficie redondeada, $R^2 = 0.70$, pero la ecuación fue $\text{Precio} = 1741 - 150\times\text{Superficie real} + 152\times\text{Superficie redondeada}$: dice a la vez que más superficie *baja* el precio y que lo *sube*.
+
+Esto es la **multicolinealidad** (Módulo 3; el VIF del Módulo 5.2 la mide). Los coeficientes se vuelven **inestables** (mover un solo dato puede cambiarles el signo), se pierde la capacidad de explicar ("¿esta variable ayuda o perjudica?") y, con 100 o 500 columnas, no se detecta mirando correlaciones de a pares, porque una columna puede ser combinación de otras tres o cuatro a la vez. El PCA ataca justamente este problema: reemplaza las columnas redundantes por pocas variables nuevas que no están correlacionadas.
+
+> **Analogía del velocímetro trabado:** evaluar el rendimiento de un auto con un velocímetro clavado en 60 km/h, esté frenado en un semáforo o a fondo en la pista, no aporta ningún dato: lo que no cambia no informa.
+
+#### De la dimensión observada a la dimensión verdadera
+En datos reales se observan muchas columnas (500 en una aseguradora, 5000 en genética), pero muchas miden aspectos repetidos del mismo fenómeno. La **dimensión verdadera** (o latente) es el número reducido de ejes independientes que realmente gobiernan la variación. En muchos problemas prácticos, pasar de 500 variables a 10 o 20 componentes conserva más del 75-80 % de la información útil.
+
+*Historia breve:*
+* **Karl Pearson (1901):** primera versión, geométrica, buscando rectas y planos de mejor ajuste.
+* **Charles Spearman (1904):** Análisis Factorial (AF), en psicología. Diferencia clave: el PCA busca explicar la **varianza total**; el AF, solo la **varianza compartida** (comunalidad) mediante factores latentes no observados.
+* **Harold Hotelling (1933):** formulación matricial moderna, con valores y vectores propios; los componentes resultan ortogonales (no correlacionados).
+
+**Intuición geométrica.** Una nube de puntos con variables muy correlacionadas no es redonda como una pelota de fútbol: está alargada en diagonal, como una pelota de rugby.
+1. El **primer componente** ($CP_1$) es la recta que atraviesa la nube a lo largo de su lado más largo: la dirección de máxima varianza.
+2. El **segundo componente** ($CP_2$) es un eje a $90^\circ$ del primero (ortogonal), que captura la mayor variabilidad restante.
+3. En lugar de describir los puntos con los ejes originales (correlacionados), el PCA **rota el sistema de coordenadas** hasta alinearlo con los ejes naturales de la nube. En el sistema nuevo, $CP_1$ y $CP_2$ tienen correlación exactamente igual a cero.
+
+> **Analogía de la sombra de la estatua:** para fotografiar una escultura 3D en una página plana, si la fotografías desde el costado correcto, la sombra conserva casi todos los detalles; desde un ángulo ciego solo ves un círculo sin forma. El PCA busca el ángulo de la mejor "sombra" de tus datos.
+
+Cada componente $CP_k$ tiene asociado un **autovalor** (o valor propio) $\lambda_k$: la cantidad de varianza que captura. Se ordenan $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_p > 0$, y su suma es la varianza total de los datos originales. La proporción de varianza que explica cada componente es:
+
+$$\text{Varianza explicada por } CP_k = \frac{\lambda_k}{\lambda_1 + \lambda_2 + \dots + \lambda_p}$$
+
+#### Cargas factoriales y círculo de correlaciones
+Las **cargas factoriales** (*loadings*) son números entre $-1$ y $+1$ que miden la correlación simple entre cada variable original $X_j$ y un componente $CP_k$. Sirven para **ponerle nombre** a los componentes. *Ejemplo:* si con las notas de 5 materias el $CP_1$ tiene cargas altas y positivas ($+0.85$) en Matemática y en Física, se lo puede llamar "aptitud cuantitativa general".
+
+En el **círculo de correlaciones** cada variable es una flecha:
+* **Ángulo pequeño** ($\theta \approx 0^\circ$): variables con fuerte correlación positiva (avanzan juntas).
+* **Ángulo recto** ($\theta = 90^\circ$): variables no correlacionadas.
+* **Flechas opuestas** ($\theta = 180^\circ$): fuerte correlación negativa.
+* **Flecha que llega al borde del círculo**: la variable está bien representada en ese plano.
+
+#### Covarianza o correlación: ¿hay que estandarizar?
+Un paso metodológico crítico es decidir sobre qué matriz se aplica el PCA:
+* **Matriz de covarianza** ($S$, PCA no estandarizado): solo si todas las variables están en las **mismas unidades** y con escalas comparables.
+* **Matriz de correlación** ($R$, PCA estandarizado): cuando las unidades son distintas (años, pesos, mmHg, miligramos frente a toneladas). Si no se estandariza, la variable con números más grandes (por ejemplo, ingresos de \$500.000) domina los primeros componentes por una cuestión de escala y no porque contenga más información.
+
+Con la matriz de correlación, cada variable original aporta $1$ unidad de varianza, así que la varianza total es igual al número de variables $p$.
+
+#### ¿Cuántos componentes retener?
+Al pasar de $p$ variables a $p$ componentes hay que decidir con cuántos ($k<p$) quedarse y cuáles descartar como ruido:
+
+| Criterio | Regla de decisión |
+| :--- | :--- |
+| **Varianza acumulada** | Retener los primeros $k$ componentes que acumulen entre el $70\,\%$ y el $80\,\%$ de la varianza total. |
+| **Regla de Kaiser-Guttman** | Con la matriz de correlación, conservar solo los componentes con $\lambda > 1$: los que aportan más información que una variable original aislada. |
+| **Gráfico de sedimentación** (*scree plot*) | Graficar los autovalores en orden decreciente y buscar el "codo", donde la curva se aplana; retener los componentes anteriores al codo. |
+| **Análisis paralelo de Horn** | Simular (Monte Carlo) conjuntos de ruido aleatorio con las mismas dimensiones; retener solo los componentes reales cuyo autovalor supera al del ruido. Se lo considera el estándar de oro. |
+
+Los criterios pueden no coincidir. *Ejemplo con los valores propios $2.8,\ 0.9,\ 0.2,\ 0.1$ del Módulo 6.4 (4 variables estandarizadas):* Kaiser retiene solo el primero ($2.8>1$); la varianza acumulada es $70\,\%$ con uno y $92.5\,\%$ con dos. Por eso conviene **triangular**: usar varios criterios y decidir con criterio.
+
+#### Casos de la clase: pizzas y gorriones
+* **Pizzas.** 71 muestras de masa de pizza analizadas en laboratorio, con 8 propiedades químicas continuas (pH, grasa, proteína, ceniza, sodio, calorías, entre otras). El $CP_1$ explicó el $65\,\%$ de la varianza y el $CP_2$ el $29\,\%$: entre los dos, el $94\,\%$. El espacio de 8 dimensiones era en realidad una nube casi plana de 2 dimensiones.
+* **Gorriones.** 49 gorriones con 5 medidas morfológicas (largo total, extensión de las alas, largo de la quilla, entre otras), para estudiar su supervivencia tras una tormenta. El $CP_1$ explicó el $72\,\%$ (asociado al tamaño general del ave) y los dos primeros, el $83\,\%$ acumulado.
+
+*Aplicando Kaiser a estas cifras (suponiendo matriz de correlación, con la varianza total igual a $p$ y los porcentajes redondeados):* en las pizzas, $\lambda_1 \approx 0.65 \times 8 = 5.2$ y $\lambda_2 \approx 0.29 \times 8 = 2.32$; el $6\,\%$ restante ($0.48$) se reparte entre 6 componentes, ninguno con $\lambda>1$: Kaiser retiene 2. En los gorriones, $\lambda_1 \approx 0.72 \times 5 = 3.6$ y $\lambda_2 \approx (0.83 - 0.72) \times 5 = 0.55 < 1$: Kaiser retendría 1, mientras que la regla del $80\,\%$ pide 2.
+
+#### Valores atípicos y limitaciones
+El PCA permite detectar dos tipos de observaciones atípicas:
+* **Distancia de puntaje** (*score distance*): puntos dentro del plano de los componentes retenidos, pero muy alejados del centro (puntos de apalancamiento).
+* **Distancia ortogonal** (*orthogonal distance*): puntos que se disparan en una dimensión perpendicular, la que el modelo descartó (atípicos reales).
+
+Un solo atípico severo puede "tirar de la cuerda" y rotar indebidamente los ejes; conviene correr el análisis con y sin los atípicos para ver si los ejes son estables.
+
+*Limitaciones y cuidados:*
+* **Solo variables numéricas continuas.** Convertir una variable categórica (por ejemplo, estado civil $=1,2,3$) a números y meterla en un PCA es un error grave que distorsiona los resultados.
+* **Solo estructuras lineales.** El PCA usa combinaciones lineales y rotaciones rígidas. Si los datos siguen formas curvas (como un pastel arrollado, el *Swiss roll*), falla y hace falta una variante como el **Kernel PCA**.
+* **Explicar frente a predecir.** El PCA resuelve la multicolinealidad y permite modelos predictivos estables (regresión sobre componentes principales), pero para explicar el modelo a personas no técnicas hay que traducir las cargas de vuelta a las variables originales.
+
+#### Análisis de correspondencias simples (ACS)
+Cuando las variables no son números continuos sino **categóricas** (región del vino, plato elegido), se usa el **análisis de correspondencias**, el equivalente del PCA para este caso:
+
+| | PCA | Análisis de correspondencias |
+| :--- | :--- | :--- |
+| Variables | Continuas | Categóricas |
+| Datos | Tabla de observaciones por variables | Tabla de contingencia (cruce de filas y columnas) |
+| Distancia | Euclídea | Chi-cuadrado ($\chi^2$) |
+| Variabilidad | Varianza total | **Inercia total** |
+
+**Regla de oro:** nunca hagas un análisis de correspondencias sin comprobar antes, con una prueba de $\chi^2$ sobre la tabla de contingencia (Módulo 2.4), que las variables están estadísticamente asociadas. *Demostración de la clase* (400 clientes que eligen vino y plato): en la tabla **sin asociación real**, todos los puntos del mapa se amontonaron en el centro, y interpretar distancias ahí era inventar historias sobre la nada misma; en la tabla **con asociación significativa**, platos y vinos se separaron con claridad (el tinto de Burdeos cerca de las carnes rojas, el blanco cerca de los pescados).
+
+#### Mapa de decisión y lista de verificación
+Para reducir dimensión:
+* Si las variables son **continuas**: si tienen unidades o escalas distintas, PCA con la matriz de correlación ($R$); si no, con la de covarianza ($S$). En ambos casos, elegir los componentes con el gráfico de sedimentación, Kaiser ($\lambda>1$) y el análisis paralelo de Horn.
+* Si las variables son **categóricas**: comprobar la asociación con $\chi^2$. Si **no** hay asociación significativa, no hacer el mapa. Si la hay, análisis de correspondencias (simple o múltiple).
+
+Lista de verificación para el analista:
+1. **Garantizar variabilidad:** comprobar que ninguna columna sea constante antes de modelar.
+2. **Eliminar la multicolinealidad:** usar PCA o regresión sobre componentes cuando haya variables muy correlacionadas.
+3. **Estandarizar** (matriz $R$) si las unidades de medida son heterogéneas.
+4. **Validar la cantidad de ejes** triangulando codo, Kaiser y análisis paralelo.
+5. **No forzar métodos:** PCA para continuas, análisis de correspondencias para categóricas asociadas.
 
 ### Autoevaluación del Módulo 6
 
@@ -1685,7 +1807,10 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 
 * **AdaBoost**: boosting que da más peso a lo mal clasificado (6.5).
 * **AUC**: área bajo la curva ROC; 0.5 = azar, 1 = perfecto (5.2).
+* **Análisis de correspondencias**: equivalente del PCA para variables categóricas; trabaja con tablas de contingencia y distancia $\chi^2$ (6.8).
+* **Análisis paralelo de Horn**: criterio que retiene solo los componentes cuyo autovalor supera al de datos de ruido simulados (6.8).
 * **Atributo**: variable o columna de los datos (4).
+* **Autovalor (valor propio)**: varianza que captura un componente principal (6.4, 6.8).
 * **Bagging**: promediar modelos entrenados en muestras bootstrap (6.5).
 * **Bayes, teorema de**: invierte una probabilidad condicional (0.2).
 * **BLUE**: mejor estimador lineal insesgado; propiedad de OLS bajo Gauss-Markov (3.6).
@@ -1693,6 +1818,7 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **C (parámetro de regularización)**: inverso de la fuerza de regularización en la regresión logística; C chico = más regularización (5.2).
 * **Calibración**: las probabilidades predichas coinciden con las frecuencias observadas (5.2).
 * ***Ceteris paribus***: "manteniendo todo lo demás constante" (3.2).
+* **Carga factorial (*loading*)**: correlación entre una variable original y un componente principal (6.8).
 * **Chi-cuadrado ($\chi^2$)**: distribución de una suma de normales al cuadrado (2.4).
 * **Clasificación**: predecir una categoría (4.3).
 * ***Clustering***: agrupar registros por similitud, sin etiquetas (4.5, 6.7).
@@ -1701,6 +1827,7 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **Contrafactual**: lo que habría pasado sin el tratamiento (3.2).
 * **Correlación serial**: error correlacionado entre períodos (3.7).
 * **Covarianza, matriz de**: tabla de varianzas y covarianzas entre variables (0.3).
+* **Deriva de datos / de concepto (*drift*)**: cambia la distribución de las entradas / la relación entre entradas y respuesta (6.5).
 * **Dendrograma**: árbol de fusiones del clustering jerárquico (6.7).
 * **DBSCAN**: agrupamiento por densidad (4.5).
 * **Desviación típica**: raíz de la varianza (2.2).
@@ -1724,11 +1851,14 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **Gini, índice**: impureza de un nodo (4.3).
 * **Gradient boosting**: boosting con árboles ajustados al gradiente de la pérdida (6.5).
 * **Heterocedasticidad**: varianza del error no constante (3.7).
+* **Gráfico de sedimentación (*scree plot*)**: autovalores en orden decreciente; se busca el codo (6.8).
 * **Hiperparámetro**: parámetro que se fija antes de entrenar (6.3).
 * **Hiperplano**: generalización de la recta/plano a $k$ dimensiones (0.3, 6.6).
 * **Homocedasticidad**: varianza del error constante (3.6).
 * **Hosmer–Lemeshow, test de**: compara casos observados y esperados por grupos para evaluar la calibración (5.2).
+* **Inercia**: variabilidad total en el análisis de correspondencias (6.8).
 * **Intervalo de confianza**: rango construido con un método que acierta con cierta frecuencia (2.6).
+* **Kaiser-Guttman, regla de**: retener los componentes con autovalor mayor que 1 (6.8).
 * **Kernel**: función que calcula productos internos en un espacio ampliado (6.6).
 * **K-Means**: agrupamiento por centroides (6.7).
 * **Lasso**: regularización $L_1$ con selección de variables (6.4).
@@ -1757,6 +1887,7 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **Regularización**: penalizar la complejidad (6.4, 7.6).
 * **Residuo**: $y-\hat{y}$ (3.3).
 * **Ridge**: regularización $L_2$ (6.4).
+* **SHAP**: explica la contribución de cada variable a la predicción de un individuo, para cualquier modelo (6.5).
 * **Sesgo (*bias*)**: error por un modelo demasiado simple (6.2).
 * **Sesgo inductivo**: suposición previa que permite generalizar (7.2, 7.5).
 * **Sobreajuste / subajuste**: memorizar el ruido / no captar el patrón (6.2).
@@ -1802,7 +1933,7 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 | Interpretar con **odds ratios** | Regresión logística | 5 |
 | Encontrar **qué se compra junto** | Apriori (soporte, confianza, lift) | 4 |
 | **Agrupar** sin etiquetas | K-Means, jerárquico, DBSCAN | 4, 6 |
-| **Reducir dimensión** | PCA, Lasso | 6 |
+| **Reducir dimensión** | PCA (variables numéricas), análisis de correspondencias (categóricas), Lasso | 6 |
 | Elegir hiperparámetros / estimar error | Validación cruzada, OOB | 6 |
 
 ### Los errores más comunes (y cómo evitarlos)

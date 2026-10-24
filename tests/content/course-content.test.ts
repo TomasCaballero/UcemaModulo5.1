@@ -11,9 +11,9 @@ describe('contenido cargado', () => {
     expect(validateContent(courseContent)).toEqual([])
   })
 
-  it('tiene las 49 secciones del catálogo más el anexo opcional 1.7, en orden', () => {
+  it('tiene las 50 secciones del catálogo más el anexo opcional 1.7, en orden', () => {
     const ids = courseContent.sections.map((s) => s.id)
-    expect(ids).toHaveLength(50)
+    expect(ids).toHaveLength(51)
     expect(ids.filter((id) => id.startsWith('2.'))).toEqual(['2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7'])
     expect(courseContent.sections.filter((s) => s.optional).map((s) => s.id)).toEqual(['1.7'])
     expect(ids.filter((id) => id !== '1.7')).toEqual(sectionCatalog.map((entry) => entry.id))

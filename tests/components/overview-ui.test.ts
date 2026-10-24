@@ -88,9 +88,9 @@ describe('cuadro síntesis', () => {
 })
 
 describe('mapa de conceptos', () => {
-  it('muestra los 49 nodos agrupados en los 8 módulos', async () => {
+  it('muestra los 50 nodos agrupados en los 8 módulos', async () => {
     const wrapper = await openApp('/mapa')
-    expect(wrapper.findAll('button.node')).toHaveLength(49)
+    expect(wrapper.findAll('button.node')).toHaveLength(50)
     expect(wrapper.findAll('.module-title')).toHaveLength(8)
     expect(wrapper.find('#detalle + p').text()).toBe('No elegiste ninguna sección.')
   })

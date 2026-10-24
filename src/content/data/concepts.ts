@@ -8,7 +8,7 @@ export interface CatalogEntry {
   title: string
 }
 
-/** Las 49 secciones numeradas de la guía, también las de módulos que aún no se cargaron. */
+/** Las 50 secciones numeradas de la guía, también las de módulos que aún no se cargaron. */
 export const sectionCatalog: CatalogEntry[] = [
   { id: '0.1', title: 'Notación básica' },
   { id: '0.2', title: 'Probabilidad' },
@@ -52,6 +52,7 @@ export const sectionCatalog: CatalogEntry[] = [
   { id: '6.5', title: 'Métodos de ensamble' },
   { id: '6.6', title: 'Máquinas de Vectores de Soporte (SVM)' },
   { id: '6.7', title: 'Agrupamiento no supervisado: K-Means y clustering jerárquico' },
+  { id: '6.8', title: 'PCA en profundidad y análisis de correspondencias' },
   { id: '7.1', title: 'Aprender es inducir, no memorizar' },
   { id: '7.2', title: 'Riesgo real, riesgo empírico y minimización del riesgo empírico (ERM)' },
   { id: '7.3', title: 'Aprendizaje PAC (Probably Approximately Correct)' },
@@ -101,6 +102,9 @@ export const dependencies: Dependency[] = [
   { from: '6.6', to: '0.3' },
   { from: '6.7', to: '0.4' },
   { from: '6.7', to: '4.5' },
+  { from: '6.8', to: '2.4' },
+  { from: '6.8', to: '5.2' },
+  { from: '6.8', to: '6.4' },
   { from: '7.2', to: '0.4' },
   { from: '7.2', to: '6.1' },
   { from: '7.2', to: '6.6' },

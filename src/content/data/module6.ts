@@ -412,6 +412,54 @@ export const module6Sections: Section[] = [
         type: 'paragraph',
         text: t`**Comparación final (ejemplo de clase, Titanic, prueba).** Con la misma partición y las mismas variables (sexo, edad imputada y clase), los tres modelos dieron: regresión logística, AUC $0.838$, accuracy $0.780$, precisión $0.700$, recall $0.748$; árbol de decisión (max_depth=None, min_samples_leaf=5), AUC $0.837$, accuracy $0.813$, precisión $0.752$, recall $0.767$; bosque aleatorio, AUC $0.856$, accuracy $0.802$, precisión $0.755$, recall $0.718$. **Si se prioriza el AUC, el mejor fue el bosque; si se miran accuracy y recall, el árbol tuvo los valores más altos:** el "mejor" modelo depende de la métrica elegida.`,
       },
+      { type: 'subheading', text: 'Explicabilidad frente a capacidad predictiva' },
+      {
+        type: 'paragraph',
+        text: t`Al elegir una técnica hay que equilibrar dos fuerzas contrapuestas: **explicabilidad** (poder decir *por qué* el modelo decidió algo) y **capacidad predictiva**. Con los tres modelos de la comparación anterior:`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**Regresión logística** (modelo "blanco"): es transparente. Entrega una ecuación con coeficientes interpretables (*odds ratios*, Módulo 5.2) y permite inferencia formal (p-valores, intervalos de confianza).`,
+          t`**Árbol de decisión**: si se mantiene pequeño (profundidad de hasta 3), se puede seguir el camino gráfico de la decisión y presentarlo a directivos o reguladores.`,
+          t`**Bosque aleatorio** ("caja negra"): es un enjambre de cientos de árboles promediados. Suele predecir mejor con grandes volúmenes de datos, pero **no hay una ecuación única ni un gráfico sencillo** que explique por qué se clasificó a un cliente de cierta manera.`,
+        ],
+      },
+      {
+        type: 'analogy',
+        text: t`**Analogía de la receta y el comité:** la regresión logística es una receta con cantidades exactas: puedes explicar cada ingrediente. El árbol chico es un diagrama de flujo que se sigue con el dedo. El bosque es un comité de cien médicos que vota: acierta más, pero nadie puede resumir en una frase por qué votó así el comité.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Qué se gana y qué se pierde al elegir un bosque',
+        text: t`**Qué se gana y qué se pierde.** Más potencia para predecir se paga con menos capacidad de explicar. Si un banco te rechaza un crédito, tiene que poder decirte por qué. Con una regresión logística, señala los coeficientes. Con un árbol chico, muestra el camino de preguntas. Con un bosque, no puede mostrar los cálculos de 500 árboles. En el ejemplo del Titanic, el bosque ganó en AUC ($0.856$), pero la regresión logística quedó muy cerca ($0.838$) y se puede explicar de punta a punta: a veces esa diferencia no compensa perder la explicación.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`**SHAP.** En sectores muy regulados (banca, seguros, salud) hay que justificar, por ejemplo, por qué se rechazó un crédito. Como no se puede mostrar el cálculo de 500 árboles, se usan herramientas de explicabilidad válidas para cualquier modelo, como **SHAP** (*SHapley Additive exPlanations*): analizan cómo cambia la predicción al alterar las variables de un individuo, para medir qué variables aportaron más a su decisión.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q20'] },
+      {
+        type: 'paragraph',
+        text: t`**Deriva de datos y de concepto (*drift*).** Los modelos basados en árboles afinan patrones muy finos; si la realidad cambia, su rendimiento puede deteriorarse rápido (la regresión logística suele ser más estable en el tiempo). Hay dos tipos de cambio:`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**Deriva de datos** (*data drift*): cambia la distribución de las variables de entrada (por ejemplo, los clientes pasan de comprar por la web a comprar por la aplicación móvil).`,
+          t`**Deriva de concepto** (*concept drift*): cambia la relación entre las variables y la respuesta (por ejemplo, tras una crisis económica, un nivel de ingresos que antes era seguro pasa a ser de alto riesgo).`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Por eso, en empresas de gran escala (bancos, tarjetas de crédito, plataformas de comercio electrónico) estos modelos se **monitorean** y se **reentrenan periódicamente** (en la clase se mencionó cada 6 a 12 meses).`,
+      },
+      {
+        type: 'intuition',
+        title: 'El mapa que envejece',
+        text: t`**El mapa que envejece.** Un modelo es como un mapa de la ciudad dibujado con datos de hace años. En la **deriva de datos** cambió quién usa la ciudad: llega gente que antes no venía, o por otro medio (de la web a la app). En la **deriva de concepto** cambiaron las calles: lo que antes era un buen indicio ya no lo es (un ingreso que era seguro ahora es de riesgo). En los dos casos el mapa viejo guía mal, y por eso se vigila el rendimiento y se vuelve a dibujar cada tanto.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q21'] },
       { type: 'subheading', text: 'Boosting' },
       {
         type: 'paragraph',
@@ -670,6 +718,268 @@ export const module6Sections: Section[] = [
       {
         type: 'extra',
         text: t`Un dendrograma se parece a un árbol genealógico o a la clasificación de los seres vivos: primero se juntan los individuos más parecidos (dos gatos domésticos), luego esos grupos se unen con otros cercanos (felinos), y así hasta que todo queda en un solo árbol. Elegir dónde cortar es elegir cuántos grupos quieres: un corte bajo da muchos grupos muy parecidos por dentro; uno alto, pocos grupos amplios.`,
+      },
+    ],
+  },
+  {
+    id: '6.8',
+    moduleId: 6,
+    title: 'PCA en profundidad y análisis de correspondencias',
+    blocks: [
+      {
+        type: 'paragraph',
+        text: t`Amplía el PCA del Módulo 6.4 con lo trabajado en la clase de aprendizaje no supervisado: por qué hace falta, cómo se interpreta, cuántos componentes conservar y qué hacer cuando las variables son categóricas.`,
+      },
+      { type: 'subheading', text: 'Por qué hace falta: variabilidad y multicolinealidad' },
+      {
+        type: 'paragraph',
+        text: t`En la clase se mostró, con un archivo de departamentos (se quería explicar el precio), qué pasa cuando las columnas no aportan información, en cuatro pasos:`,
+      },
+      {
+        type: 'list',
+        ordered: true,
+        items: [
+          t`**Columnas constantes.** Si todos los departamentos tienen 10 años de antigüedad y el mismo código de tipo (99), el modelo da $R^2 = 0$, pendiente cero y se reduce al promedio del precio. **Sin variabilidad no hay información:** una columna que no cambia (varianza $=0$) no distingue entre observaciones.`,
+          t`**Constante más variable.** Al sumar la superficie en $m^2$ (que sí varía) a la antigüedad constante, $R^2 = 0.69$ y la antigüedad recibe coeficiente cero: agregarla es peso muerto.`,
+          t`**Variables idénticas.** Con dos predictoras iguales ($X_1 = X_2$) hay dependencia lineal perfecta: no se puede invertir la matriz y el programa anula una de las dos (coeficiente $0$).`,
+          t`**Variables casi iguales.** Con la superficie real y la superficie redondeada, $R^2 = 0.70$, pero la ecuación fue $\text{Precio} = 1741 - 150\times\text{Superficie real} + 152\times\text{Superficie redondeada}$: dice a la vez que más superficie *baja* el precio y que lo *sube*.`,
+        ],
+      },
+      {
+        type: 'analogy',
+        text: t`**Analogía del velocímetro trabado:** evaluar el rendimiento de un auto con un velocímetro clavado en 60 km/h, esté frenado en un semáforo o a fondo en la pista, no aporta ningún dato: lo que no cambia no informa.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`Esto es la **multicolinealidad** (Módulo 3; el VIF del Módulo 5.2 la mide). Los coeficientes se vuelven **inestables** (mover un solo dato puede cambiarles el signo), se pierde la capacidad de explicar ("¿esta variable ayuda o perjudica?") y, con 100 o 500 columnas, no se detecta mirando correlaciones de a pares, porque una columna puede ser combinación de otras tres o cuatro a la vez. El PCA ataca justamente este problema: reemplaza las columnas redundantes por pocas variables nuevas que no están correlacionadas.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Dos termómetros pegados',
+        text: t`**Dos termómetros pegados.** Si colgás dos termómetros casi idénticos en la misma pared y le pedís al modelo cuánto de la temperatura de la habitación se debe a cada uno, no tiene cómo repartirlo: puede decir "+152 el primero y −150 el segundo" y el resultado total sigue dando bien. La predicción puede ser buena, pero los coeficientes individuales no significan nada. Y una columna que no cambia nunca (el velocímetro clavado) no ayuda a distinguir un caso de otro.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q24'] },
+      { type: 'subheading', text: 'De la dimensión observada a la dimensión verdadera' },
+      {
+        type: 'paragraph',
+        text: t`En datos reales se observan muchas columnas (500 en una aseguradora, 5000 en genética), pero muchas miden aspectos repetidos del mismo fenómeno. La **dimensión verdadera** (o latente) es el número reducido de ejes independientes que realmente gobiernan la variación. En muchos problemas prácticos, pasar de 500 variables a 10 o 20 componentes conserva más del 75-80 % de la información útil.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Muchas columnas, pocas ideas',
+        text: t`**Muchas columnas, pocas ideas.** En una tabla de una aseguradora, "edad del conductor", "años de carnet" y "antigüedad como cliente" dicen casi lo mismo con palabras distintas. Detrás de cientos de columnas suele haber unas pocas ideas de fondo (la experiencia del conductor, el valor del auto...). Esas ideas de fondo son la dimensión verdadera, y el PCA las busca.`,
+      },
+      { type: 'paragraph', text: '*Historia breve:*' },
+      {
+        type: 'list',
+        items: [
+          t`**Karl Pearson (1901):** primera versión, geométrica, buscando rectas y planos de mejor ajuste.`,
+          t`**Charles Spearman (1904):** Análisis Factorial (AF), en psicología. Diferencia clave: el PCA busca explicar la **varianza total**; el AF, solo la **varianza compartida** (comunalidad) mediante factores latentes no observados.`,
+          t`**Harold Hotelling (1933):** formulación matricial moderna, con valores y vectores propios; los componentes resultan ortogonales (no correlacionados).`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`**Intuición geométrica.** Una nube de puntos con variables muy correlacionadas no es redonda como una pelota de fútbol: está alargada en diagonal, como una pelota de rugby.`,
+      },
+      {
+        type: 'list',
+        ordered: true,
+        items: [
+          t`El **primer componente** ($CP_1$) es la recta que atraviesa la nube a lo largo de su lado más largo: la dirección de máxima varianza.`,
+          t`El **segundo componente** ($CP_2$) es un eje a $90^\circ$ del primero (ortogonal), que captura la mayor variabilidad restante.`,
+          t`En lugar de describir los puntos con los ejes originales (correlacionados), el PCA **rota el sistema de coordenadas** hasta alinearlo con los ejes naturales de la nube. En el sistema nuevo, $CP_1$ y $CP_2$ tienen correlación exactamente igual a cero.`,
+        ],
+      },
+      {
+        type: 'analogy',
+        text: t`**Analogía de la sombra de la estatua:** para fotografiar una escultura 3D en una página plana, si la fotografías desde el costado correcto, la sombra conserva casi todos los detalles; desde un ángulo ciego solo ves un círculo sin forma. El PCA busca el ángulo de la mejor "sombra" de tus datos.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Girar el mapa hasta que las calles queden derechas',
+        text: t`**Girar el mapa.** Rotar los ejes es como girar un mapa hasta que la avenida principal quede horizontal. Los datos son los mismos, pero ahora el primer eje sigue la dirección en que más se extienden, y el segundo mide lo que se desvía de ella. Como los dos ejes son perpendiculares, ya no se pisan: mover un punto a lo largo de uno no dice nada sobre el otro (correlación cero).`,
+      },
+      {
+        type: 'paragraph',
+        text: t`Cada componente $CP_k$ tiene asociado un **autovalor** (o valor propio) $\lambda_k$: la cantidad de varianza que captura. Se ordenan $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_p > 0$, y su suma es la varianza total de los datos originales. La proporción de varianza que explica cada componente es:`,
+      },
+      {
+        type: 'formula',
+        latex: t`\text{Varianza explicada por } CP_k = \frac{\lambda_k}{\lambda_1 + \lambda_2 + \dots + \lambda_p}`,
+      },
+      {
+        type: 'intuition',
+        title: 'El autovalor como porción de la historia',
+        text: t`**El autovalor como porción de la historia.** Si la varianza total es la "historia completa" de los datos, el autovalor de cada componente es el capítulo que cuenta. Con los valores propios $2.8,\ 0.9,\ 0.2,\ 0.1$ del Módulo 6.4 y varianza total $4$, el primer componente cuenta el $70\,\%$ de la historia y los dos primeros, el $92.5\,\%$.`,
+      },
+      { type: 'subheading', text: 'Cargas factoriales y círculo de correlaciones' },
+      {
+        type: 'paragraph',
+        text: t`Las **cargas factoriales** (*loadings*) son números entre $-1$ y $+1$ que miden la correlación simple entre cada variable original $X_j$ y un componente $CP_k$. Sirven para **ponerle nombre** a los componentes. *Ejemplo:* si con las notas de 5 materias el $CP_1$ tiene cargas altas y positivas ($+0.85$) en Matemática y en Física, se lo puede llamar "aptitud cuantitativa general".`,
+      },
+      { type: 'paragraph', text: t`En el **círculo de correlaciones** cada variable es una flecha:` },
+      {
+        type: 'list',
+        items: [
+          t`**Ángulo pequeño** ($\theta \approx 0^\circ$): variables con fuerte correlación positiva (avanzan juntas).`,
+          t`**Ángulo recto** ($\theta = 90^\circ$): variables no correlacionadas.`,
+          t`**Flechas opuestas** ($\theta = 180^\circ$): fuerte correlación negativa.`,
+          t`**Flecha que llega al borde del círculo**: la variable está bien representada en ese plano.`,
+        ],
+      },
+      {
+        type: 'intuition',
+        title: 'Las flechas como manecillas de reloj',
+        text: t`**Las flechas como manecillas de reloj.** Dos manecillas que apuntan casi al mismo lado se mueven juntas: son variables que suben y bajan a la vez. Dos manecillas a las 12 y a las 3 no tienen relación entre sí. Dos manecillas opuestas, a las 12 y a las 6, se mueven en sentido contrario: cuando una sube, la otra baja. Una manecilla larga, que llega al borde de la esfera, está bien representada; una corta se pierde en el centro.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q26'] },
+      { type: 'subheading', text: 'Covarianza o correlación: ¿hay que estandarizar?' },
+      { type: 'paragraph', text: t`Un paso metodológico crítico es decidir sobre qué matriz se aplica el PCA:` },
+      {
+        type: 'list',
+        items: [
+          t`**Matriz de covarianza** ($S$, PCA no estandarizado): solo si todas las variables están en las **mismas unidades** y con escalas comparables.`,
+          t`**Matriz de correlación** ($R$, PCA estandarizado): cuando las unidades son distintas (años, pesos, mmHg, miligramos frente a toneladas). Si no se estandariza, la variable con números más grandes (por ejemplo, ingresos de \$500.000) domina los primeros componentes por una cuestión de escala y no porque contenga más información.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Con la matriz de correlación, cada variable original aporta $1$ unidad de varianza, así que la varianza total es igual al número de variables $p$.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Metros contra kilómetros',
+        text: t`**Metros contra kilómetros.** Si medís una distancia en metros y otra en kilómetros, los números de la primera serán mil veces más grandes y parecerán "variar más", aunque no sea así. Estandarizar es pasar todo a la misma vara (cuántos desvíos se aleja cada dato de su promedio) para que ninguna variable gane solo por sus unidades.`,
+      },
+      {
+        type: 'extra',
+        text: t`Con la edad de los clientes (desvío típico de unos 10 años, o sea varianza $100$) y su ingreso en pesos (desvío típico de unos $100.000$, o sea varianza $10^{10}$), el PCA sin estandarizar daría un primer componente que es casi puro ingreso: la edad no pesaría nada. Con la matriz de correlación, las dos variables arrancan con varianza $1$ y compiten en igualdad.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q25'] },
+      { type: 'subheading', text: '¿Cuántos componentes retener?' },
+      {
+        type: 'paragraph',
+        text: t`Al pasar de $p$ variables a $p$ componentes hay que decidir con cuántos ($k<p$) quedarse y cuáles descartar como ruido:`,
+      },
+      {
+        type: 'table',
+        headers: ['Criterio', 'Regla de decisión'],
+        rows: [
+          [t`**Varianza acumulada**`, t`Retener los primeros $k$ componentes que acumulen entre el $70\,\%$ y el $80\,\%$ de la varianza total.`],
+          [t`**Regla de Kaiser-Guttman**`, t`Con la matriz de correlación, conservar solo los componentes con $\lambda > 1$: los que aportan más información que una variable original aislada.`],
+          [t`**Gráfico de sedimentación** (*scree plot*)`, t`Graficar los autovalores en orden decreciente y buscar el "codo", donde la curva se aplana; retener los componentes anteriores al codo.`],
+          [t`**Análisis paralelo de Horn**`, t`Simular (Monte Carlo) conjuntos de ruido aleatorio con las mismas dimensiones; retener solo los componentes reales cuyo autovalor supera al del ruido. Se lo considera el estándar de oro.`],
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Los criterios pueden no coincidir. *Ejemplo con los valores propios $2.8,\ 0.9,\ 0.2,\ 0.1$ del Módulo 6.4 (4 variables estandarizadas):* Kaiser retiene solo el primero ($2.8>1$); la varianza acumulada es $70\,\%$ con uno y $92.5\,\%$ con dos. Por eso conviene **triangular**: usar varios criterios y decidir con criterio.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Resumir una película',
+        text: t`**Resumir una película.** Con una frase contás el $70\,\%$ del argumento; con dos, el $92.5\,\%$; lo que sigue es puro detalle. Los criterios te ayudan a decidir cuándo el resumen ya alcanza. El de Horn es el más exigente: compara cada componente con el que saldría de datos inventados al azar, y solo conserva el que le gana al azar.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q22'] },
+      { type: 'subheading', text: 'Casos de la clase: pizzas y gorriones' },
+      {
+        type: 'list',
+        items: [
+          t`**Pizzas.** 71 muestras de masa de pizza analizadas en laboratorio, con 8 propiedades químicas continuas (pH, grasa, proteína, ceniza, sodio, calorías, entre otras). El $CP_1$ explicó el $65\,\%$ de la varianza y el $CP_2$ el $29\,\%$: entre los dos, el $94\,\%$. El espacio de 8 dimensiones era en realidad una nube casi plana de 2 dimensiones.`,
+          t`**Gorriones.** 49 gorriones con 5 medidas morfológicas (largo total, extensión de las alas, largo de la quilla, entre otras), para estudiar su supervivencia tras una tormenta. El $CP_1$ explicó el $72\,\%$ (asociado al tamaño general del ave) y los dos primeros, el $83\,\%$ acumulado.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`*Aplicando Kaiser a estas cifras (suponiendo matriz de correlación, con la varianza total igual a $p$ y los porcentajes redondeados):* en las pizzas, $\lambda_1 \approx 0.65 \times 8 = 5.2$ y $\lambda_2 \approx 0.29 \times 8 = 2.32$; el $6\,\%$ restante ($0.48$) se reparte entre 6 componentes, ninguno con $\lambda>1$: Kaiser retiene 2. En los gorriones, $\lambda_1 \approx 0.72 \times 5 = 3.6$ y $\lambda_2 \approx (0.83 - 0.72) \times 5 = 0.55 < 1$: Kaiser retendría 1, mientras que la regla del $80\,\%$ pide 2.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Una hoja de papel en una habitación',
+        text: t`**Una hoja de papel en una habitación.** Una hoja de papel flotando en el aire se puede ubicar con 3 coordenadas, pero en realidad es plana: tiene solo 2 dimensiones reales. Las pizzas son parecidas: se midieron 8 propiedades, pero casi todo lo que varía entre una masa y otra cabe en 2 ejes, que juntos cuentan el $94\,\%$ de la historia.`,
+      },
+      { type: 'subheading', text: 'Valores atípicos y limitaciones' },
+      { type: 'paragraph', text: t`El PCA permite detectar dos tipos de observaciones atípicas:` },
+      {
+        type: 'list',
+        items: [
+          t`**Distancia de puntaje** (*score distance*): puntos dentro del plano de los componentes retenidos, pero muy alejados del centro (puntos de apalancamiento).`,
+          t`**Distancia ortogonal** (*orthogonal distance*): puntos que se disparan en una dimensión perpendicular, la que el modelo descartó (atípicos reales).`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`Un solo atípico severo puede "tirar de la cuerda" y rotar indebidamente los ejes; conviene correr el análisis con y sin los atípicos para ver si los ejes son estables.`,
+      },
+      { type: 'paragraph', text: t`*Limitaciones y cuidados:*` },
+      {
+        type: 'list',
+        items: [
+          t`**Solo variables numéricas continuas.** Convertir una variable categórica (por ejemplo, estado civil $=1,2,3$) a números y meterla en un PCA es un error grave que distorsiona los resultados.`,
+          t`**Solo estructuras lineales.** El PCA usa combinaciones lineales y rotaciones rígidas. Si los datos siguen formas curvas (como un pastel arrollado, el *Swiss roll*), falla y hace falta una variante como el **Kernel PCA**.`,
+          t`**Explicar frente a predecir.** El PCA resuelve la multicolinealidad y permite modelos predictivos estables (regresión sobre componentes principales), pero para explicar el modelo a personas no técnicas hay que traducir las cargas de vuelta a las variables originales.`,
+        ],
+      },
+      {
+        type: 'intuition',
+        title: 'El imán cerca de la brújula',
+        text: t`**El imán cerca de la brújula.** Un solo dato muy extraño puede desviar los ejes como un imán desvía una brújula: el PCA gira para acomodarlo y deja de reflejar a los demás. Por eso se prueba con y sin él. Y con las categorías numeradas (1 = soltero, 2 = casado, 3 = divorciado) pasa algo parecido: el programa cree que "divorciado" es tres veces "soltero" y construye un eje con una distancia que no existe.`,
+      },
+      { type: 'subheading', text: 'Análisis de correspondencias simples (ACS)' },
+      {
+        type: 'paragraph',
+        text: t`Cuando las variables no son números continuos sino **categóricas** (región del vino, plato elegido), se usa el **análisis de correspondencias**, el equivalente del PCA para este caso:`,
+      },
+      {
+        type: 'table',
+        headers: ['', 'PCA', 'Análisis de correspondencias'],
+        rows: [
+          ['Variables', 'Continuas', 'Categóricas'],
+          ['Datos', 'Tabla de observaciones por variables', 'Tabla de contingencia (cruce de filas y columnas)'],
+          ['Distancia', 'Euclídea', t`Chi-cuadrado ($\chi^2$)`],
+          ['Variabilidad', 'Varianza total', '**Inercia total**'],
+        ],
+      },
+      {
+        type: 'callout',
+        kind: 'advertencia',
+        text: t`**Regla de oro:** nunca hagas un análisis de correspondencias sin comprobar antes, con una prueba de $\chi^2$ sobre la tabla de contingencia (Módulo 2.4), que las variables están estadísticamente asociadas.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`*Demostración de la clase* (400 clientes que eligen vino y plato): en la tabla **sin asociación real**, todos los puntos del mapa se amontonaron en el centro, y interpretar distancias ahí era inventar historias sobre la nada misma; en la tabla **con asociación significativa**, platos y vinos se separaron con claridad (el tinto de Burdeos cerca de las carnes rojas, el blanco cerca de los pescados).`,
+      },
+      {
+        type: 'intuition',
+        title: 'Ver figuras en las nubes',
+        text: t`**Ver figuras en las nubes.** Con ruido puro el ojo siempre encuentra algo: un conejo, un barco. Un mapa de correspondencias hecho sobre una tabla sin asociación real es lo mismo: los puntos caen en algún lugar y uno se inventa un relato. La prueba de $\chi^2$ es el control previo que dice si hay algo para ver. Si no hay asociación, no se dibuja el mapa.`,
+      },
+      {
+        type: 'extra',
+        text: t`Una cadena de supermercados cruza "provincia" con "marca de yerba preferida". Antes de dibujar el mapa, hace la prueba de $\chi^2$ sobre esa tabla: si el p-valor da alto, las preferencias no dependen de la provincia y cualquier "cercanía" en el mapa sería un espejismo; si da muy bajo, hay asociación y el mapa sí puede mostrar qué marcas "pertenecen" a qué provincias.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q23'] },
+      { type: 'subheading', text: 'Mapa de decisión y lista de verificación' },
+      { type: 'paragraph', text: t`Para reducir dimensión:` },
+      {
+        type: 'list',
+        items: [
+          t`Si las variables son **continuas**: si tienen unidades o escalas distintas, PCA con la matriz de correlación ($R$); si no, con la de covarianza ($S$). En ambos casos, elegir los componentes con el gráfico de sedimentación, Kaiser ($\lambda>1$) y el análisis paralelo de Horn.`,
+          t`Si las variables son **categóricas**: comprobar la asociación con $\chi^2$. Si **no** hay asociación significativa, no hacer el mapa. Si la hay, análisis de correspondencias (simple o múltiple).`,
+        ],
+      },
+      { type: 'paragraph', text: t`Lista de verificación para el analista:` },
+      {
+        type: 'list',
+        ordered: true,
+        items: [
+          t`**Garantizar variabilidad:** comprobar que ninguna columna sea constante antes de modelar.`,
+          t`**Eliminar la multicolinealidad:** usar PCA o regresión sobre componentes cuando haya variables muy correlacionadas.`,
+          t`**Estandarizar** (matriz $R$) si las unidades de medida son heterogéneas.`,
+          t`**Validar la cantidad de ejes** triangulando codo, Kaiser y análisis paralelo.`,
+          t`**No forzar métodos:** PCA para continuas, análisis de correspondencias para categóricas asociadas.`,
+        ],
       },
     ],
   },

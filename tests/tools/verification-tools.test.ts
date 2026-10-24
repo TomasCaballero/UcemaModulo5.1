@@ -52,11 +52,11 @@ describe('lectura de la guía', () => {
     expect(autoevaluationCounts(SAMPLE)).toEqual({ 1: 2 })
   })
 
-  it('la guía real tiene las 82 preguntas del PRD y 87 términos de glosario', () => {
+  it('la guía real tiene las 82 preguntas del PRD y 96 términos de glosario', () => {
     const counts = autoevaluationCounts(guide)
     expect(counts).toEqual(PRD_QUESTION_COUNTS)
     expect(Object.values(counts).reduce((a, b) => a + b, 0)).toBe(82)
-    expect(countBullets(guide, 'Glosario')).toBe(87)
+    expect(countBullets(guide, 'Glosario')).toBe(96)
     expect(countNumberedItems(guide, 'Los errores más comunes (y cómo evitarlos)')).toBe(11)
   })
 })
@@ -66,10 +66,10 @@ describe('RNF-17: equivalencia de encabezados', () => {
   const checks = checkHeadings(guide, headings, courseContent)
   const byHeading = (text: string) => checks.find((c) => c.heading === text)
 
-  it('la guía real tiene 81 encabezados y ninguno falta entre los módulos cargados', () => {
-    expect(headings).toHaveLength(81)
+  it('la guía real tiene 82 encabezados y ninguno falta entre los módulos cargados', () => {
+    expect(headings).toHaveLength(82)
     expect(summarize(checks).missing).toBe(0)
-    expect(summarize(checks)).toMatchObject({ covered: 81, pending: 0 }) // curso completo: los 8 módulos
+    expect(summarize(checks)).toMatchObject({ covered: 82, pending: 0 }) // curso completo: los 8 módulos
   })
 
   it('reconoce cada tipo de encabezado cubierto', () => {
@@ -77,7 +77,7 @@ describe('RNF-17: equivalencia de encabezados', () => {
     expect(byHeading('2.4 Distribuciones de probabilidad')?.status).toBe('covered')
     expect(byHeading('Autoevaluación del Módulo 2')).toMatchObject({ status: 'covered', detail: '12 preguntas' })
     expect(byHeading('Respuestas del Módulo 2')?.status).toBe('covered')
-    expect(byHeading('Glosario')).toMatchObject({ status: 'covered', detail: '87 términos' })
+    expect(byHeading('Glosario')).toMatchObject({ status: 'covered', detail: '96 términos' })
     expect(byHeading('Cómo usar esta guía')).toMatchObject({ status: 'covered', detail: '3 reglas' })
     expect(byHeading('Cómo estudiar con esta guía')).toMatchObject({ status: 'covered', detail: '5 puntos' })
     expect(byHeading('La escalera del conocimiento')?.status).toBe('covered')

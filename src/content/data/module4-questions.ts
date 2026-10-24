@@ -259,4 +259,18 @@ export const module4Questions: Question[] = [
     correctIndex: 0,
     explanation: t`Un árbol clasifica siguiendo **un único camino** desde el nodo raíz hasta una hoja. Los hombres de 3.ª clase caen en una hoja con baja proporción de sobrevivientes en el entrenamiento, y esa proporción es la probabilidad estimada.`,
   },
+  {
+    id: 'm4-q19',
+    moduleId: 4,
+    sectionId: '4.3',
+    prompt: 'Para una variable continua como la edad, ¿cómo decide un árbol dónde cortar?',
+    options: [
+      'Ordena los valores, prueba los puntos de corte posibles y se queda con el umbral que deja los grupos más puros',
+      'Usa siempre la mediana de la variable',
+      'Divide la edad en tantos grupos como categorías tenga la clase',
+      'Elige el punto de corte al azar y lo deja fijo',
+    ],
+    correctIndex: 0,
+    explanation: t`Con una variable continua, el árbol ordena los valores y prueba todos los puntos de corte posibles (por ejemplo, 10, 24.5 o 38.5 años), eligiendo el umbral que maximiza la pureza. Con una categórica, prueba separaciones binarias de las categorías.`,
+  },
 ]

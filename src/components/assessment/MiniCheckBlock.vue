@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { courseIndex } from '@/content'
+import { richTextToPlain } from '@/content/plainText'
 import type { BlockOf } from '@/content/types'
 import { presentQuestion, type PresentedQuestion } from '@/logic/assessment/present'
 import { useServices } from '@/services'
@@ -14,10 +15,14 @@ const presented: PresentedQuestion[] = props.block.questionIds.flatMap((id) => {
   const question = courseIndex.getQuestion(id)
   return question ? [presentQuestion(question, random)] : []
 })
+
+// El nombre incluye la pregunta: varias regiones con el mismo nombre en una sección violan landmark-unique.
+const PROMPT_LABEL_LENGTH = 50
+const label = presented[0] ? `Mini-chequeo: ${richTextToPlain(presented[0].question.prompt).slice(0, PROMPT_LABEL_LENGTH)}` : 'Mini-chequeo'
 </script>
 
 <template>
-  <aside v-if="presented.length > 0" class="mini-check" aria-label="Mini-chequeo">
+  <aside v-if="presented.length > 0" class="mini-check" :aria-label="label">
     <p class="mini-check__title">Mini-chequeo: probá responder antes de seguir leyendo</p>
     <QuestionCard v-for="item in presented" :key="item.question.id" :presented="item" :guide-link="false" />
   </aside>

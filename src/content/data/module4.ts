@@ -241,6 +241,16 @@ export const module4Sections: Section[] = [
       },
       {
         type: 'paragraph',
+        text: t`**Variables categóricas y continuas.** El árbol también decide *cómo* cortar cada tipo de variable. Con una variable **categórica** de varias categorías (clase 1, 2 o 3), prueba separaciones binarias de las categorías: por ejemplo, {1.ª y 2.ª} contra {3.ª}, o {1.ª} contra {2.ª y 3.ª}. Con una variable **continua** (edad), ordena los valores y prueba los **puntos de corte** posibles (por ejemplo, 10, 24.5 o 38.5 años); se queda con el umbral que deja los grupos más puros.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Dónde cortar una fila ordenada',
+        text: t`**Dónde cortar una fila ordenada.** Imaginá a los pasajeros formados en una fila ordenada por edad. El árbol prueba cortar la fila en cada lugar posible (entre el de 9 y el de 10 años, entre el de 24 y el de 25...) y se queda con el corte que deja a cada lado lo más parecido posible en cuanto a quién sobrevivió. Con una variable de categorías, como la clase del pasajero, no hay fila que cortar: prueba repartir las categorías en dos bolsas, por ejemplo {1.ª y 2.ª} contra {3.ª}, y se queda con el reparto más puro.`,
+      },
+      { type: 'miniCheck', questionIds: ['m4-q19'] },
+      {
+        type: 'paragraph',
         text: t`**El árbol del Titanic (ejemplo de clase, profundidad 3).** La raíz contiene los 623 pasajeros de entrenamiento (239 sobrevivieron, $38.4\,\%$) y pregunta "¿es mujer?". Para clasificar a un pasajero se sigue **un único camino** desde la raíz hasta una hoja: por ejemplo, un hombre de 3.ª clase responde "¿es mujer?" $\to$ no, "¿clase = 3?" $\to$ sí, y llega a una hoja con **baja** probabilidad de sobrevivir; una mujer de 1.ª clase llega a una hoja con probabilidad alta. Los componentes son el **nodo raíz** (primera pregunta), los **nodos internos**, las **ramas** (respuestas) y las **hojas** (predicción: la proporción de sobrevivientes del entrenamiento que cayó en ellas). Un árbol no usa una fórmula única: toma decisiones a partir de preguntas sucesivas.`,
       },
       {
@@ -318,7 +328,7 @@ export const module4Sections: Section[] = [
       },
       {
         type: 'paragraph',
-        text: t`**El umbral cambia las métricas, no el modelo.** Un modelo que entrega probabilidades se convierte en clasificador al fijar un **umbral** $t$: se predice positivo si $\hat{p} \ge t$. Con el mismo modelo, subir $t$ lo vuelve más exigente (sube la precisión y la especificidad, pero puede bajar el recall) y bajarlo hace lo contrario. *Ejemplo ilustrativo (cifras inventadas):* 8 pasajeros con probabilidades estimadas $0.95, 0.85, 0.60, 0.55, 0.45, 0.35, 0.20, 0.10$; sobrevivieron 5 de ellos (los de probabilidad $0.95$, $0.85$, $0.55$, $0.45$ y $0.20$).`,
+        text: t`**El umbral cambia las métricas, no el modelo.** Un modelo que entrega probabilidades se convierte en clasificador al fijar un **umbral** $t$: se predice positivo si $\hat{p} \ge t$. Con el mismo modelo, subir $t$ lo vuelve más exigente (sube la precisión y la especificidad, pero puede bajar el recall) y bajarlo hace lo contrario. *Ejemplo ilustrativo (cifras inventadas):* 8 pasajeros con probabilidades estimadas $0.95,\allowbreak\ 0.85,\allowbreak\ 0.60,\allowbreak\ 0.55,\allowbreak\ 0.45,\allowbreak\ 0.35,\allowbreak\ 0.20,\allowbreak\ 0.10$; sobrevivieron 5 de ellos (los de probabilidad $0.95$, $0.85$, $0.55$, $0.45$ y $0.20$).`,
       },
       {
         type: 'table',

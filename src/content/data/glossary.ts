@@ -1,6 +1,6 @@
 import type { GlossaryEntry } from '../types'
 
-// Fuente: recorrido-guias-de-aprendizaje-v3.md, "Glosario" (87 términos, en el orden de la guía).
+// Fuente: recorrido-guias-de-aprendizaje-v3.md, "Glosario" (96 términos, en el orden de la guía).
 // Los números entre paréntesis de la guía son `references`: una sección ("6.4") o solo un
 // módulo ("4"). El término va en cursiva con `*...*` donde la guía lo marca (se muestra en negrita).
 const t = String.raw
@@ -8,7 +8,10 @@ const t = String.raw
 export const glossary: GlossaryEntry[] = [
   { term: 'AdaBoost', definition: 'boosting que da más peso a lo mal clasificado', references: ['6.5'] },
   { term: 'AUC', definition: 'área bajo la curva ROC; 0.5 = azar, 1 = perfecto', references: ['5.2'] },
+  { term: 'Análisis de correspondencias', definition: t`equivalente del PCA para variables categóricas; trabaja con tablas de contingencia y distancia $\chi^2$`, references: ['6.8'] },
+  { term: 'Análisis paralelo de Horn', definition: 'criterio que retiene solo los componentes cuyo autovalor supera al de datos de ruido simulados', references: ['6.8'] },
   { term: 'Atributo', definition: 'variable o columna de los datos', references: ['4'] },
+  { term: 'Autovalor (valor propio)', definition: 'varianza que captura un componente principal', references: ['6.4', '6.8'] },
   { term: 'Bagging', definition: 'promediar modelos entrenados en muestras bootstrap', references: ['6.5'] },
   { term: 'Bayes, teorema de', definition: 'invierte una probabilidad condicional', references: ['0.2'] },
   {
@@ -24,6 +27,7 @@ export const glossary: GlossaryEntry[] = [
     definition: '"manteniendo todo lo demás constante"',
     references: ['3.2'],
   },
+  { term: 'Carga factorial (*loading*)', definition: 'correlación entre una variable original y un componente principal', references: ['6.8'] },
   {
     term: t`Chi-cuadrado ($\chi^2$)`,
     definition: 'distribución de una suma de normales al cuadrado',
@@ -48,6 +52,7 @@ export const glossary: GlossaryEntry[] = [
     definition: 'tabla de varianzas y covarianzas entre variables',
     references: ['0.3'],
   },
+  { term: 'Deriva de datos / de concepto (*drift*)', definition: 'cambia la distribución de las entradas / la relación entre entradas y respuesta', references: ['6.5'] },
   { term: 'Dendrograma', definition: 'árbol de fusiones del clustering jerárquico', references: ['6.7'] },
   { term: 'DBSCAN', definition: 'agrupamiento por densidad', references: ['4.5'] },
   { term: 'Desviación típica', definition: 'raíz de la varianza', references: ['2.2'] },
@@ -103,6 +108,7 @@ export const glossary: GlossaryEntry[] = [
     references: ['6.5'],
   },
   { term: 'Heterocedasticidad', definition: 'varianza del error no constante', references: ['3.7'] },
+  { term: 'Gráfico de sedimentación (*scree plot*)', definition: 'autovalores en orden decreciente; se busca el codo', references: ['6.8'] },
   { term: 'Hiperparámetro', definition: 'parámetro que se fija antes de entrenar', references: ['6.3'] },
   {
     term: 'Hiperplano',
@@ -111,11 +117,13 @@ export const glossary: GlossaryEntry[] = [
   },
   { term: 'Homocedasticidad', definition: 'varianza del error constante', references: ['3.6'] },
   { term: 'Hosmer–Lemeshow, test de', definition: 'compara casos observados y esperados por grupos para evaluar la calibración', references: ['5.2'] },
+  { term: 'Inercia', definition: 'variabilidad total en el análisis de correspondencias', references: ['6.8'] },
   {
     term: 'Intervalo de confianza',
     definition: 'rango construido con un método que acierta con cierta frecuencia',
     references: ['2.6'],
   },
+  { term: 'Kaiser-Guttman, regla de', definition: t`retener los componentes con autovalor mayor que 1`, references: ['6.8'] },
   {
     term: 'Kernel',
     definition: 'función que calcula productos internos en un espacio ampliado',
@@ -188,6 +196,7 @@ export const glossary: GlossaryEntry[] = [
   { term: 'Regularización', definition: 'penalizar la complejidad', references: ['6.4', '7.6'] },
   { term: 'Residuo', definition: t`$y-\hat{y}$`, references: ['3.3'] },
   { term: 'Ridge', definition: t`regularización $L_2$`, references: ['6.4'] },
+  { term: 'SHAP', definition: 'explica la contribución de cada variable a la predicción de un individuo, para cualquier modelo', references: ['6.5'] },
   {
     term: 'Sesgo (*bias*)',
     definition: 'error por un modelo demasiado simple',

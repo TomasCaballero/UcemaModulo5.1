@@ -72,9 +72,9 @@ describe('ConceptGraph', () => {
 })
 
 describe('mapa de conceptos de la guía', () => {
-  it('tiene las 49 secciones, sin repetir', () => {
-    expect(sectionCatalog).toHaveLength(49)
-    expect(new Set(sectionCatalog.map((s) => s.id)).size).toBe(49)
+  it('tiene las 50 secciones, sin repetir', () => {
+    expect(sectionCatalog).toHaveLength(50)
+    expect(new Set(sectionCatalog.map((s) => s.id)).size).toBe(50)
   })
 
   it('las dependencias son válidas y no forman ciclos (el grafo se construye)', () => {

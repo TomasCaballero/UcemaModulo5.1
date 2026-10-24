@@ -53,7 +53,7 @@ export const techniques: TechniqueRow[] = [
     modules: [4],
   },
   { goal: '**Agrupar** sin etiquetas', techniques: 'K-Means, jerárquico, DBSCAN', modules: [4, 6] },
-  { goal: '**Reducir dimensión**', techniques: 'PCA, Lasso', modules: [6] },
+  { goal: '**Reducir dimensión**', techniques: 'PCA (variables numéricas), análisis de correspondencias (categóricas), Lasso', modules: [6] },
   {
     goal: 'Elegir hiperparámetros / estimar error',
     techniques: 'Validación cruzada, OOB',
