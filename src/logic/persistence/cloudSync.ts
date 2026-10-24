@@ -55,11 +55,8 @@ export async function saveRemoteData(
   data: StoredData,
 ): Promise<boolean> {
   try {
-    const { error } = await supabase.from('user_progress').upsert({
-      user_id: userId,
-      data,
-      updated_at: new Date().toISOString(),
-    })
+    // `updated_at` lo fija el servidor (trigger), no el reloj del dispositivo.
+    const { error } = await supabase.from('user_progress').upsert({ user_id: userId, data })
     return !error
   } catch {
     return false

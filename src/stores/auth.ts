@@ -63,13 +63,9 @@ export const useAuthStore = defineStore('auth', () => {
       const redirectTo = `${window.location.origin}${window.location.pathname}`
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: {
-          redirectTo,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
+        // Solo se usa la identidad de Google, no sus APIs: no hace falta pedir refresh token
+        // ni forzar la pantalla de consentimiento en cada login.
+        options: { redirectTo },
       })
       if (authError) {
         error.value = authError.message
