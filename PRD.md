@@ -2,6 +2,7 @@
 
 **Estado:** v2 (hallazgos de la auditoría 1 aprobados y aplicados; pendiente segunda auditoría)
 **Confirmado por el usuario:** SPA estática sin backend; progreso, historial y repetición espaciada; preguntas redactadas desde la guía; 8 módulos completos desde el inicio; funciones extra RF-20, RF-30, RF-31, RF-40, RF-42 y RNF-13; cifras de los RNF; decisiones técnicas propuestas.
+**Cambio posterior (2026-10-24):** se agrega sincronización **opcional** del progreso entre dispositivos con Supabase (Google Auth), manteniendo el enfoque local-first; ver RNF-21 y AC-48. El resto del PRD no cambia.
 **Fuente de contenido:** `recorrido-guias-de-aprendizaje-v3.md` (Módulos 0 a 7, Glosario, Cuadro síntesis)
 
 ---
@@ -16,7 +17,7 @@ La guía de estudio existe y es completa (8 módulos, ~1700 líneas), pero está
 | :--- | :--- | :--- |
 | **P1 — Estudiante de posgrado (usuario principal)** | Estudia ciencia de datos mientras trabaja. Parte de matemática de secundaria. Estudia en sesiones cortas, desde la PC y desde el celular. | Aprender sin leer paredes de texto; ver y manipular los conceptos; saber qué domina y qué no; retomar donde dejó. |
 
-La app es de **usuario único, local al dispositivo** (sin cuentas).
+La app es de **usuario único** y **local al dispositivo** por defecto, sin cuentas obligatorias. De forma opcional, el usuario puede iniciar sesión con Google para sincronizar su progreso entre la PC y el celular.
 
 ---
 
@@ -201,7 +202,7 @@ Cada fila es un componente que debe existir (RF-17). La columna "Guía" indica e
 - **RNF-20:** Cada módulo debe tener ≥ 12 preguntas en su banco de evaluación.
 
 **Privacidad**
-- **RNF-21:** El sistema debe enviar 0 datos de progreso o respuestas del usuario a servidores externos.
+- **RNF-21:** Sin sesión iniciada, el sistema debe enviar 0 datos de progreso o respuestas del usuario a servidores externos. Con sesión iniciada, solo debe enviar el documento de progreso del propio usuario a su fila en Supabase (protegida por reglas de acceso por usuario) y 0 datos a cualquier otro destino, sin analítica ni terceros.
 
 **Mantenibilidad**
 - **RNF-22:** La cobertura de tests automatizados de la lógica de negocio (cálculos, evaluaciones, repetición espaciada, persistencia) debe ser ≥ 85 %.
@@ -293,7 +294,7 @@ Los patrones "propuestos" se consideran aprobados salvo que el usuario indique l
 - **AC-45 (RNF-13):** Dado una app visitada una vez, cuando se desconecta la red y se recarga, entonces el inicio, una sección, una simulación y una evaluación funcionan.
 - **AC-46 (RNF-17):** Dado el script de cobertura, cuando compara los encabezados `##` y `###` de la guía con el curso, entonces reporta 0 encabezados faltantes.
 - **AC-47 (RNF-18):** Dado la suite de tests numéricos, cuando se ejecuta, entonces el 100 % de los ejemplos (p. ej. Bayes = 0.154, β̂₁ = 2.1, DID = 3, entropía = 0.971, lift = 1.25, varianza del bagging = 2.02) coincide con la guía.
-- **AC-48 (RNF-21, control de acceso):** Dado cualquier uso de la app, cuando se inspecciona el tráfico de red, entonces 0 solicitudes contienen datos de progreso o respuestas; y los datos guardados solo son accesibles desde el origen de la propia app (no existen cuentas ni datos de otros usuarios).
+- **AC-48 (RNF-21, control de acceso):** Dado un uso de la app sin sesión iniciada, cuando se inspecciona el tráfico de red, entonces 0 solicitudes contienen datos de progreso o respuestas. Dado un uso con sesión iniciada, entonces las únicas solicitudes con progreso van a Supabase con el identificador del propio usuario, y un usuario autenticado no puede leer ni escribir la fila de otro (verificable con las políticas RLS de `user_progress`).
 - **AC-49 (RNF-08):** Dado Lighthouse de accesibilidad en 4 tipos de pantalla, cuando se mide, entonces cada una obtiene ≥ 90.
 - **AC-50 (RNF-10):** Dado una evaluación, cuando se recorre usando solo teclado, entonces se pueden elegir opciones, confirmar y avanzar sin mouse.
 - **AC-51 (RNF-15):** Dado un navegador con almacenamiento bloqueado, cuando se abre la app, entonces el contenido se muestra y aparece un aviso de que el progreso no se guardará.
@@ -312,7 +313,8 @@ Los patrones "propuestos" se consideran aprobados salvo que el usuario indique l
 
 ## Fuera de Alcance
 
-- Cuentas de usuario, login, sincronización en la nube y backend.
+- Backend propio y cuentas obligatorias. La sincronización opcional usa Supabase como servicio gestionado, con login solo de Google.
+- Resolver el borrado de progreso entre dispositivos (la fusión es por unión; un borrado en un dispositivo puede recuperarse desde otro).
 - Generación de preguntas o explicaciones con IA en tiempo de uso.
 - Gamificación (puntos, rachas, insignias, rankings).
 - Modo oscuro / temas personalizables (no pedido).
