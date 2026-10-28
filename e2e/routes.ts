@@ -9,6 +9,8 @@ export const ROUTES = [
   '/#/seccion/2.4',
   '/#/seccion/2.5',
   '/#/seccion/2.7',
+  '/#/seccion/3.3',
+  '/#/seccion/3.7',
   '/#/seccion/4.3',
   '/#/seccion/6.5',
   '/#/seccion/6.8',

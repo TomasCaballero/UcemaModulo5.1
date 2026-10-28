@@ -82,6 +82,28 @@ describe('SectionRenderer', () => {
     const link = wrapper.findAll('a').find((a) => a.text() === 'Módulo 0.5')
     expect(link?.attributes('href')).toBe('/seccion/0.5')
   })
+
+  it('3.7: abre con el repaso de lo previo y rotula las ampliaciones como ajenas a la guía (RNF-24)', async () => {
+    const wrapper = await renderSection('3.7')
+    const recall = wrapper.find('.recall')
+    expect(recall.exists()).toBe(true)
+    expect(recall.text()).toContain('Antes de seguir, ¿te acordás?')
+    expect(recall.findAll('details').length).toBeGreaterThan(0)
+    const link = recall.findAll('a').find((a) => a.text() === 'Módulo 3.3')
+    expect(link?.attributes('href')).toBe('/seccion/3.3')
+    const deepDives = wrapper.findAll('.deep-dive')
+    expect(deepDives.length).toBeGreaterThan(0)
+    for (const block of deepDives) {
+      expect(block.text()).toContain('va más allá de la guía')
+      expect(block.text()).toContain('Fuentes:')
+    }
+  })
+
+  it('ningún texto del Módulo 3 muestra delimitadores "$" crudos', async () => {
+    for (const id of ['3.1', '3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '3.8']) {
+      expect((await renderSection(id)).text(), `sección ${id}`).not.toContain('$')
+    }
+  })
 })
 
 describe('CalloutBlock', () => {
@@ -105,6 +127,16 @@ describe('TableBlock', () => {
     expect(plain.text()).not.toContain('Ilustrativa')
     const illustrative = mount(TableBlock, { props: { block: { ...base, illustrative: true } }, ...mountOptions })
     expect(illustrative.text()).toContain('Ilustrativa (cifras inventadas)')
+  })
+
+  it('un encabezado que es solo una fórmula se dibuja como texto legible; uno mixto conserva KaTeX', async () => {
+    const block: BlockOf<'table'> = { type: 'table', headers: [String.raw`$\lambda$`, String.raw`$\beta_1$ (Ridge)`], rows: [['1', '2']] }
+    const wrapper = mount(TableBlock, { props: { block }, ...mountOptions })
+    await flushPromises()
+    const [onlyMath, mixed] = wrapper.findAll('th')
+    expect(onlyMath?.text()).toBe('λ')
+    expect(onlyMath?.find('.katex').exists()).toBe(false)
+    expect(mixed?.find('.katex').exists()).toBe(true)
   })
 })
 

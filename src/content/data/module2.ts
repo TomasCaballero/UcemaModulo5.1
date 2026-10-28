@@ -2,6 +2,8 @@ import type { Section } from '../types'
 
 // Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 2. Los strings llevan LaTeX
 // (barras invertidas), por eso se escriben con String.raw. Un `$` literal va como `\$`.
+// Los bloques `deepDive` (ampliaciones) y `recall` (repasos de lo previo) no son de la guía y se
+// muestran rotulados; las cifras de las ampliaciones se verifican en tools/expansion-numbers.ts.
 const t = String.raw
 
 export const module2Sections: Section[] = [
@@ -48,11 +50,14 @@ export const module2Sections: Section[] = [
         ],
       },
       {
-        type: 'intuition',
-        title: 'Descriptiva e inferencial, y por qué la cucharada debe estar bien revuelta',
-        text: t`**Dos ramas.** La estadística **descriptiva** solo cuenta lo que ya tenés a la vista: una foto del grupo, con su estatura promedio. La **inferencial** da un salto: usa lo que viste para opinar sobre lo que no pudiste ver.
+        type: 'deepDive',
+        title: 'Por qué una muestra chica bien elegida le gana a una gigante mal elegida',
+        text: t`Es tentador pensar que con más datos siempre se acierta más. No es así: **el tamaño reduce el error por azar, pero no corrige una muestra torcida**.
 
-**La condición clave.** Una cucharada solo sirve si la sopa está **bien revuelta**. Si probás solo lo que flota arriba, vas a opinar mal de la olla. Con las muestras pasa lo mismo: tienen que ser representativas, y lo ideal es elegirlas al azar.`,
+El caso clásico es el de la revista *Literary Digest* en la elección presidencial de Estados Unidos de 1936. Mandó millones de encuestas a personas que sacó de guías telefónicas y de registros de autos, y pronosticó una derrota clara de Roosevelt. Roosevelt ganó por amplio margen. En plena crisis, tener teléfono o auto era cosa de gente con más dinero, que votaba distinto del resto: la cucharada se había sacado solo de la superficie de la olla. Al mismo tiempo, George Gallup acertó con una muestra muchísimo más chica, pero elegida para parecerse a la población.
+
+Este error se llama **sesgo de selección**, y tiene una propiedad incómoda: **no se ve en los datos**. Una muestra torcida de un millón de personas da resultados muy precisos... alrededor del número equivocado. Por eso, antes de mirar cuántos datos hay, conviene preguntarse **cómo se eligieron**.`,
+        sources: ['Freedman, Pisani y Purves, *Statistics*, cap. 19 (el caso *Literary Digest*)'],
       },
     ],
   },
@@ -61,6 +66,19 @@ export const module2Sections: Section[] = [
     moduleId: 2,
     title: 'Medidas de tendencia central y de dispersión',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué significaban $\sum$ y $\bar{x}$?`,
+            answer: t`$\sum$ (sumatoria) es la instrucción "sumá todos los términos": $\sum_{i=1}^{3} x_i = 4 + 7 + 9 = 20$. $\bar{x}$ es el promedio: esa suma dividida por la cantidad de datos $n$. Lo viste en Módulo 0.1.`,
+          },
+          {
+            question: '¿Qué significaba que el promedio "minimiza los cuadrados"?',
+            answer: t`Entre todos los números posibles, el promedio es el que hace más chica la suma de las distancias al cuadrado a los datos. Lo viste en Módulo 0.4, y acá va a explicar por qué la varianza se divide por $n-1$.`,
+          },
+        ],
+      },
       {
         type: 'paragraph',
         text: t`Para resumir una lista de datos se usan números de **posición** (dónde está el centro) y de **dispersión** (cuánto se esparcen).`,
@@ -107,9 +125,14 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         result: t`$s^2 = 28/4 = 7$; $s = \sqrt{7} \approx 2.65$.`,
       },
       {
-        type: 'intuition',
-        title: 'De dónde sale la varianza',
-        text: t`**De dónde sale la varianza.** Se mide cuánto se aleja cada dato de la media, se eleva al cuadrado para que los desvíos positivos y negativos no se cancelen, y se promedia. En el ejemplo, los desvíos al cuadrado suman $28$. Se divide por $n - 1 = 4$ y no por $n = 5$ porque la media sale de los mismos datos, y por eso los datos quedan algo más cerca de ella de lo que estarían de la verdadera: dividir por menos compensa ese achicamiento. Da $s^2 = 7$, y la desviación típica $s = \sqrt{7} \approx 2.65$ está en las mismas unidades que los datos.`,
+        type: 'deepDive',
+        title: t`Por qué se eleva al cuadrado y por qué se divide por $n-1$`,
+        text: t`**Los desvíos siempre suman cero.** En el ejemplo, $-3 - 1 - 1 + 1 + 4 = 0$. No es casualidad: la media es el punto de equilibrio, así que lo que sobra de un lado compensa exactamente lo que falta del otro. Si promediaras los desvíos tal cual, la dispersión de **cualquier** lista daría $0$. Elevarlos al cuadrado los vuelve todos positivos. (Se podría usar el valor absoluto, pero los cuadrados tienen propiedades matemáticas mucho más cómodas, y son los mismos cuadrados que minimiza la regresión.)
+
+**Por qué $n-1$: la media de la muestra "hace trampa".** Ya viste (Módulo 0.4) que el promedio es el número que **minimiza** la suma de distancias al cuadrado. Eso significa que, medidos desde $\bar{x}$, los datos parecen **más juntos** de lo que están en realidad alrededor de la verdadera $\mu$. Por ejemplo, si la verdadera media de la población fuera $6$, la suma de cuadrados de los mismos datos alrededor de $6$ sería $16 + 4 + 4 + 0 + 9 = 33$, más que los $28$ medidos desde $\bar{x} = 5$. Medir desde $\bar{x}$ siempre da lo mínimo posible, así que subestima. Dividir por un número algo más chico ($n - 1$ en lugar de $n$) corrige ese achicamiento en promedio.
+
+**La otra mirada: los grados de libertad.** Como los desvíos suman cero, si conocés cuatro de ellos ($-3, -1, -1, 1$), el quinto queda obligado a ser $4$. Solo hay $n-1$ desvíos que aportan información "libre": por eso se divide por $n-1$. Vas a ver esta idea muchas veces: cada cosa que estimás con los datos te cuesta un grado de libertad.`,
+        sources: ['Wackerly, Mendenhall y Scheaffer, *Estadística matemática con aplicaciones*, cap. 8 (estimador insesgado de la varianza)'],
       },
       { type: 'miniCheck', questionIds: ['m2-q12'] },
       {
@@ -119,16 +142,11 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
       {
         type: 'intuition',
         title: 'Por qué la mediana aguanta mejor',
-        text: t`**Por qué la mediana aguanta mejor.** Con los datos $2, 4, 4, 6, 9$, la media es $5$. Si el $9$ fuera un $90$, la media saltaría a $21.2$ porque el valor enorme tira de ella, pero la mediana seguiría en $4$. Es como un millonario que entra a un bar: el ingreso promedio de los clientes se dispara, pero el cliente "del medio" casi no cambia. Por eso, con salarios o precios de viviendas, suele usarse la mediana.`,
+        text: t`**El millonario que entra a un bar.** Si entra al bar alguien con una fortuna enorme, el ingreso **promedio** de los clientes se dispara, aunque nadie más se haya vuelto rico. El cliente "del medio", en cambio, sigue siendo el mismo. La media reparte el valor extremo entre todos; a la mediana solo le importa quién queda en el centro de la fila.`,
       },
       {
         type: 'paragraph',
         text: t`**Metáfora del abanico.** La media indica hacia dónde apunta el mango del abanico; la desviación típica indica cuánto se abre la tela. Desviación pequeña: datos agrupados. Desviación grande: datos dispersos.`,
-      },
-      {
-        type: 'intuition',
-        title: 'La dispersión como un abanico',
-        text: t`**La dispersión, con el abanico.** La media dice hacia dónde apunta el mango del abanico; la desviación típica dice **cuánto se abre la tela**. Datos agrupados: abanico cerrado. Datos desparramados: abanico abierto.`,
       },
     ],
   },
@@ -169,17 +187,7 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
       {
         type: 'intuition',
         title: 'Los números no son todos iguales: las cuatro escalas',
-        text: t`**Los números no son todos iguales.** Un número de camiseta de fútbol, una nota de "bajo, medio, alto" y un sueldo no se pueden tratar igual, aunque los tres sean números. La escala dice **qué operaciones tienen sentido**.
-
-**Las cuatro escalas, con ejemplos de la vida diaria.**
-
-**Nominal:** solo etiquetas, sin orden (estado civil, marca de auto). Lo único que podés hacer es contar cuántos hay de cada una.
-
-**Ordinal:** hay un orden, pero no sabés cuánta distancia hay entre los escalones (satisfacción: bajo, medio, alto). Pasar de "bajo" a "medio" no tiene por qué ser el mismo salto que de "medio" a "alto".
-
-**Intervalo:** las diferencias sí son iguales, pero el cero es un acuerdo, no una ausencia real (temperatura en °C). Por eso 20 °C no es "el doble de caliente" que 10 °C.
-
-**Razón:** además tiene un cero verdadero que significa "nada" (salario, peso, edad). Acá sí vale decir que \$2000 es el doble que \$1000.`,
+        text: t`**Los números no son todos iguales.** Pensá en los números de las camisetas de un equipo de fútbol. Son números, pero promediarlos no tiene ningún sentido: el "promedio de camisetas" no dice nada del equipo. Son solo **etiquetas** (escala nominal). Las posiciones de llegada de una carrera (1.º, 2.º, 3.º) sí tienen orden, pero el 1.º puede haberle sacado un segundo al 2.º y diez minutos al 3.º (escala ordinal). Antes de calcular algo, preguntate qué significa realmente la distancia entre dos valores.`,
       },
       { type: 'paragraph', text: '*Claves para recordar:*' },
       {
@@ -200,9 +208,18 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         ],
       },
       {
-        type: 'intuition',
-        title: 'Antes de analizar, revisá la cocina',
-        text: t`**Antes de analizar, revisá la cocina.** Un buen análisis arranca revisando los datos: hay ruido (un sensor impreciso), hay valores que parecen raros (¿error de carga o caso real?), hay datos que faltan (y conviene pensar **por qué** faltan antes de rellenarlos) y hay que evitar mostrar más precisión de la que tiene tu instrumento. Si medís con regla en milímetros, no tiene sentido informar 12.34567 mm.`,
+        type: 'deepDive',
+        title: 'Por qué importa *por qué* faltan los datos',
+        text: t`**Rellenar con la media no es inocente.** Tomemos los datos del ejemplo de la sección anterior, $2, 4, 4, 6, 9$, y supongamos que el $9$ no se registró. Si se rellena con la media de los demás ($4$), quedan $2, 4, 4, 6, 4$: la media baja de $5$ a $4$ y la varianza se desploma de $7$ a $s^2 = 8/4 = 2$. Agregar un valor "promedio" achica artificialmente la dispersión, y con ella todos los márgenes de error que vas a calcular después.
+
+**Lo que más importa es el motivo.** Hay tres situaciones típicas:
+
+**Faltan por puro azar** (se perdió una planilla). Los datos que quedan siguen siendo una muestra representativa, solo que más chica: se pierde precisión, pero no se tuercen los resultados.
+
+**Faltan por algo que sí observaste** (los más jóvenes responden menos, y la edad la tenés). Se puede corregir usando esa información, por ejemplo imputando con un modelo que tenga en cuenta la edad.
+
+**Faltan por el propio valor que falta** (los que ganan mucho no declaran su ingreso). Es el caso peligroso: los datos que quedan están torcidos, y ningún relleno lo arregla del todo, porque lo que necesitarías saber es justamente lo que no tenés. En el ejemplo, eso es lo que pasó con el $9$: faltaba el valor más alto, y la media de los que quedaban subestimaba la verdadera.`,
+        sources: ['Little y Rubin, *Statistical Analysis with Missing Data*, cap. 1 (tipos de datos faltantes)', 'Datos del ejemplo de la guía (sección 2.2), modificados'],
       },
     ],
   },
@@ -211,6 +228,23 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
     moduleId: 2,
     title: 'Distribuciones de probabilidad',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué eran una variable aleatoria, su esperanza y su varianza?',
+            answer: t`Una variable aleatoria es un número que depende del azar (lo que sale al tirar un dado). Su **esperanza** es el promedio de largo plazo ($3.5$ para el dado) y su **varianza**, el promedio de las distancias al cuadrado a ese centro. Lo viste en Módulo 0.2.`,
+          },
+          {
+            question: '¿Qué significaba que dos sucesos sean independientes?',
+            answer: t`Que saber que ocurrió uno no cambia la probabilidad del otro. Entonces la probabilidad de que ocurran ambos es el producto: $P(A \text{ y } B) = P(A)\cdot P(B)$. La binomial y la Poisson lo suponen. Lo viste en Módulo 0.2.`,
+          },
+          {
+            question: t`¿Qué era $e$ y la exponencial $e^x$?`,
+            answer: t`$e \approx 2.718$ es una constante especial, y $e^x$ siempre da un número positivo, con $e^0 = 1$. Aparece en la fórmula de la Poisson y en la de la Normal. Lo viste en Módulo 0.5.`,
+          },
+        ],
+      },
       {
         type: 'paragraph',
         text: t`Una **distribución** describe **qué valores puede tomar una variable aleatoria y con qué probabilidad**.`,
@@ -222,11 +256,6 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
           t`Si es **continua** (cualquier valor en un intervalo: estatura, tiempo), se usa una **curva de densidad**, y la **probabilidad de un rango es el área bajo la curva** en ese rango. (La probabilidad de un valor exacto es 0.)`,
           t`Las **colas** son los extremos de la distribución. Una distribución de "colas pesadas" da más probabilidad a valores extremos.`,
         ],
-      },
-      {
-        type: 'intuition',
-        title: 'Qué es una distribución',
-        text: t`**Qué es una distribución.** Es el "mapa" de un fenómeno aleatorio: qué valores puede tomar y con qué chance. Si los valores se pueden contar (0, 1, 2…), se da la chance de cada uno. Si son continuos (estatura, tiempo), se usa una curva y la chance de un rango es el **área bajo la curva** en ese rango. Las **colas** son los extremos: dónde viven los casos raros.`,
       },
       { type: 'subheading', text: 'Binomial' },
       {
@@ -242,11 +271,6 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         type: 'paragraph',
         text: t`*Ejemplo:* 10 tiradas de moneda, ¿probabilidad de exactamente 3 caras? $\binom{10}{3}(0.5)^{10} = 120/1024 \approx 0.117$.`,
       },
-      {
-        type: 'intuition',
-        title: 'Binomial: contar aciertos',
-        text: t`**Binomial: contar aciertos.** Tirás una moneda 10 veces y contás las caras. Sirve cada vez que repetís lo mismo $n$ veces, cada una con la misma chance de éxito, y querés saber cuántos éxitos hubo. Tres caras en diez tiradas tiene una chance de $0.117$.`,
-      },
       { type: 'subheading', text: 'Poisson' },
       {
         type: 'paragraph',
@@ -259,9 +283,12 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         text: t`*Ejemplo:* una central recibe en promedio $\lambda = 3$ llamadas por minuto. Probabilidad de **ninguna** llamada: $e^{-3} \approx 0.050$. De **exactamente 2**: $e^{-3}\cdot 9/2 \approx 0.224$.`,
       },
       {
-        type: 'intuition',
-        title: 'Poisson: contar cosas raras en un intervalo',
-        text: t`**Poisson: contar cosas raras en un intervalo.** Las llamadas que entran a una central, los clientes que llegan a un local. Basta con saber el promedio ($\lambda$). Con $\lambda = 3$ llamadas por minuto, la chance de que no entre ninguna es de $0.050$.`,
+        type: 'deepDive',
+        title: 'La Poisson es una binomial con muchísimos intentos',
+        text: t`¿Por qué la Poisson sirve para "eventos raros"? Pensá en las llamadas a la central como una binomial: cada minuto hay muchísimas personas que **podrían** llamar, pero cada una lo hace con una probabilidad minúscula. Por ejemplo, $600$ personas, cada una con probabilidad $0.005$ de llamar en un minuto dado. En promedio llaman $600 \times 0.005 = 3$, como en el ejemplo.
+
+Con la binomial, la probabilidad de que no llame nadie es $0.995^{600} \approx 0.0494$; con la Poisson de $\lambda = 3$, $e^{-3} \approx 0.0498$. Casi idénticas. Cuando $n$ es muy grande y $p$ muy chica, la binomial se vuelve una Poisson con $\lambda = np$, y ya no hace falta saber ni $n$ ni $p$: alcanza con el promedio. Por eso la Poisson es tan práctica: casi nunca sabés cuántas personas *podrían* llamar, pero sí cuántas llaman en promedio.`,
+        sources: ['Ross, *A First Course in Probability*, cap. 4 (la Poisson como límite de la binomial)'],
       },
       { type: 'subheading', text: 'Normal (la campana de Gauss)' },
       {
@@ -281,9 +308,14 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         text: t`**Estandarización (puntaje $z$):** $z = (x-\mu)/\sigma$ dice a cuántas desviaciones típicas de la media está un valor. *Ejemplo:* si el coeficiente intelectual tiene $\mu=100$ y $\sigma=15$, un valor de 130 tiene $z=2$, y solo ~2.3 % de la gente lo supera.`,
       },
       {
-        type: 'intuition',
-        title: 'Normal: la campana',
-        text: t`**Normal: la campana.** Aparece cuando algo es la suma de muchas causas pequeñas e independientes, como la estatura. La regla útil: aproximadamente 68 % de los datos queda a una desviación de la media, 95 % a dos y 99.7 % a tres. El puntaje $z$ dice a cuántas desviaciones de la media está un valor. Con $\mu = 100$ y $\sigma = 15$, un valor de 130 tiene $z = 2$.`,
+        type: 'deepDive',
+        title: t`De dónde sale el $1.96$ que vas a ver en todas partes`,
+        text: t`La regla "95 % a menos de 2 desviaciones" está redondeada. El valor exacto es $1.96$: en una Normal, el 95 % del área queda entre $-1.96$ y $+1.96$ desviaciones típicas de la media, y queda un $2.5$ % en cada cola. Ese $1.96$ es el que aparece en los intervalos de confianza de la sección 2.6.
+
+**El puntaje $z$ convierte cualquier Normal en una sola.** Una estatura en centímetros y un coeficiente intelectual no se pueden comparar directamente. Pero si a cada valor le restás su media y lo dividís por su desviación típica, todos quedan en la misma escala: "a cuántas desviaciones del centro estás". Así, con una sola tabla (la de la Normal estándar, con media $0$ y desviación $1$) se responde cualquier pregunta. Por ejemplo, el ~2.3 % de la guía para $z = 2$ es el área a la derecha de $2$ en esa curva: $1 - 0.977 \approx 0.023$.
+
+**Por qué aparece tanto.** Una variable que es la suma de muchas causas chicas e independientes tiende a la campana, porque los empujones hacia arriba y hacia abajo se compensan casi siempre y solo rara vez se suman todos para el mismo lado. Por eso los valores extremos son raros. La sección 2.5 lleva esta idea a los promedios.`,
+        sources: ['Freedman, Pisani y Purves, *Statistics*, cap. 5 (la curva Normal)'],
       },
       { type: 'subheading', text: t`$t$ de Student` },
       {
@@ -301,9 +333,16 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         text: t`Es el **cociente entre dos $\chi^2$**, cada una dividida por sus grados de libertad. Sirve para **comparar variabilidades**: por ejemplo, en el análisis de varianza (**ANOVA**, que compara las medias de varios grupos mediante la relación entre la variabilidad *entre* grupos y *dentro* de los grupos) y en la regresión, para decidir si un modelo explica algo en conjunto.`,
       },
       {
-        type: 'intuition',
-        title: 'La t, la chi-cuadrado y la F: parientes para cuando hay más incertidumbre',
-        text: t`**La t, chi-cuadrado y F: parientes que aparecen cuando hay más incertidumbre.** La **t** es una campana con las colas más gordas: se usa cuando la desviación hay que estimarla con pocos datos, que agrega dudas extra. La **chi-cuadrado** y la **F** sirven para comparar variabilidades y tablas de conteos. No hace falta memorizarlas ahora: lo importante es saber que cada una nace de una situación concreta, y que la tabla resumen te dice cuál usar.`,
+        type: 'deepDive',
+        title: t`La $t$, la $\chi^2$ y la $F$: para qué vas a usar cada una`,
+        text: t`Estas tres distribuciones no describen datos del mundo (estaturas, llamadas), sino **estadísticos**: números que calculás con una muestra para tomar decisiones. Cada una responde a una pregunta distinta.
+
+**La $t$: "¿qué tan lejos está mi estimación, contando que el margen de error también es estimado?"** Si conocieras $\sigma$, la distancia de $\bar{x}$ al valor de la hipótesis, medida en errores estándar, seguiría una Normal. Pero casi siempre usás $s$, que también varía de muestra en muestra, y eso agrega incertidumbre: las colas se engordan. Con pocos datos, mucho: para dejar un 2.5 % en cada cola hay que irse a $3.18$ con 3 grados de libertad, a $2.03$ con 35, y con muchos datos se llega al $1.96$ de la Normal. La vas a usar para decidir si **un** coeficiente o **una** media difieren de un valor.
+
+**La $\chi^2$: "¿qué tan grande es esta suma de cuadrados?"** Como es una suma de Normales al cuadrado, aparece cada vez que sumás desvíos al cuadrado, que es exactamente lo que hace la varianza. Sirve para sacar conclusiones sobre una varianza y para comparar conteos observados con los esperados en una tabla.
+
+**La $F$: "¿esta variabilidad es más grande que esta otra, más de lo que daría el azar?"** Es el cociente de dos $\chi^2$, o sea, de dos varianzas. Si las dos miden lo mismo, el cociente ronda $1$; si el numerador es mucho mayor, algo lo está inflando. En la regresión vas a comparar la variabilidad que explica un **grupo** de variables con la que queda sin explicar: si el cociente es grande, ese grupo aporta. Es la pregunta de la $t$, pero para varias cosas juntas.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, apéndice B (distribuciones $t$, $\chi^2$ y $F$)'],
       },
       { type: 'paragraph', text: '**Resumen:**' },
       {
@@ -326,6 +365,23 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
     title: 'Distribución muestral y Teorema del Límite Central (TLC)',
     blocks: [
       {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué diferencia había entre un parámetro y un estadístico?',
+            answer: t`El **parámetro** describe a la población y casi siempre es desconocido ($\mu$, $\sigma$). El **estadístico** se calcula con la muestra ($\bar{x}$, $s$) y sirve para estimarlo. Lo viste en Módulo 2.1.`,
+          },
+          {
+            question: '¿Qué medía la desviación típica?',
+            answer: t`Cuánto se alejan, típicamente, los datos de su media, en las mismas unidades que los datos. Lo viste en Módulo 2.2.`,
+          },
+          {
+            question: '¿Qué decía la regla 68-95-99.7?',
+            answer: t`En una Normal, alrededor del 68 % de los valores está a menos de 1 desviación típica de la media, el 95 % a menos de 2 (exactamente, $1.96$) y el 99.7 % a menos de 3. Lo viste en Módulo 2.4.`,
+          },
+        ],
+      },
+      {
         type: 'paragraph',
         text: t`Si tomas una muestra y calculas $\bar{x}$, y luego tomas **otra** muestra, obtienes otra $\bar{x}$ distinta. La $\bar{x}$ **varía de muestra en muestra**. Su distribución se llama **distribución muestral de la media**.`,
       },
@@ -347,22 +403,12 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
           t`El teorema habla de **promedios (y sumas)**, no de los datos individuales.`,
         ],
       },
-      {
-        type: 'intuition',
-        title: 'El Teorema del Límite Central en una frase',
-        text: t`**El Teorema del Límite Central, en una frase.** Aunque los datos individuales sean un desparramo muy raro, los **promedios** de muchas muestras bastante grandes se acomodan en forma de campana, centrada en el verdadero promedio. Eso sí: el teorema habla de promedios, no de datos individuales.`,
-      },
       { type: 'simulation', simulationId: 'IN-21' },
       {
         type: 'workedExample',
         title: t`*Ejemplo:* ingresos de una población muy sesgada con $\mu = 1000$ y $\sigma = 600$. Se toman muestras de $n=100$.`,
         steps: [t`El error estándar es $600/10 = 60$.`],
         result: t`Aproximadamente el 95 % de las medias muestrales cae en $1000 \pm 2\times60$, es decir, entre 880 y 1120, aunque los ingresos individuales estén muy dispersos.`,
-      },
-      {
-        type: 'intuition',
-        title: 'El tamaño de la campana de los promedios',
-        text: t`**El tamaño de la campana.** Su ancho se llama **error estándar** y vale $\sigma/\sqrt{n}$. Con $\sigma = 600$ y $n = 100$, es $600/10 = 60$. Es decir, aunque los ingresos individuales estén muy dispersos, aproximadamente el 95 % de los promedios cae entre 880 y 1120.`,
       },
       { type: 'miniCheck', questionIds: ['m2-q05'] },
       { type: 'paragraph', text: '**Dos consecuencias clave:**' },
@@ -375,9 +421,22 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         ],
       },
       {
-        type: 'intuition',
-        title: 'Por qué importa',
-        text: t`**Por qué importa.** Dos cosas prácticas. Primero, más datos significa menos error, pero con rendimientos decrecientes: para reducir el error a la mitad hay que **cuadruplicar** la muestra. Segundo, como los promedios se comportan como una campana, podemos calcular rangos de confianza y pruebas sin conocer la forma de la población. Es lo que da base a todo lo que sigue en este módulo.`,
+        type: 'deepDive',
+        title: 'Desviación típica y error estándar: la confusión más común',
+        text: t`**Miden cosas distintas.** La desviación típica ($\sigma = 600$ en el ejemplo) dice cuánto se alejan **las personas** del promedio: una persona cualquiera gana fácilmente 600 más o menos que la media. El error estándar ($60$) dice cuánto se aleja **el promedio de una muestra** del verdadero promedio. Tomando 100 personas al azar, el promedio casi nunca se aleja más de unos 120 de la verdad, aunque cada persona varíe muchísimo.
+
+**Por qué se divide por $\sqrt{n}$ y no por $n$.** Al promediar, los que ganan de más y los que ganan de menos se compensan en parte, pero no del todo: la compensación es imperfecta y aleatoria. La cuenta exacta dice que la varianza del promedio es $\sigma^2/n$, así que su desviación es $\sigma/\sqrt{n}$. Con los números del ejemplo:
+
+$n = 25$: error estándar $= 600/5 = 120$.
+
+$n = 100$: error estándar $= 600/10 = 60$.
+
+$n = 400$: error estándar $= 600/20 = 30$.
+
+Cada vez que se cuadruplica la muestra, el error se reduce a la mitad. Por eso los primeros datos rinden mucho y los siguientes cada vez menos.
+
+**Por qué es la pieza central de lo que sigue.** Intervalos de confianza, contrastes, el $t$ de una regresión: todo se mide **en errores estándar**. Cuando más adelante leas "el error estándar está mal calculado", significa que la regla con la que medís "lejos" o "cerca" está mal graduada.`,
+        sources: ['Freedman, Pisani y Purves, *Statistics*, cap. 17 (el error estándar del promedio)'],
       },
     ],
   },
@@ -386,6 +445,27 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
     moduleId: 2,
     title: 'Estimación: intervalos de confianza y máxima verosimilitud',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué era el error estándar?',
+            answer: t`La desviación típica de un estimador: cuánto variaría, por ejemplo, $\bar{x}$ de muestra en muestra. Para la media vale $\sigma/\sqrt{n}$ y se estima con $s/\sqrt{n}$. Lo viste en Módulo 2.5.`,
+          },
+          {
+            question: t`¿De dónde salía el $1.96$?`,
+            answer: t`En una Normal, el 95 % de los valores queda a menos de $1.96$ desviaciones típicas de la media. Lo viste en Módulo 2.4.`,
+          },
+          {
+            question: '¿Cómo se encontraba el máximo o el mínimo de una función?',
+            answer: t`Buscando el punto donde la derivada (la pendiente) vale cero: en la cima o en el fondo del valle, la curva está plana. Lo viste en Módulo 0.4.`,
+          },
+          {
+            question: '¿Qué propiedad estrella tenía el logaritmo?',
+            answer: t`Convierte productos en sumas: $\ln(a \cdot b) = \ln(a) + \ln(b)$. Lo viste en Módulo 0.5.`,
+          },
+        ],
+      },
       {
         type: 'paragraph',
         text: t`Un **estimador** es una regla para calcular, desde la muestra, un valor que aproxime un parámetro. Un estimador es **insesgado** si, en promedio sobre muchas muestras, acierta al parámetro (por ejemplo, $\bar{x}$ es insesgado para $\mu$).`,
@@ -406,11 +486,6 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         steps: [t`Error estándar $= 60$.`, t`Intervalo al 95 %: $1050 \pm 1.96\times60 = 1050 \pm 117.6$.`],
         result: t`**[932.4 ; 1167.6]**`,
       },
-      {
-        type: 'intuition',
-        title: 'Un número solo casi nunca acierta',
-        text: t`**Un número solo casi nunca acierta.** Si decís "el promedio verdadero es exactamente 1050", casi seguro te equivocás por poco. Por eso se da un **rango**, el intervalo de confianza. Con los datos del ejemplo queda entre 932.4 y 1167.6.`,
-      },
       { type: 'miniCheck', questionIds: ['m2-q06'] },
       {
         type: 'paragraph',
@@ -421,18 +496,22 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         text: t`**Analogía del aro y la estaca.** La estaca (el parámetro) está clavada en el suelo y no se mueve. Tú lanzas un aro (el intervalo) una y otra vez con una técnica que atrapa la estaca el 95 % de las veces. Cada lanzamiento concreto la atrapa o no; no sabes cuál ocurrió. Por eso **no es correcto** decir "hay un 95 % de probabilidad de que $\mu$ esté en [932.4 ; 1167.6]": en ese intervalo ya calculado, $\mu$ está o no está. El 95 % describe la **fiabilidad del método**.`,
       },
       {
-        type: 'intuition',
-        title: 'El aro y la estaca',
-        text: t`**La estaca y el aro.** El valor verdadero es una **estaca clavada en el piso**: no se mueve. Vos lanzás un aro (el intervalo) con una técnica que atrapa la estaca el 95 % de las veces. Cada lanzamiento concreto la atrapa o no, y no sabés cuál ocurrió. Por eso "95 %" habla de la **confiabilidad de la técnica**, no de la probabilidad de que la estaca esté en un aro que ya tiraste.`,
-      },
-      {
         type: 'paragraph',
         text: t`**Qué hace al intervalo más ancho:** mayor confianza (99 % > 95 %), mayor variabilidad ($s$) y menos datos ($n$).`,
       },
       {
-        type: 'intuition',
-        title: 'Qué hace más ancho al intervalo',
-        text: t`**Qué lo hace más ancho.** Pedir más confianza, tener datos más dispersos o contar con menos datos. Igual que un cartel que quiere asegurarse de abarcar a todos: más grande si hay más dudas.`,
+        type: 'deepDive',
+        title: t`De dónde sale "$\pm 1.96$ errores estándar"`,
+        text: t`**Dar vuelta la frase.** Por el TLC, $\bar{x}$ cae a menos de $1.96$ errores estándar de $\mu$ en el 95 % de las muestras. Pero "$\bar{x}$ está cerca de $\mu$" es lo mismo que "$\mu$ está cerca de $\bar{x}$": la distancia es la misma, se mire desde donde se mire. Entonces, si a cada $\bar{x}$ le sumás y restás $1.96$ errores estándar, el rango que armás alcanza a $\mu$ en el 95 % de las muestras. Eso es el intervalo, y por eso el 95 % habla del método y no de un intervalo en particular (el aro y la estaca).
+
+**Cada ingrediente de la fórmula explica qué lo ensancha.** En $\bar{x} \pm z^* \cdot s/\sqrt{n}$:
+
+**Más confianza:** para atrapar a $\mu$ el 99 % de las veces hay que abrir más el aro, con $z^* = 2.576$ en lugar de $1.96$. Con los datos del ejemplo, $1050 \pm 2.576\times60 \approx 1050 \pm 154.6$, es decir, $[895.4 ;\ 1204.6]$, contra $[932.4 ;\ 1167.6]$ al 95 %. Más seguridad cuesta precisión.
+
+**Más dispersión ($s$):** datos más desparramados dan promedios más inestables.
+
+**Menos datos ($n$):** el error estándar crece, aunque solo con la raíz de $n$.`,
+        sources: ['Freedman, Pisani y Purves, *Statistics*, cap. 21 (intervalos de confianza)'],
       },
       { type: 'subheading', text: 'Función de verosimilitud y máxima verosimilitud (MLE)' },
       {
@@ -465,9 +544,14 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         text: t`La máxima verosimilitud es un método general de estimación: sirve siempre que se pueda escribir la probabilidad de los datos en función de un parámetro, no solo para una moneda.`,
       },
       {
-        type: 'intuition',
-        title: 'Máxima verosimilitud: la explicación que mejor encaja',
-        text: t`**Máxima verosimilitud: la explicación que mejor encaja.** Tiraste una moneda 10 veces y salieron 7 caras. ¿Qué tan probable es que esa moneda sea "justa" (50 %)? ¿Y que dé cara el 70 % de las veces? Con una chance de 50 % la probabilidad de lo que viste es $0.00098$; con una de 70 % es $0.00222$, más del doble. El método elige la chance que **hace más creíbles los datos que ya viste**: en este caso, $0.7$. No dice "la probabilidad de que la moneda sea así", sino "qué tan bien explica esa moneda lo que observé".`,
+        type: 'deepDive',
+        title: t`Cómo se encuentra el máximo, y por qué con logaritmos`,
+        text: t`**Probar valores a mano.** Con 7 caras en 10 tiros: $L(0.6) = 0.6^7 \cdot 0.4^3 \approx 0.00179$, $L(0.7) \approx 0.00222$ y $L(0.8) = 0.8^7 \cdot 0.2^3 \approx 0.00168$. La curva sube hasta $0.7$ y después baja: el máximo está en la cima, donde la pendiente es cero (Módulo 0.4).
+
+**Por qué se usa el logaritmo.** La verosimilitud es un **producto** de una probabilidad por cada dato. Con 1000 datos serían 1000 números menores que 1 multiplicados entre sí, un número tan chico que la computadora ni lo puede guardar. El logaritmo convierte ese producto en una **suma**, $\ln L = 7\ln p + 3\ln(1-p)$, que es fácil de manejar. Y como el logaritmo siempre crece cuando crece su argumento, el máximo está en el mismo $p$.
+
+**La cuenta.** Derivando, $\dfrac{7}{p} - \dfrac{3}{1-p} = 0$, o sea, $7(1-p) = 3p$, y queda $p = 0.7$: la proporción observada. El método confirma lo que dice la intuición, pero su valor está en que funciona igual cuando la intuición no alcanza: con muchos parámetros, la computadora busca la cima por pasos (como el descenso por gradiente del Módulo 0.4). Muchos de los modelos que vienen más adelante se estiman así.`,
+        sources: ['Wackerly, Mendenhall y Scheaffer, *Estadística matemática con aplicaciones*, cap. 9 (máxima verosimilitud)'],
       },
     ],
   },
@@ -476,6 +560,27 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
     moduleId: 2,
     title: 'Contraste de hipótesis y tamaño del efecto',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué era el error estándar?',
+            answer: t`Cuánto variaría una estimación (como $\bar{x}$) de muestra en muestra: $s/\sqrt{n}$ para la media. Es la "regla" con la que se mide si un resultado está lejos o cerca. Lo viste en Módulo 2.5.`,
+          },
+          {
+            question: t`¿Por qué la $t$ de Student tiene colas más pesadas que la Normal?`,
+            answer: t`Porque se usa cuando la desviación se estima con la propia muestra ($s$), lo que agrega incertidumbre, sobre todo con pocos datos. Con muchos datos se parece a la Normal. Lo viste en Módulo 2.4.`,
+          },
+          {
+            question: '¿Qué significaba "95 % de confianza"?',
+            answer: t`Que el método de construir el intervalo atrapa al verdadero parámetro en el 95 % de las muestras (el aro y la estaca). Lo viste en Módulo 2.6.`,
+          },
+          {
+            question: '¿Qué hacía el teorema de Bayes?',
+            answer: t`Daba vuelta una probabilidad condicional: de $P(B \mid A)$ a $P(A \mid B)$. En el test médico, que el test detecte al 90 % de los enfermos no significa que un positivo tenga 90 % de chance de estar enfermo: con una enfermedad rara, era apenas $0.154$. Lo viste en Módulo 0.2.`,
+          },
+        ],
+      },
       { type: 'paragraph', text: t`El contraste de hipótesis se parece a un **juicio**:` },
       {
         type: 'table',
@@ -486,11 +591,6 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
           ['Las pruebas', 'Los datos de la muestra'],
           ['El veredicto', t`Rechazar o **no** rechazar $H_0$`],
         ],
-      },
-      {
-        type: 'intuition',
-        title: 'La hipótesis nula es la presunción de inocencia',
-        text: t`**La hipótesis nula es la presunción de inocencia.** Se parte de "no pasa nada" (por ejemplo, las baterías duran 100 horas, como dice el fabricante). Los datos son las pruebas. El veredicto no es "inocente probado" sino "no hay pruebas suficientes para condenar": **no rechazar** no es lo mismo que **demostrar** que no hay efecto.`,
       },
       { type: 'paragraph', text: '**Pasos:**' },
       {
@@ -512,9 +612,20 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         text: t`Lo que el p-valor **no** es: no es la probabilidad de que $H_0$ sea cierta, ni la probabilidad de que el resultado sea fruto del azar.`,
       },
       {
-        type: 'intuition',
-        title: 'El p-valor, en palabras simples',
-        text: t`**El p-valor, en palabras simples.** Es la respuesta a la pregunta: "si en realidad no pasara nada, ¿qué tan raro sería ver datos tan extremos como los míos?". Si es muy raro (menos del límite que elegiste, casi siempre $0.05$), dudás de la hipótesis nula. **No** dice cuán probable es que la hipótesis sea cierta.`,
+        type: 'deepDive',
+        title: 'Por qué el p-valor no es "la probabilidad de que $H_0$ sea cierta"',
+        text: t`Es la confusión más común, y la diferencia es la misma que en el test médico del Módulo 0.2: no es lo mismo $P(\text{datos así} \mid H_0)$ que $P(H_0 \mid \text{datos así})$.
+
+**Un ejemplo con mil hipótesis.** Supongamos que un laboratorio pone a prueba $1000$ ideas, y que solo $100$ de ellas son efectos reales (las otras $900$ no hacen nada). Usan $\alpha = 0.05$ y sus estudios tienen una potencia de $0.8$:
+
+De las $100$ reales, detectan $100 \times 0.8 = 80$.
+
+De las $900$ falsas, igual salen "significativas" por azar $900 \times 0.05 = 45$.
+
+En total hay $125$ resultados significativos, y $45$ de ellos son falsas alarmas: $45/125 = 36$ %. Aunque cada uno tenga $p < 0.05$, más de un tercio de los "descubrimientos" no son reales. Cuánto creerle a un resultado significativo depende de qué tan probable era la idea **antes** de probarla, igual que en Bayes dependía de qué tan rara era la enfermedad.
+
+**Qué sí dice el p-valor.** Si $H_0$ fuera cierta, qué tan raro sería ver datos como estos. Es una medida de sorpresa, no la probabilidad de que la hipótesis sea verdadera o falsa.`,
+        sources: ['Ioannidis, "Why Most Published Research Findings Are False", *PLoS Medicine* (2005)', 'Cifras inventadas para el ejemplo'],
       },
       {
         type: 'workedExample',
@@ -528,9 +639,12 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         result: t`**Decisión:** como $p > 0.05$, **no se rechaza $H_0$**. (Si hubieras obtenido $\bar{x}=95$, $t=-2.5$ y $p \approx 0.017$, y sí se rechazaría.)`,
       },
       {
-        type: 'intuition',
-        title: 'El caso de las baterías',
-        text: t`**Con las baterías.** Promedio de 96 horas en 36 pruebas, frente a las 100 prometidas. El estadístico da $t = -2$ y el p-valor es aproximadamente $0.053$, apenas por encima de $0.05$: no se rechaza. Ojo: con $0.049$ la decisión sería la contraria, y la evidencia casi no habría cambiado. El límite de $0.05$ es una convención, no una frontera natural.`,
+        type: 'deepDive',
+        title: t`De dónde sale el $0.053$, y por qué el intervalo dice lo mismo`,
+        text: t`**El p-valor es un área.** Si las baterías duraran de verdad 100 horas, el estadístico $t$ seguiría una $t$ de Student con 35 grados de libertad. El p-valor es la probabilidad de caer **tan lejos o más** que lo observado, en cualquiera de las dos direcciones porque $H_a$ es "distinto de 100". Es el área de la curva más allá de $-2$ sumada al área más allá de $+2$: alrededor de $2.7$ % de cada lado, y en total $\approx 0.053$.
+
+**El contraste y el intervalo son dos caras de lo mismo.** El intervalo al 95 % para la duración media es $96 \pm 2.03 \times 2$, es decir, $[91.94 ;\ 100.06]$. Contiene al $100$, así que $100$ es un valor plausible, y por eso no se rechaza $H_0$. En general, un contraste a dos colas al 5 % rechaza $H_0$ exactamente cuando el valor de $H_0$ queda **fuera** del intervalo al 95 %. El intervalo además te dice algo que el p-valor no: el rango completo de duraciones compatibles con los datos.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, apéndice C (contrastes e intervalos)'],
       },
       {
         type: 'paragraph',
@@ -561,11 +675,6 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
           t`Reducir $\alpha$ (ser más exigente para condenar) **aumenta $\beta$** si no cambias $n$: hay un equilibrio entre ambos errores.`,
         ],
       },
-      {
-        type: 'intuition',
-        title: 'Los dos errores posibles',
-        text: t`**Los dos errores posibles.** Condenar a un inocente (error Tipo I) o dejar libre a un culpable (error Tipo II). Ser más exigente para condenar reduce el primero pero aumenta el segundo, salvo que tengas más datos. La **potencia** es la capacidad de detectar un efecto cuando de verdad existe.`,
-      },
       { type: 'subheading', text: 'Tamaño del efecto' },
       {
         type: 'paragraph',
@@ -581,9 +690,16 @@ La **media** es el punto de equilibrio: si la lista fuera una balanza, es donde 
         text: t`*Contraste:* con $n = 100\,000$, una diferencia de solo $0.5$ horas ($s=12$) daría $t \approx 13$ (muy significativa), pero $d \approx 0.04$ (irrelevante en la práctica). **Siempre hay que mirar el p-valor y el tamaño del efecto.**`,
       },
       {
-        type: 'intuition',
-        title: '"Significativo" no es "importante"',
-        text: t`**"Significativo" no es "importante".** Con una muestra gigante, hasta una diferencia ínfima sale "significativa". Por eso se mide también el **tamaño del efecto**: cuántas desviaciones típicas separan a los grupos. En el ejemplo de las baterías, $d \approx -0.33$: una diferencia entre pequeña y mediana. Mirá siempre las dos cosas: si hay evidencia (p-valor) y si importa en la práctica (tamaño del efecto).`,
+        type: 'deepDive',
+        title: 'Por qué con muestras enormes todo sale significativo',
+        text: t`El estadístico $t$ y la $d$ de Cohen están conectados por una cuenta simple: $t = d \times \sqrt{n}$. El $t$ mide la diferencia en errores estándar, y el error estándar es $s/\sqrt{n}$; la $d$ la mide en desviaciones típicas. La diferencia entre las dos es justamente el factor $\sqrt{n}$.
+
+**Con las baterías:** $d \approx -0.33$ y $\sqrt{36} = 6$, así que $t = -0.33 \times 6 \approx -2$, el mismo valor de la guía.
+
+**Con la muestra gigante:** $d = 0.5/12 \approx 0.04$, un efecto mínimo, pero $\sqrt{100\,000} \approx 316$, así que $t \approx 0.0417 \times 316 \approx 13.2$.
+
+El tamaño del efecto queda fijo, pero el $t$ crece sin límite con la muestra. Con datos suficientes, **cualquier** diferencia distinta de cero termina siendo "significativa". Por eso el p-valor responde "¿hay algo?" y la $d$ responde "¿cuánto?". Son preguntas distintas y hacen falta las dos.`,
+        sources: ['Cohen, *Statistical Power Analysis for the Behavioral Sciences*, cap. 1'],
       },
     ],
   },

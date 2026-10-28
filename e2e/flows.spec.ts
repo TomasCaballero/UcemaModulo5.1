@@ -16,7 +16,7 @@ test('flujo principal: inicio → módulo → sección → simulación → autoe
   const simulation = page.getByRole('group', { name: 'Simulador del Teorema del Límite Central' })
   await simulation.scrollIntoViewIfNeeded()
   await expect(simulation.locator('.clt__summary')).toContainText('Medias dibujadas: 400 de 400')
-  await expect(page.locator('.katex').first()).toBeVisible()
+  await expect(page.locator('.math-display .katex').first()).toBeVisible()
 
   await page.getByRole('link', { name: 'Autoevaluación' }).first().click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Autoevaluación del Módulo 2')
