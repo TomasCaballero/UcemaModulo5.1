@@ -57,6 +57,12 @@ export function validateContent(content: CourseContent): string[] {
           errors.push(`Sección ${section.id}: el mini-chequeo debe tener de 1 a 3 preguntas`)
         }
       }
+      if (block.type === 'deepDive' && block.sources.length === 0) {
+        errors.push(`Sección ${section.id}: la ampliación "${block.title}" no cita fuentes`)
+      }
+      if (block.type === 'recall' && block.items.length === 0) {
+        errors.push(`Sección ${section.id}: el bloque "¿Te acordás?" está vacío`)
+      }
       if (block.type === 'simulation' && !simulationIds.has(block.simulationId)) {
         errors.push(`Sección ${section.id}: simulación inexistente ${block.simulationId}`)
       }

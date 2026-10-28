@@ -51,6 +51,14 @@ export const recall = (c: Confusion): number => ratio(c.tp, c.tp + c.fn)
 /** Especificidad: de los negativos reales, cuántos se identificaron como tales. */
 export const specificity = (c: Confusion): number => ratio(c.tn, c.tn + c.fp)
 export const accuracy = (c: Confusion): number => ratio(c.tp + c.tn, c.tp + c.fp + c.fn + c.tn)
+/** F1: media armónica de precisión y recall. */
+export const f1 = (precisionValue: number, recallValue: number): number =>
+  ratio(2 * precisionValue * recallValue, precisionValue + recallValue)
+
+/** Entropía en bits de una distribución de proporciones: $-\sum p \log_2 p$ (los ceros no aportan). */
+export function entropy(proportions: readonly number[]): number {
+  return proportions.reduce((sum, p) => (p > 0 ? sum - p * Math.log2(p) : sum), 0)
+}
 
 /** Función logística 1 / (1 + e^-z). */
 export const logistic = (z: number): number => 1 / (1 + Math.exp(-z))

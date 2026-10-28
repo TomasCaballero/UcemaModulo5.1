@@ -66,6 +66,17 @@ describe('validateContent', () => {
     expect(errors).toContain('Sección 2.2: simulación inexistente IN-99')
   })
 
+  it('exige fuentes en las ampliaciones y contenido en los repasos (RNF-24)', () => {
+    const content = validContent()
+    content.sections[0]!.blocks = [
+      { type: 'deepDive', title: 'Por qué', text: 'Porque sí', sources: [] },
+      { type: 'recall', items: [] },
+    ]
+    const errors = validateContent(content)
+    expect(errors).toContain('Sección 2.2: la ampliación "Por qué" no cita fuentes')
+    expect(errors).toContain('Sección 2.2: el bloque "¿Te acordás?" está vacío')
+  })
+
   it('exige de 1 a 3 preguntas por mini-chequeo', () => {
     const content = validContent()
     content.sections[0]!.blocks = [{ type: 'miniCheck', questionIds: [] }]

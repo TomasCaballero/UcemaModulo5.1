@@ -96,6 +96,10 @@ function blockTexts(block: ContentBlock): string[] {
     case 'extra':
     case 'intuition':
       return [block.text]
+    case 'deepDive':
+      return [block.title, block.text]
+    case 'recall':
+      return block.items.flatMap((item) => [item.question, item.answer])
     case 'list':
       return block.items
     case 'table':
