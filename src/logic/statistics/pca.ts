@@ -22,6 +22,13 @@ export function componentsForVariance(eigenvalues: readonly number[], threshold:
   return index === -1 ? eigenvalues.length : index + 1
 }
 
+/** Autovalores de la matriz simétrica $\begin{pmatrix} a & b \\ b & c \end{pmatrix}$, de mayor a menor. */
+export function symmetric2x2Eigenvalues(a: number, b: number, c: number): [number, number] {
+  const center = (a + c) / 2
+  const radius = Math.sqrt(((a - c) / 2) ** 2 + b ** 2)
+  return [center + radius, center - radius]
+}
+
 /** Autovalor de un componente que explica `share` de la varianza, con matriz de correlación de `p` variables (varianza total = p). */
 export function eigenvalueFromShare(share: number, variables: number): number {
   return share * variables

@@ -6,6 +6,17 @@ import { mean, sampleVariance } from '@/logic/statistics/descriptive'
 import { binomialPmf, normalCdf, poissonPmf, tCritical, tTwoTailedPValue } from '@/logic/statistics/distributions'
 import { bernoulliLikelihood, cohensD, confidenceInterval, standardError } from '@/logic/statistics/inference'
 import { attenuationFactor, fStatistic, simpleOls, tRatio, waldEstimate } from '@/logic/statistics/regression'
+import { GUIDE_POINTS, kmeansFrames, type Point } from '@/logic/simulations/kmeans'
+import {
+  allBootstrapSamples,
+  exactBootstrapStandardError,
+  lassoOneVariable,
+  majorityVoteAccuracy,
+  meanPredictionError,
+  ridgeOneVariable,
+  shrunkMeanError,
+} from '@/logic/statistics/learning'
+import { explainedVariance, symmetric2x2Eigenvalues } from '@/logic/statistics/pca'
 import type { NumericExample } from './numeric-examples'
 
 /**
@@ -185,10 +196,65 @@ const module5Examples: NumericExample[] = [
   example('5.4-naive', r`$0.1/0.1015 \approx 0.985$`, 0.985, 3, () => (0.4 * 0.25) / (0.4 * 0.25 + 0.6 * 0.0025)),
 ]
 
+// Ampliaciones del Módulo 6.
+const meanError = meanPredictionError(4, 5)
+const bootstrapData = [2, 4, 9]
+const finalSse = (points: readonly Point[], initial: readonly Point[]) => {
+  const frames = kmeansFrames(points, initial)
+  return frames[frames.length - 1]?.sse as number
+}
+const guideStart = [GUIDE_POINTS[0], GUIDE_POINTS[3]] as Point[]
+const rectangle: Point[] = [[0, 0], [10, 0], [0, 1], [10, 1]]
+const phi = ([a, b]: readonly [number, number]) => [a ** 2, Math.SQRT2 * a * b, b ** 2]
+const dot = (u: readonly number[], v: readonly number[]) => u.reduce((acc, ui, i) => acc + ui * (v[i] as number), 0)
+const correlated = symmetric2x2Eigenvalues(1, 0.9, 1)
+
+const module6Examples: NumericExample[] = [
+  example('6.1-entrenamiento', r`$\tfrac{4}{5} \times 4 = 3.2$`, 3.2, 1, () => meanError.training),
+  example('6.1-prueba', r`$\tfrac{6}{5} \times 4 = 4.8$`, 4.8, 1, () => meanError.test),
+  example('6.1-optimismo', r`un 50 % más de error`, 50, 0, () => (meanError.test / meanError.training - 1) * 100),
+  example('6.2-varianza-encogida', r`$0.8^2 \times 4 = 2.56$`, 2.56, 2, () => shrunkMeanError(0.8, 2, 4).variance),
+  example('6.2-sesgo-mu-2', r`el sesgo es $0.4$ y su cuadrado, $0.16$`, 0.16, 2, () => shrunkMeanError(0.8, 2, 4).bias2),
+  example('6.2-total-mu-2', r`$0.16 + 2.56 = 2.72$`, 2.72, 2, () => shrunkMeanError(0.8, 2, 4).mse),
+  example('6.2-sesgo-mu-10', r`el sesgo es $2$ y su cuadrado, $4$`, 4, 6, () => shrunkMeanError(0.8, 10, 4).bias2),
+  example('6.2-total-mu-10', r`$4 + 2.56 = 6.56$`, 6.56, 2, () => shrunkMeanError(0.8, 10, 4).mse),
+  example('6.3-muestras', r`$3^3 = 27$`, 27, 6, () => allBootstrapSamples(bootstrapData).length),
+  example('6.3-media-alta', r`$(9, 9, 4)$ con media $7.33$`, 7.33, 2, () => mean([9, 9, 4])),
+  example('6.3-error-estandar', r`Su desviación típica es $\approx 1.70$`, 1.7, 2, () => exactBootstrapStandardError(bootstrapData)),
+  example('6.3-formula', r`$\sqrt{(26/3)/3}$`, 1.7, 2, () => Math.sqrt(26 / 3 / 3)),
+  example('6.3-cifras', r`un número de 27 cifras`, 27, 6, () => Math.floor(20 * Math.log10(20)) + 1),
+  example('6.3-sin-el-2', r`son $2^3 = 8$ de las 27`, 8, 6, () => allBootstrapSamples(bootstrapData).filter((x) => !x.includes(2)).length),
+  example('6.3-fuera', r`$(2/3)^3 \approx 0.296$`, 0.296, 3, () => (1 - 1 / 3) ** 3),
+  example('6.4-ridge-3', r`Ridge da $3/3 = 1$`, 1, 6, () => ridgeOneVariable(3, 2)),
+  example('6.4-lasso-3', r`Lasso $3 - 1 = 2$`, 2, 6, () => lassoOneVariable(3, 2)),
+  example('6.4-ridge-0.5', r`$0.5/3 \approx 0.167$`, 0.167, 3, () => ridgeOneVariable(0.5, 2)),
+  example('6.4-lasso-0.5', r`Lasso da **exactamente 0**`, 0, 6, () => lassoOneVariable(0.5, 2)),
+  example('6.5-tres', r`$P(3) = 10 \times 0.7^3 \times 0.3^2 \approx 0.309$`, 0.309, 3, () => binomialPmf(5, 3, 0.7)),
+  example('6.5-cuatro', r`$P(4) = 5 \times 0.7^4 \times 0.3 \approx 0.360$`, 0.36, 3, () => binomialPmf(5, 4, 0.7)),
+  example('6.5-cinco', r`$P(5) = 0.7^5 \approx 0.168$`, 0.168, 3, () => binomialPmf(5, 5, 0.7)),
+  example('6.5-voto', r`el comité acierta el **83.7 %**`, 83.7, 1, () => majorityVoteAccuracy(5, 0.7) * 100),
+  example('6.5-voto-malo', r`el comité acierta el 40.7 %`, 40.7, 1, () => majorityVoteAccuracy(5, 0.45) * 100),
+  example('6.6-camino-largo', r`$9 + 12 + 4 = 25$`, 25, 6, () => dot(phi([1, 2]), phi([3, 1]))),
+  example('6.6-atajo', r`$5^2 = 25$`, 25, 6, () => dot([1, 2], [3, 1]) ** 2),
+  example('6.6-coordenadas', r`tendría 5050 coordenadas`, 5050, 6, () => 100 + (100 * 99) / 2),
+  example('6.6-rbf-1', r`$K = e^{-1} \approx 0.368$`, 0.368, 3, () => Math.exp(-1)),
+  example('6.6-rbf-10', r`$K = e^{-10} \approx 0.00005$`, 0.00005, 5, () => Math.exp(-10)),
+  example('6.7-primera-asignacion', r`$(0 + 1 + 9) + (0 + 1 + 9) = 20$`, 20, 6, () => kmeansFrames(GUIDE_POINTS, guideStart)[1]?.sse as number),
+  example('6.7-final', r`baja a $9.33$`, 9.33, 2, () => finalSse(GUIDE_POINTS, guideStart)),
+  example('6.7-natural', r`SSE $= 4 \times 0.5^2 = 1$`, 1, 6, () => finalSse(rectangle, [[0, 0.5], [10, 0.5]])),
+  example('6.7-trampa', r`SSE $= 4 \times 25 = 100$`, 100, 6, () => finalSse(rectangle, [[0, 0], [0, 1]])),
+  example('6.8-autovalores', r`los autovalores son $1.9$ y $0.1$`, 1.9, 1, () => correlated[0]),
+  example('6.8-segundo', r`los autovalores son $1.9$ y $0.1$`, 0.1, 1, () => correlated[1]),
+  example('6.8-primero', r`$1.9/2 = 95$ %`, 95, 0, () => (explainedVariance(correlated)[0] as number) * 100),
+  example('6.8-resto', r`apenas el 5 %`, 5, 0, () => (explainedVariance(correlated)[1] as number) * 100),
+  example('6.8-sin-correlacion', r`cada componente explica el 50 %`, 50, 0, () => (explainedVariance(symmetric2x2Eigenvalues(1, 0, 1))[0] as number) * 100),
+]
+
 export const expansionExamples: NumericExample[] = [
   ...module0Examples,
   ...module4Examples,
   ...module5Examples,
+  ...module6Examples,
   {
     id: '2.2-desvios-suman-cero',
     section: '2.2',

@@ -5,6 +5,7 @@ import {
   eigenvalueFromShare,
   explainedVariance,
   kaiserCount,
+  symmetric2x2Eigenvalues,
 } from '@/logic/statistics/pca'
 
 describe('PCA: varianza explicada y criterios de retención', () => {
@@ -44,5 +45,12 @@ describe('PCA: varianza explicada y criterios de retención', () => {
     const sparrows = [eigenvalueFromShare(0.72, 5), eigenvalueFromShare(0.11, 5)]
     expect(kaiserCount(sparrows)).toBe(1)
     expect(componentsForVariance([0.72, 0.11, 0.17], 0.8)).toBe(2)
+  })
+
+  it('autovalores de una matriz simétrica 2×2: con correlación r son 1 + r y 1 - r', () => {
+    const [first, second] = symmetric2x2Eigenvalues(1, 0.9, 1)
+    expect(first).toBeCloseTo(1.9, 10)
+    expect(second).toBeCloseTo(0.1, 10)
+    expect(symmetric2x2Eigenvalues(4, 0, 1)).toEqual([4, 1])
   })
 })
