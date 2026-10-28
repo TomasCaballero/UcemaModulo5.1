@@ -13,9 +13,20 @@ import {
   lassoOneVariable,
   majorityVoteAccuracy,
   meanPredictionError,
+  ridgeMean,
   ridgeOneVariable,
   shrunkMeanError,
 } from '@/logic/statistics/learning'
+import {
+  agnosticSampleSize,
+  consistentProbability,
+  hoeffdingSampleSize,
+  intervalLabelings,
+  normalSampleSize,
+  offTrainingError,
+  realizableSampleSize,
+  sauerBound,
+} from '@/logic/statistics/pac'
 import { explainedVariance, symmetric2x2Eigenvalues } from '@/logic/statistics/pca'
 import type { NumericExample } from './numeric-examples'
 
@@ -250,11 +261,60 @@ const module6Examples: NumericExample[] = [
   example('6.8-sin-correlacion', r`cada componente explica el 50 %`, 50, 0, () => (explainedVariance(symmetric2x2Eigenvalues(1, 0, 1))[0] as number) * 100),
 ]
 
+// Ampliaciones del Módulo 7.
+const seen: [number, number][] = [[1, 0], [2, 0], [7, 1], [8, 1]]
+const nearestDistance = (x: number) => Math.min(...seen.map(([p]) => Math.abs(p - x)))
+const sixes = Array<number>(10).fill(6)
+const oneChanged = [0, ...Array<number>(9).fill(6)]
+const extreme = [10, ...Array<number>(9).fill(0)]
+const zeros = Array<number>(10).fill(0)
+const bits = (errorRate: number) => 1000 * entropy([errorRate, 1 - errorRate])
+
+const module7Examples: NumericExample[] = [
+  example('7.1-vecino', r`a $0.5$ de distancia`, 0.5, 1, () => nearestDistance(6.5)),
+  example('7.1-lejos', r`el 2 está a $4.5$`, 4.5, 1, () => Math.abs(6.5 - (seen[1] as [number, number])[0])),
+  example('7.2-veinte', r`$0.95^{20} \approx 0.358$`, 0.358, 3, () => consistentProbability(0.05, 20)),
+  example('7.2-guia', r`$0.95^{231} \approx 0.0000071$`, 0.0000071, 7, () => consistentProbability(0.05, 231)),
+  example('7.2-union', r`$1000 \times 0.0000071 \approx 0.0071$`, 0.0071, 4, () => 1000 * consistentProbability(0.05, 231)),
+  example('7.2-duplicar-clase', r`$\ln 2/0.05 \approx 13.9$`, 13.9, 1, () => Math.log(2) / 0.05),
+  example('7.2-mitad-error', r`duplica la cuenta a $461$`, 461, 0, () => realizableSampleSize(1000, 0.025, 0.01)),
+  example('7.3-normal-exacto', r`$m \ge (1.96 \times 0.5 / 0.05)^2 \approx 384.2$`, 384.2, 1, () => (1.96 * 0.5 / 0.05) ** 2),
+  example('7.3-normal', r`o sea $385$ casos`, 385, 0, () => normalSampleSize(0.05, 1.96)),
+  example('7.3-hoeffding-exacto', r`$\ln(40)/0.005 \approx 737.8$`, 737.8, 1, () => Math.log(2 / 0.05) / (2 * 0.05 ** 2)),
+  example('7.3-hoeffding', r`o sea $738$ casos`, 738, 0, () => hoeffdingSampleSize(0.05, 0.05)),
+  example('7.3-logaritmo', r`$\ln(200\,000) \approx 12.21$`, 12.21, 2, () => Math.log((2 * 1000) / 0.01)),
+  example('7.3-agnostico', r`$2 \times 12.21/0.0025 \approx 9765$`, 9765, 0, () => agnosticSampleSize(1000, 0.05, 0.01)),
+  example('7.3-realizable-mitad', r`pasa de 231 a 461 datos`, 461, 0, () => realizableSampleSize(1000, 0.025, 0.01)),
+  example('7.3-agnostico-mitad', r`de 9765 a unos $39\,060$`, 39060, 0, () => agnosticSampleSize(1000, 0.025, 0.01)),
+  example('7.4-total', r`$2^{10} = 1024$`, 1024, 0, () => 2 ** 10),
+  example('7.4-bloques', r`(55 formas)`, 55, 0, () => intervalLabelings(10) - 1),
+  example('7.4-intervalos', r`En total, $56$ de $1024$`, 56, 0, () => intervalLabelings(10)),
+  example('7.4-cien', r`Con 100 puntos, $5051$`, 5051, 0, () => sauerBound(100, 2)),
+  example('7.4-cifras', r`un número de 31 cifras`, 31, 0, () => Math.floor(100 * Math.log10(2)) + 1),
+  example('7.4-sauer', r`$1 + 10 + 45 = 56$`, 56, 0, () => sauerBound(10, 2)),
+  example('7.5-errores', r`$0 + 1 + 1 + 2 = 4$ errores en $8$ predicciones`, 4, 0, () => offTrainingError([1, 1]) * 8),
+  example('7.5-mitad', r`predicciones: un $50$ %`, 50, 0, () => offTrainingError([1, 1]) * 100),
+  example('7.5-diez', r`el promedio sigue siendo $50$ %`, 50, 0, () => offTrainingError([1, 0, 1, 1, 0, 0, 1, 0, 1, 1]) * 100),
+  example('7.6-sin-penalizacion', r`$10/10 = 1$`, 1, 0, () => ridgeMean(extreme, 0) - ridgeMean(zeros, 0)),
+  example('7.6-con-penalizacion', r`$10/20 = 0.5$`, 0.5, 1, () => ridgeMean(extreme, 10) - ridgeMean(zeros, 10)),
+  example('7.6-encogida', r`$b = 60/20 = 3$`, 3, 0, () => ridgeMean(sixes, 10)),
+  example('7.6-cambio-libre', r`pasa de $6$ a $5.4$`, 5.4, 1, () => ridgeMean(oneChanged, 0)),
+  example('7.6-cambio-penalizado', r`solo de $3$ a $2.7$`, 2.7, 1, () => ridgeMean(oneChanged, 10)),
+  example('7.6-ln2', r`$\ln 2 \approx 0.69$`, 0.69, 2, () => Math.log(2)),
+  example('7.6-entropia-5', r`$H(0.05) \approx 0.286$`, 0.286, 3, () => entropy([0.05, 0.95])),
+  example('7.6-bits-5', r`unos $286$ bits en total`, 286, 0, () => bits(0.05)),
+  example('7.6-mensaje-simple', r`unos $306$ bits`, 306, 0, () => 20 + bits(0.05)),
+  example('7.6-entropia-1', r`$H(0.01) \approx 0.081$`, 0.081, 3, () => entropy([0.01, 0.99])),
+  example('7.6-bits-1', r`unos $81$ bits. Mensaje`, 81, 0, () => bits(0.01)),
+  example('7.6-mensaje-complejo', r`unos $481$ bits`, 481, 0, () => 400 + bits(0.01)),
+]
+
 export const expansionExamples: NumericExample[] = [
   ...module0Examples,
   ...module4Examples,
   ...module5Examples,
   ...module6Examples,
+  ...module7Examples,
   {
     id: '2.2-desvios-suman-cero',
     section: '2.2',

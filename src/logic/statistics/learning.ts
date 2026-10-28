@@ -63,6 +63,14 @@ export function averagedVariance(sigma2: number, rho: number, models: number): n
   return rho * sigma2 + ((1 - rho) / models) * sigma2
 }
 
+/**
+ * Predecir con una sola constante $b$ penalizada, minimizando $\sum (x_i - b)^2 + \lambda b^2$:
+ * da $\sum x_i / (n + \lambda)$, el promedio encogido hacia cero.
+ */
+export function ridgeMean(data: readonly number[], lambda: number): number {
+  return data.reduce((acc, x) => acc + x, 0) / (data.length + lambda)
+}
+
 /** Probabilidad de que acierte el voto de mayoría de `voters` clasificadores independientes (cantidad impar) con acierto `p`. */
 export function majorityVoteAccuracy(voters: number, p: number): number {
   let total = 0
