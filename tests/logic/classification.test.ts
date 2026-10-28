@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   accuracy,
+  aucByPairs,
   confusionAtThreshold,
   forestProbability,
   gini,
@@ -62,6 +63,15 @@ describe('métricas por umbral', () => {
 
   it('rechaza entradas de distinta longitud', () => {
     expect(() => confusionAtThreshold([0.1], [1, 0], 0.5)).toThrow(RangeError)
+  })
+
+  it('cuenta el AUC por pares: 11 de 15, y no cambia si se conserva el orden', () => {
+    expect(aucByPairs(probabilities, labels)).toBeCloseTo(11 / 15, 10)
+    expect(aucByPairs(probabilities.map((p) => p / 2), labels)).toBeCloseTo(11 / 15, 10)
+    expect(aucByPairs([0.9, 0.1], [1, 0])).toBe(1)
+    expect(aucByPairs([0.5, 0.5], [1, 0])).toBe(0.5)
+    expect(() => aucByPairs([0.5], [1, 0])).toThrow(RangeError)
+    expect(() => aucByPairs([0.5, 0.6], [1, 1])).toThrow(RangeError)
   })
 
   it('la especificidad del ejemplo de los 100 pacientes es 0.80', () => {

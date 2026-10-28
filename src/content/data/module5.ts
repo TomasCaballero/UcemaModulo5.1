@@ -1,7 +1,8 @@
 import type { ContentBlock, Section } from '../types'
 
-// Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 5. Los bloques `extra` son ejemplos
-// agregados (cotidianos o clásicos): no son de la guía y se muestran rotulados.
+// Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 5. Los bloques `extra` (ejemplos
+// cotidianos o clásicos), `deepDive` (ampliaciones) y `recall` (repasos de lo previo) no son de la
+// guía y se muestran rotulados; las cifras de las ampliaciones se verifican en tools/expansion-numbers.ts.
 const t = String.raw
 
 /** Apertura del módulo, previa a la sección 5.1. */
@@ -22,16 +23,28 @@ export const module5Sections: Section[] = [
     moduleId: 5,
     title: 'El modelo lineal de probabilidad (LPM) y sus límites',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué medía la pendiente de una regresión?',
+            answer: t`Cuánto cambia $y$, en promedio, por cada unidad más de $x$. Mínimos cuadrados ordinarios (OLS) elige la recta que hace mínima la suma de los errores al cuadrado. Lo viste en Módulo 3.3.`,
+          },
+          {
+            question: '¿Cómo se leía el coeficiente de una variable ficticia?',
+            answer: t`Una variable ficticia vale 1 si se cumple algo y 0 si no; su coeficiente es la **diferencia promedio** de $y$ entre los dos grupos, con lo demás constante. Acá cambia el papel: la variable 0/1 es la que se quiere explicar. Lo viste en Módulo 3.5.`,
+          },
+          {
+            question: '¿Qué decía MLR.5 y qué pasaba si fallaba?',
+            answer: t`Homocedasticidad: el error tiene la misma dispersión para cualquier valor de las $x$. Si falla, la pendiente sigue bien en promedio, pero los errores estándar habituales están mal, y con ellos los contrastes $t$ y $F$; se usan errores estándar robustos. Lo viste en Módulo 3.6 y en Módulo 3.7.`,
+          },
+        ],
+      },
       { type: 'paragraph', text: t`La idea más simple: aplicar OLS (Módulo 3) directamente a $y$ (que vale 0 o 1):` },
       { type: 'formula', latex: t`y = \beta_0 + \beta_1 x_1 + \dots + \beta_k x_k + u` },
       {
         type: 'paragraph',
         text: t`Como $E(y \mid X) = P(y=1 \mid X)$, el valor predicho $\hat{y}$ se interpreta como una **probabilidad**, y $\beta_j$ como el cambio en esa probabilidad (en puntos de probabilidad) por cada unidad de $x_j$. Es simple y fácil de interpretar, pero tiene **tres problemas**:`,
-      },
-      {
-        type: 'intuition',
-        title: 'La tentación de la recta',
-        text: t`**La tentación de la recta.** Si querés predecir algo que solo puede ser "sí" (1) o "no" (0), lo más simple parece ajustar una recta, como en el módulo 3. Y la predicción se lee como una probabilidad. Funciona hasta cierto punto, pero tiene tres problemas.`,
       },
       {
         type: 'list',
@@ -43,13 +56,19 @@ export const module5Sections: Section[] = [
         ],
       },
       {
-        type: 'intuition',
-        title: 'Los tres problemas de la recta, en palabras simples',
-        text: t`**Probabilidades imposibles.** Una recta no sabe que debe quedarse entre 0 y 1. Con $\hat{y} = -0.1 + 0.25x$ y $x = 5$ predice $1.15$, un 115 %. Y con $x = 0$ predice $-0.10$, un 10 % negativo. Es como una escalera que sigue subiendo después de llegar al techo.
+        type: 'deepDive',
+        title: t`De dónde sale $p(1-p)$, y cuándo la recta alcanza`,
+        text: t`**La varianza de algo que vale 0 o 1.** Si $y = 1$ con probabilidad $p$, el error $u = y - p$ solo puede tomar dos valores: $1 - p$ (cuando $y = 1$) o $-p$ (cuando $y = 0$). Su varianza es el promedio de esos dos desvíos al cuadrado, cada uno pesado por su probabilidad:
 
-**Siempre suma lo mismo.** La recta dice que cada unidad extra mueve la probabilidad en la misma cantidad, parta de donde parta. Pero no es realista: pasar de 0 a 1 hijo no pesa igual en la decisión de trabajar que pasar de 4 a 5. Y cerca de 0 % o 100 % ya no hay espacio para seguir sumando.
+$\text{Var}(u) = p\,(1-p)^2 + (1-p)\,p^2 = p\,(1-p)\,\big[(1-p) + p\big] = p\,(1-p)$
 
-**El error no se reparte parejo.** Como el resultado solo puede ser 0 o 1, el error es más grande cuando la probabilidad ronda $0.5$ (varianza $0.25$) que cuando es alta (varianza $0.09$ con $0.9$). Eso rompe una de las cinco reglas del módulo 3 y obliga a usar errores estándar robustos.`,
+Con $p = 0.9$: $0.9 \times 0.1^2 + 0.1 \times 0.9^2 = 0.009 + 0.081 = 0.09$. No es un defecto de los datos: **la heterocedasticidad viene de que $y$ valga 0 o 1**, y aparece siempre que la probabilidad cambie con $x$. Por eso la pendiente del LPM puede estar bien estimada mientras sus errores estándar habituales no sirven.
+
+**Cuándo la recta es una buena aproximación.** La curva en S de la sección 5.2 es casi recta en el medio. A una unidad del centro, en $z = 1$ la curva da $0.731$ y la recta que la toca en el centro da $0.5 + 1/4 = 0.75$: apenas 2 puntos de diferencia. Si todas las probabilidades del problema quedan lejos de 0 y de 1, el LPM y el modelo de la sección siguiente suelen dar efectos parecidos; los problemas aparecen en los extremos.`,
+        sources: [
+          'Wooldridge, *Introductory Econometrics: A Modern Approach*, cap. 7.5 (modelo lineal de probabilidad) y 8.5 (su heterocedasticidad)',
+          'Angrist y Pischke, *Mostly Harmless Econometrics*, cap. 3',
+        ],
       },
       { type: 'miniCheck', questionIds: ['m5-q01'] },
       {
@@ -59,11 +78,6 @@ export const module5Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`*Ejemplo de clase (Titanic):* si se codifica Survived como $0$ (no sobrevivió) y $1$ (sobrevivió) y se ajusta una recta, las predicciones de tres pasajeros pueden ser $-0.20$, $0.67$ y $1.12$: la recta se sale de $[0,1]$ y dos de esos valores no pueden ser probabilidades. Es el problema que resuelve la función logística de 5.2.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Qué hacer',
-        text: t`**Qué hacer.** Se usa en economía por su sencillez, pero para predecir, o para probabilidades extremas, se prefieren los modelos que siguen. En el ejemplo del Titanic, la recta daba valores como $-0.20$ y $1.12$, que no pueden ser probabilidades. La solución viene en 5.2.`,
       },
       {
         type: 'extra',
@@ -77,6 +91,23 @@ export const module5Sections: Section[] = [
     title: 'Regresión logística',
     blocks: [
       {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué relación había entre $\ln$ y $e^x$?`,
+            answer: t`Son inversas: $\ln(e^x) = x$. Y el logaritmo convierte productos en sumas, $\ln(ab) = \ln a + \ln b$: sumar en la escala del logaritmo es multiplicar en la original. Lo viste en Módulo 0.5.`,
+          },
+          {
+            question: '¿Qué hacía la máxima verosimilitud?',
+            answer: t`Elige el valor del parámetro que hace más probables los datos observados: con 7 caras en 10 tiradas, $p = 0.7$. Se maximiza el logaritmo de la verosimilitud porque convierte el producto en una suma. Lo viste en Módulo 2.6.`,
+          },
+          {
+            question: '¿Qué pasaba con la precisión y el recall al bajar el umbral?',
+            answer: t`Se predicen más positivos: sube el recall (se escapan menos casos) y suele bajar la precisión (más falsas alarmas). El modelo no cambia, solo la regla con la que se decide. Lo viste en Módulo 4.3.`,
+          },
+        ],
+      },
+      {
         type: 'paragraph',
         text: t`**Idea:** en vez de modelar la probabilidad con una recta, se pasa la combinación lineal $z = \beta_0 + \beta_1 X_1 + \dots + \beta_k X_k$ por una función en forma de "S" que **siempre devuelve valores entre 0 y 1**: la **función logística**.`,
       },
@@ -89,11 +120,6 @@ export const module5Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`Cuando $z$ es muy negativo, $p$ se acerca a 0 sin llegar; cuando es muy positivo, se acerca a 1 sin pasarse.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Una S que nunca se pasa de 0 ni de 1',
-        text: t`**Una S que nunca se pasa de 0 ni de 1.** La regresión logística hace lo mismo que una recta, pero pasa el resultado por una curva con forma de "S" (la función logística). Cuando el valor es muy negativo, la probabilidad se acerca a 0 sin llegar. Cuando es muy positivo, se acerca a 1 sin pasarse. En el medio ($z = 0$) vale justo $0.5$. Por eso nunca produce probabilidades imposibles.`,
       },
       { type: 'subheading', text: 'Probabilidad, odds, log-odds y odds ratio' },
       { type: 'paragraph', text: 'Para interpretar los coeficientes conviene pasar por tres escalas:' },
@@ -113,9 +139,14 @@ export const module5Sections: Section[] = [
         text: t`Es decir: **el modelo es lineal en los log-odds**. Por eso $\beta_1$ es el cambio en el log-odds al aumentar $X_1$ una unidad, manteniendo lo demás constante.`,
       },
       {
-        type: 'intuition',
-        title: 'Probabilidad y chances de apuesta (odds)',
-        text: t`**Probabilidad y chances de apuesta (odds).** Si el pronóstico dice 80 % de probabilidad de lluvia, los *odds* son $0.8 / 0.2 = 4$: "4 a 1" a favor. Los odds cuentan cuántas veces es más probable que ocurra a que no ocurra. Los dos números cuentan la misma historia en escalas distintas. El **logaritmo de los odds** (log-odds) es la escala en la que el modelo sí es una suma de ingredientes con pesos, como en el módulo 3.`,
+        type: 'deepDive',
+        title: 'Por qué justo el logaritmo de los odds',
+        text: t`Una combinación lineal $\beta_0 + \beta_1 X_1 + \dots$ puede dar **cualquier número**, de $-\infty$ a $+\infty$. Para igualarla a algo, ese algo tiene que poder recorrer el mismo rango. La probabilidad no puede: vive entre 0 y 1 (era el problema del LPM). Los odds tampoco: van de 0 a $+\infty$ y nunca son negativos. El logaritmo de los odds sí: cuando $p$ se acerca a 0, los odds se acercan a 0 y su logaritmo se hunde hacia $-\infty$; cuando $p$ se acerca a 1, crece sin techo.
+
+**Además, es simétrico.** Con $p = 0.8$, los odds son 4 y $\ln 4 \approx 1.386$; con $p = 0.2$, los odds son $0.25$ y $\ln 0.25 \approx -1.386$. "Ocurre con 80 %" y "no ocurre con 80 %" quedan a la misma distancia del cero (que corresponde a $p = 0.5$), con el signo cambiado. En la escala de los odds, en cambio, uno queda en 4 y el otro apretado en $0.25$.
+
+**Y estira los extremos.** Pasar de $p = 0.5$ a $p = 0.8$ lleva el log-odds de 0 a $1.386$; seguir hasta $p = 0.99$ (odds de 99) lo lleva a $\ln 99 \approx 4.595$. Cada punto más cerca de la certeza cuesta más: por eso la S se achata en las puntas y nunca llega a 0 ni a 1.`,
+        sources: ['Hosmer, Lemeshow y Sturdivant, *Applied Logistic Regression*, cap. 1'],
       },
       {
         type: 'paragraph',
@@ -136,11 +167,6 @@ export const module5Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`**Ejemplo de interpretación.** Si el coeficiente de "fumar" es $\beta_1 = 0.693$, entonces $\text{OR} = e^{0.693} \approx 2$: los fumadores tienen **el doble de odds** de enfermar que los no fumadores (a igualdad de las demás variables). Cuidado: **doble de odds no es doble de probabilidad**; solo son parecidos cuando el evento es raro.`,
-      },
-      {
-        type: 'intuition',
-        title: 'El odds ratio: cuánto multiplica una variable las chances',
-        text: t`**El odds ratio: cuánto multiplica una variable las chances.** Si un factor suma $\beta$ en esa escala, los odds se **multiplican** por $e^{\beta}$ (el *odds ratio*). Con $\beta = 0.693$, $e^{0.693} \approx 2$: los fumadores tienen **el doble de odds** de enfermar. Ojo: doble de odds no es doble de probabilidad; solo se parecen cuando el evento es raro.`,
       },
       {
         type: 'paragraph',
@@ -165,11 +191,6 @@ export const module5Sections: Section[] = [
         text: t`**El mismo odds ratio, distinto cambio en probabilidad.** Si una variable multiplica los odds por $\text{OR}$ y la probabilidad inicial era $p_0$, la nueva probabilidad es $p_1 = \dfrac{\text{OR}\cdot p_0}{1-p_0+\text{OR}\cdot p_0}$. *Ejemplo de clase (Titanic, ser mujer, $\text{OR} = e^{2.61} \approx 13.6$):* con $p_0 = 0.10$ los odds pasan de $0.11$ a $0.11 \times 13.6 \approx 1.50$ y $p_1 = 0.60$ (**+50 puntos porcentuales**); con $p_0 = 0.50$ los odds pasan de $1$ a $13.6$ y $p_1 \approx 0.93$ (**+43 puntos**). El OR es el mismo, pero el cambio en probabilidad depende del punto de partida.`,
       },
       {
-        type: 'intuition',
-        title: 'Por qué la probabilidad no sube parejo',
-        text: t`**Por qué la probabilidad no sube parejo.** Los odds se multiplican por lo mismo en cada paso, pero la probabilidad cambia más en el medio de la S y menos en los extremos. En el ejemplo de morosidad, pasar de 0 a 1 atraso sube la probabilidad $0.095$, y pasar de 2 a 3 la sube $0.171$. Es como empujar una pelota en una curva: en la parte empinada avanza más que en las partes planas. Lo mismo vale para el Titanic: con un odds ratio de $13.6$ por ser mujer, la probabilidad pasa de $0.10$ a $0.60$ para quien partía de abajo y de $0.50$ a $0.93$ para quien partía del medio.`,
-      },
-      {
         type: 'extra',
         text: t`Volvamos al examen: ahora con un modelo logístico $z = -3 + 0.5\,\text{horas}$. Con 2 horas, $z=-2$ y $p \approx 0.119$; con 4 horas, $z=-1$ y $p \approx 0.269$; con 6 horas, $z=0$ y $p = 0.5$; con 8 horas, $z=1$ y $p \approx 0.731$; con 10 horas, $p \approx 0.881$. Nunca pasa de 1, y las horas que más suben la probabilidad son las del medio (alrededor de 6 horas). Cada hora multiplica los odds por $e^{0.5} \approx 1.65$.`,
       },
@@ -177,11 +198,6 @@ export const module5Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`Los coeficientes no se calculan con una fórmula cerrada como OLS, sino por **máxima verosimilitud (MLE)**, como la moneda del Módulo 2.6, pero ahora con una probabilidad $p_i$ distinta para cada observación. La probabilidad de observar $y_i$ es $p_i^{y_i}(1-p_i)^{1-y_i}$, la verosimilitud es el producto de todas, y se maximiza su logaritmo (suma) con un **algoritmo iterativo** (Newton-Raphson). Para el logit la función a maximizar es cóncava, así que hay un único máximo.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Cómo se encuentran los números del modelo',
-        text: t`**Cómo se encuentran los números del modelo.** Se prueban muchos valores y se elige el que hace más creíbles los datos que ya vimos (máxima verosimilitud, igual que con la moneda en el módulo 2, pero ahora con una probabilidad distinta para cada persona). Con cuatro pasajeros, un modelo que acierta con confianza se lleva mejor puntaje que uno que duda: $-0.60$ frente a $-2.42$.`,
       },
       {
         type: 'paragraph',
@@ -197,17 +213,8 @@ export const module5Sections: Section[] = [
         ],
       },
       {
-        type: 'extra',
-        text: t`El AUC se entiende con un juego: elige al azar a una persona realmente enferma y a otra sana, y fíjate a cuál le asignó el modelo la probabilidad más alta. Un AUC de 0.5 es lo mismo que tirar una moneda para decidir cuál es la enferma; un AUC de 0.9 significa que, en 9 de cada 10 pares así, el modelo pone más arriba a la persona enferma.`,
-      },
-      {
         type: 'paragraph',
         text: t`**Cómo leer la curva ROC.** Cada punto de la curva corresponde a un **umbral** distinto: el eje vertical es la tasa de verdaderos positivos (recall) y el horizontal la tasa de falsos positivos $= 1-\text{especificidad}$. La diagonal representa el azar (un clasificador sin capacidad de discriminar); cuanto más cerca de la esquina superior izquierda, mejor discrimina el modelo. La ROC mira **todos** los umbrales a la vez; el AUC resume qué tan bien el modelo distingue entre quienes tienen el evento y quienes no. Mover el umbral no cambia el modelo ni su AUC: solo recorre la curva (Módulo 4.3).`,
-      },
-      {
-        type: 'intuition',
-        title: 'AUC y ROC: dos maneras de decir qué tan bueno es',
-        text: t`**Dos maneras de decir "qué tan bueno es".** El **AUC** responde: "si elijo al azar a un enfermo y a un sano, ¿a cuál le asignó la probabilidad más alta?". Un AUC de $0.5$ es lo mismo que tirar una moneda; $1$ es perfecto. La **curva ROC** muestra todos los umbrales posibles de una vez, y cambiar el umbral solo recorre la curva, no cambia el modelo.`,
       },
       { type: 'subheading', text: 'Un caso completo: el Titanic de la clase' },
       {
@@ -244,6 +251,19 @@ export const module5Sections: Section[] = [
         type: 'paragraph',
         text: t`**De dónde salen los $\beta$ (ejemplo de clase).** Hay muchos $\beta$ posibles y hace falta un criterio: elegir los que mejor explican lo observado. Con 4 pasajeros (A sobrevivió, B no, C sobrevivió, D no), un modelo que asigna $\hat{p} = 0.90, 0.15, 0.80, 0.10$ explica mejor lo ocurrido que otro que asigna $0.60, 0.55, 0.55, 0.40$. La log-verosimilitud $\ell(\beta) = \sum_i [\,y_i \ln p_i + (1-y_i)\ln(1-p_i)\,]$ lo confirma: $\ell \approx -0.60$ para el primero y $\ell \approx -2.42$ para el segundo. Se eligen los $\beta$ que **maximizan** $\ell$ (en OLS, en cambio, se minimizan los errores al cuadrado).`,
       },
+      {
+        type: 'deepDive',
+        title: 'Por qué verosimilitud y no mínimos cuadrados',
+        text: t`Se podría ajustar la curva en S eligiendo los $\beta$ que minimizan los errores al cuadrado, como en OLS. Se usa la log-verosimilitud porque castiga muy distinto **los errores cometidos con confianza**.
+
+**Un pasajero que sobrevivió** ($y = 1$). Si el modelo le daba $\hat p = 0.9$, aporta $-\ln 0.9 \approx 0.105$ a la pérdida (el *Log Loss* es la log-verosimilitud con el signo cambiado y promediada). Si le daba $0.1$, aporta $-\ln 0.1 \approx 2.303$; si le daba $0.01$, $-\ln 0.01 \approx 4.605$. Con el error al cuadrado, esos dos últimos casos casi no se distinguen: $(1 - 0.1)^2 = 0.81$ y $(1 - 0.01)^2 \approx 0.98$, y ninguno puede pasar de 1.
+
+**Por qué importa.** El cuadrado trata casi igual "me equivoqué" que "me equivoqué y estaba casi seguro"; la log-verosimilitud cobra cada vez más a medida que el modelo se acerca a decir "imposible" sobre algo que pasó. Además, sale de suponer que cada $y_i$ es un sí o no con su propia probabilidad $p_i$, como la moneda del Módulo 2.6, y para el logit tiene un único máximo, algo que la suma de cuadrados con una curva en S no garantiza.`,
+        sources: [
+          'Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 4.4 (regresión logística)',
+          'Bishop, *Pattern Recognition and Machine Learning*, cap. 4.3',
+        ],
+      },
       { type: 'miniCheck', questionIds: ['m5-q23'] },
       { type: 'subheading', text: 'Seleccionar variables: forward, backward y stepwise' },
       {
@@ -261,11 +281,6 @@ export const module5Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`El **criterio de selección** puede ser estadístico (p-valor, AIC o BIC) o predictivo (por ejemplo, el AUC promedio por validación cruzada: se divide la muestra en partes y cada parte se evalúa con un modelo ajustado con las demás). Lo que distingue a los métodos es el punto de partida y la flexibilidad para agregar o quitar variables. *Ejemplo de clase (Titanic):* con candidatas Female, Age, Pclass, Fare y FamilySize, forward con AUC por validación cruzada de 5 folds incorporó primero Female (AUC CV $0.7708$), luego Pclass ($0.8333$) y luego Age ($0.8466$); Fare y FamilySize quedaron fuera. **Seleccionar variables no es lo mismo que regularizar:** seleccionar decide cuáles se conservan; regularizar cambia cómo se estiman los coeficientes de las que se conservan.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Elegir qué variables conservar',
-        text: t`**Elegir qué variables conservar.** Más variables no siempre ayudan: pueden aportar repetición y complejidad. *Forward* parte de un modelo vacío y va sumando la que más mejora. *Backward* parte de todas y va sacando la que menos aporta. *Stepwise* hace ambas cosas, puede sumar y también sacar. En el Titanic, forward sumó primero el sexo, luego la clase y luego la edad. Elegir variables no es lo mismo que **regularizar**: lo primero decide cuáles se quedan; lo segundo cambia cómo se calculan los pesos de las que se quedan.`,
       },
       { type: 'miniCheck', questionIds: ['m5-q15'] },
       { type: 'subheading', text: 'Regularización en la regresión logística: L1, L2 y el parámetro C' },
@@ -289,9 +304,23 @@ export const module5Sections: Section[] = [
         text: t`*Ejemplo de clase (Titanic, Female, Age y Pclass numérica, L2 con $C=1$):* los coeficientes pasaron de $2.646$, $-0.038$ y $-1.173$ a $2.511$, $-0.037$ y $-1.130$: las mismas variables, pero coeficientes algo más moderados. Aquí la penalización se suma al Log Loss; en una regresión lineal se sumaría a la suma de residuos al cuadrado (RSS).`,
       },
       {
-        type: 'intuition',
-        title: 'Regularizar es ponerle un freno a los números',
-        text: t`**Regularizar es ponerle un freno a los números.** Se agrega un castigo a los pesos demasiado grandes. Hay dos tipos: uno puede llevar algunos pesos exactamente a cero (así elige variables solo), y el otro los achica a todos sin anularlos. El parámetro $C$ dice qué tan fuerte es el freno, pero al revés de lo que parece: **C chico es freno fuerte, C grande es freno suave**.`,
+        type: 'deepDive',
+        title: 'Cuando una variable separa perfecto, los coeficientes se van al infinito',
+        text: t`Un caso extremo muestra por qué a veces hace falta el freno. Dos pasajeros: uno con $x = 0$ que no sobrevivió y otro con $x = 1$ que sí, y el modelo $z = \beta\,(x - 0.5)$. Cuanto más grande es $\beta$, más empinada la S y más seguro está el modelo de acertar a los dos:
+
+**$\beta = 2$:** $\ell \approx -0.627$.
+
+**$\beta = 10$:** $\ell \approx -0.0134$.
+
+**$\beta = 20$:** $\ell \approx -0.0001$.
+
+La log-verosimilitud mejora siempre y nunca alcanza un máximo: el algoritmo seguiría agrandando $\beta$ sin fin (en la práctica se detiene con un coeficiente enorme y un error estándar gigante). Pasa cuando una variable, o una combinación de variables, separa a la perfección las dos clases en la muestra, algo común con pocos datos o con muchas variables.
+
+**La penalización lo arregla.** Con L2, al Log Loss se le suma $\lambda\beta^2$: pasar de $\beta = 10$ a $\beta = 20$ casi no mejora el ajuste y cuesta mucho en penalización, así que el óptimo queda en un valor finito. Es la versión extrema de lo que se vio con el Titanic: la penalización modera coeficientes que los datos solos dejarían crecer.`,
+        sources: [
+          'Albert y Anderson, "On the existence of maximum likelihood estimates in logistic regression models", *Biometrika* (1984)',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
       { type: 'miniCheck', questionIds: ['m5-q16'] },
       { type: 'subheading', text: 'Discriminar bien no es estimar buenas probabilidades: calibración y Hosmer–Lemeshow' },
@@ -304,9 +333,24 @@ export const module5Sections: Section[] = [
         text: t`El **test de Hosmer–Lemeshow** evalúa esa calibración (la *bondad de ajuste* de la regresión logística): (1) se ordenan las observaciones según su probabilidad predicha; (2) se dividen en grupos (por ejemplo, 10 deciles); (3) en cada grupo se comparan los casos **observados** con los **esperados**; (4) si las diferencias son pequeñas en la mayoría de los grupos, el ajuste es razonable. Interpretación: $H_0$ = no hay evidencia de falta de ajuste. Un **p-valor grande** (por ejemplo, $>0.05$) indica que no hay evidencia contra el ajuste; un **p-valor chico** indica que las probabilidades predichas no coinciden bien con lo observado. Es una herramienta útil, pero conviene complementarla con otras métricas y con gráficos de calibración. *No mide discriminación (como el AUC): compara probabilidades predichas con frecuencias observadas.*`,
       },
       {
-        type: 'intuition',
-        title: 'Calibración: ¿las probabilidades son creíbles?',
-        text: t`**Calibración: ¿las probabilidades son creíbles?** Es otra pregunta distinta: la **calibración**. Si el modelo dice 80 %, ¿realmente 8 de cada 10 de esas personas lo tienen? Un modelo puede ordenar bien a la gente y aun así dar probabilidades torcidas. El test de Hosmer–Lemeshow lo revisa: un p-valor grande significa que no hay evidencia de mal ajuste.`,
+        type: 'deepDive',
+        title: 'El AUC contado a mano, y un modelo que ordena bien pero exagera',
+        text: t`**El AUC como conteo de pares.** Volvamos a los 8 pasajeros del ejemplo de umbrales del Módulo 4.3: probabilidades $0.95$, $0.85$, $0.60$, $0.55$, $0.45$, $0.35$, $0.20$ y $0.10$, y sobrevivieron los de $0.95$, $0.85$, $0.55$, $0.45$ y $0.20$. Con 5 sobrevivientes y 3 no sobrevivientes se forman $5 \times 3 = 15$ pares. Contemos en cuántos el sobreviviente tiene la probabilidad más alta:
+
+**Contra el $0.60$:** le ganan $0.95$ y $0.85$, 2 de 5.
+
+**Contra el $0.35$:** le ganan $0.95$, $0.85$, $0.55$ y $0.45$, 4 de 5.
+
+**Contra el $0.10$:** le ganan los 5.
+
+En total, $2 + 4 + 5 = 11$ pares de 15: el AUC es $11/15 \approx 0.733$, el área bajo la curva ROC de estos 8 pasajeros sin necesidad de dibujarla. Y se ve por qué no depende del umbral: solo mira **el orden**.
+
+**Mismo orden, otras probabilidades.** Un segundo modelo le da a cada pasajero **la mitad** de la probabilidad del primero ($0.475$, $0.425$, ...). Como el orden no cambia, su AUC sigue siendo $0.733$: discrimina exactamente igual. Pero el primero predecía en promedio $0.506$ y este, $0.253$, cuando sobrevivieron 5 de 8 ($0.625$): está muy mal calibrado. La log-verosimilitud sí lo nota: pasa de $-4.67$ a $-7.29$. Por eso son dos preguntas distintas: el AUC no ve la calibración y Hosmer–Lemeshow no ve la discriminación.`,
+        sources: [
+          'Hanley y McNeil, "The meaning and use of the area under a receiver operating characteristic (ROC) curve", *Radiology* (1982)',
+          'Fawcett, "An introduction to ROC analysis", *Pattern Recognition Letters* (2006)',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
       { type: 'miniCheck', questionIds: ['m5-q17'] },
       { type: 'subheading', text: 'Antes de confiar en el modelo: significancia y multicolinealidad (VIF)' },
@@ -322,11 +366,6 @@ export const module5Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`donde $R_j^2$ es el coeficiente de determinación de la regresión de $X_j$ contra las otras variables explicativas. *Ejemplo:* si $R_j^2 = 0.5$, $\text{VIF} = 2$; si $R_j^2 = 0.8$, $\text{VIF} = 5$. **Regla práctica:** un VIF mayor que $5$ suele considerarse una señal de alerta (y valores mucho más altos, un problema serio). En el Titanic de la clase todos los VIF estuvieron entre $1.06$ y $1.85$: sin indicios de multicolinealidad importante.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Antes de confiar en el modelo, dos chequeos',
-        text: t`**Antes de confiar en el modelo, dos chequeos.** Primero, si cada variable realmente aporta algo (se mira su p-valor). Segundo, que dos variables no cuenten casi lo mismo. Si lo hacen, los pesos se vuelven inestables, como pedirle a alguien que reparta una cuenta entre dos personas que siempre aparecen juntas. Eso se detecta con el VIF, y una regla práctica es desconfiar cuando pasa de $5$. En el Titanic todos quedaron entre $1.06$ y $1.85$: sin problemas.`,
       },
       { type: 'miniCheck', questionIds: ['m5-q18'] },
       { type: 'subheading', text: 'Comparar modelos: ¿qué pasó al agregar variables?' },
@@ -348,11 +387,6 @@ export const module5Sections: Section[] = [
         type: 'paragraph',
         text: t`Lectura: el modelo seleccionado mejora al original; la regularización L2 aporta una mejora muy leve en el AUC por validación cruzada; el completo logra el mejor AUC en prueba y el menor Log Loss; y todos los p-valores de Hosmer–Lemeshow son mayores que $0.05$. Más variables no son automáticamente mejores: las diferencias entre los tres últimos son pequeñas.`,
       },
-      {
-        type: 'intuition',
-        title: 'Lo que mostró el Titanic de la clase',
-        text: t`**Lo que mostró el Titanic de la clase.** El modelo aprendió que ser mujer, ser más joven y viajar en una clase más alta aumentan los odds de sobrevivir. Y al comparar versiones del modelo, las diferencias entre las más completas fueron pequeñas: más variables no son automáticamente mejores.`,
-      },
     ],
   },
   {
@@ -360,6 +394,19 @@ export const module5Sections: Section[] = [
     moduleId: 5,
     title: 'Probit y el modelo de variable latente',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Cómo era la distribución Normal estándar?',
+            answer: t`Una campana centrada en 0 con desviación típica 1; el 95 % del área queda entre $-1.96$ y $1.96$. El puntaje $z$ dice a cuántas desviaciones típicas de la media está un valor. Lo viste en Módulo 2.4.`,
+          },
+          {
+            question: '¿Qué hacía la función logística?',
+            answer: t`Convierte cualquier número $z$ en una probabilidad entre 0 y 1 con forma de S: $z = 0$ da $0.5$ y $z = 2$ da $0.881$. Lo viste en Módulo 5.2.`,
+          },
+        ],
+      },
       {
         type: 'paragraph',
         text: t`Tanto logit como probit pueden entenderse con una **variable latente** $y^{*}$: una magnitud **no observable** (la "utilidad neta" de comprar, la "propensión" a enfermar):`,
@@ -384,11 +431,6 @@ export const module5Sections: Section[] = [
           t`**Probit:** $e$ sigue una **Normal estándar** $N(0,1)$ $\Rightarrow$ $p = \Phi(z)$, donde $\Phi(z)$ es la **función de distribución acumulada Normal**: la probabilidad de que una Normal estándar sea menor o igual a $z$ (por ejemplo, $\Phi(0) = 0.5$ y $\Phi(1.96) \approx 0.975$).`,
         ],
       },
-      {
-        type: 'intuition',
-        title: 'Logit y probit son dos formas de decir lo mismo',
-        text: t`**Logit y probit son dos formas de decir lo mismo.** La diferencia está en cómo suponemos que se reparte lo que no conocemos de esas ganas, el "ruido". El **logit** supone una forma (la logística) y el **probit** supone la campana Normal que ya conocés del módulo 2. Las dos curvas en S resultan casi idénticas y suelen dar las mismas conclusiones.`,
-      },
       { type: 'paragraph', text: '**Comparación práctica:**' },
       {
         type: 'list',
@@ -400,15 +442,24 @@ export const module5Sections: Section[] = [
         ],
       },
       {
-        type: 'intuition',
-        title: 'Por qué los números parecen distintos, y cuál se usa más',
-        text: t`**Por qué los números parecen distintos.** Como si midieras la temperatura en Celsius o en Fahrenheit: los coeficientes del logit son aproximadamente 1.6 a 1.8 veces más grandes que los del probit. Si el logit da $0.8$, el probit andará por $0.5$. No son comparables directamente, pero cuentan la misma historia.
+        type: 'deepDive',
+        title: 'De dónde sale el factor de 1.6 a 1.8',
+        text: t`Las dos curvas en S se parecen tanto que se puede pasar de una a la otra estirando el eje. Los dos extremos del factor salen de dos maneras razonables de hacerlas coincidir.
 
-**Cuál se usa más.** El logit, porque permite hablar de odds ratios ("los odds se duplican"). El probit solo permite interpretar el signo, si es significativo y los efectos sobre la probabilidad. Los dos se estiman por máxima verosimilitud.`,
+**Igualar la dispersión: 1.8.** La Normal estándar tiene desviación típica 1; la logística estándar, $\pi/\sqrt{3} \approx 1.81$. Si el ruido $e$ del logit es 1.8 veces más disperso, para producir las mismas probabilidades todos sus coeficientes tienen que ser 1.8 veces más grandes: los $\beta$ se miden **en unidades del desvío del ruido**.
+
+**Igualar la pendiente en el centro: 1.6.** En $z = 0$ la logística sube a razón de $1/4$ (la regla de $\beta/4$ de la sección 5.2) y la Normal acumulada, a razón de $1/\sqrt{2\pi} \approx 0.399$. El cociente es $0.399/0.25 \approx 1.6$. Con ese factor las dos curvas quedan casi pegadas: $\Phi(1) \approx 0.841$, y la logística evaluada en $1.6 \times 1$ da $0.832$.
+
+**Por qué no hay una escala "verdadera".** Si se multiplican por 2 la variable latente y todos los coeficientes, $y^*$ cruza el cero exactamente en los mismos casos y los datos observados son idénticos. Solo se ve **de qué lado del cero** quedó $y^*$, así que su escala se fija por convención, y cada modelo la fija con su propio ruido. Por eso los coeficientes no se comparan entre logit y probit, pero los efectos sobre la probabilidad sí.`,
+        sources: [
+          'Amemiya, "Qualitative Response Models: A Survey", *Journal of Economic Literature* (1981)',
+          'Wooldridge, *Introductory Econometrics: A Modern Approach*, cap. 17',
+        ],
       },
       {
-        type: 'extra',
-        text: t`La variable latente es como la "ganas de salir a correr": no se mide, solo observas si finalmente saliste (1) o no (0). Si tus ganas superan el umbral cero, sales. Dos personas pueden describir lo mismo con escalas distintas, como la temperatura en Celsius o en Fahrenheit: el coeficiente 0.8 del logit y el 0.5 del probit cuentan la misma historia en unidades de error diferentes.`,
+        type: 'intuition',
+        title: 'Por qué los números parecen distintos',
+        text: t`**Por qué los números parecen distintos.** Es como medir la temperatura en Celsius o en Fahrenheit: el número cambia, el calor no. Los coeficientes del logit y del probit están en escalas distintas, así que no se comparan uno a uno, pero cuentan la misma historia.`,
       },
     ],
   },
@@ -417,6 +468,23 @@ export const module5Sections: Section[] = [
     moduleId: 5,
     title: 'Clasificadores generativos: LDA, QDA y Naive Bayes',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué decía el test médico de Bayes?',
+            answer: t`Con una enfermedad del 1 %, un test que detecta al 90 % de los enfermos y da falso positivo en el 5 % de los sanos deja solo $0.154$ de probabilidad de estar enfermo tras un positivo: la frecuencia previa pesa tanto como el test. Lo viste en Módulo 0.2.`,
+          },
+          {
+            question: '¿Cuándo dos sucesos son independientes?',
+            answer: t`Cuando saber que ocurrió uno no cambia la probabilidad del otro; entonces la probabilidad de que ocurran ambos es el producto de las dos. Lo viste en Módulo 0.2.`,
+          },
+          {
+            question: '¿Qué guardaba la matriz de covarianza?',
+            answer: t`En la diagonal, la varianza de cada variable; fuera de ella, las covarianzas: cuánto tienden a moverse juntas dos variables. Lo viste en Módulo 0.3.`,
+          },
+        ],
+      },
       {
         type: 'paragraph',
         text: t`La regresión logística es un enfoque **discriminativo**: modela directamente $P(Y \mid X)$. Los modelos **generativos** hacen lo opuesto: modelan **cómo se distribuyen las variables $X$ dentro de cada clase** y luego aplican el **Teorema de Bayes** (Módulo 0.2) para obtener la probabilidad de cada clase dada la observación:`,
@@ -439,11 +507,6 @@ export const module5Sections: Section[] = [
           t`$P(Y=k \mid X=x)$: **probabilidad a posteriori** (la que se quiere). Se asigna al registro la clase con **mayor probabilidad posterior**.`,
         ],
       },
-      {
-        type: 'intuition',
-        title: 'Bayes decide al final',
-        text: t`**Bayes es el que decide al final.** Se combinan dos cosas: qué tan frecuente es cada clase de antemano (a priori) y qué tan típico es lo que vimos dentro de cada una (verosimilitud). El resultado es la probabilidad de cada clase dado lo que viste (a posteriori), y se elige la mayor. Es el mismo razonamiento del test médico del módulo 0.`,
-      },
       { type: 'miniCheck', questionIds: ['m5-q08'] },
       { type: 'paragraph', text: 'Los tres métodos difieren en **cómo modelan** la verosimilitud.' },
       { type: 'subheading', text: 'LDA: Análisis Discriminante Lineal' },
@@ -464,9 +527,21 @@ export const module5Sections: Section[] = [
         ],
       },
       {
-        type: 'intuition',
-        title: 'LDA: dos montañas con la misma forma',
-        text: t`**LDA: dos montañas con la misma forma.** Supone que cada clase es una campana con su propio centro, pero con la misma forma y dispersión para todas. Con eso, la frontera es una línea recta. Si las dos clases son igual de frecuentes, la frontera cae justo en el punto medio, como en el ejemplo de $x = 4$. Y si una clase es más rara, la frontera se corre hacia ella: hay que estar más seguro para decir que es de la rara ($x = 5.39$).`,
+        type: 'deepDive',
+        title: 'LDA también termina en una S logística',
+        text: t`Con los números del ejemplo (A con media 2, B con media 6, $\sigma = 2$ en las dos) se ve por qué la frontera es recta. Comparemos las dos verosimilitudes con un logaritmo:
+
+$\ln\dfrac{f_B(x)}{f_A(x)} = \dfrac{(x-2)^2 - (x-6)^2}{8} = \dfrac{8x - 32}{8} = x - 4$
+
+Los $x^2$ se cancelan porque las dos campanas tienen **la misma** dispersión, y queda una función lineal de $x$. Con a priori iguales, la probabilidad posterior de B es la función logística de la sección 5.2 aplicada a $x - 4$: en $x = 5$ da $1/(1+e^{-1}) \approx 0.731$, el $0.73$ del ejemplo, y la frontera ($p = 0.5$) está donde $x - 4 = 0$.
+
+**Las a priori solo corren la constante.** Con $\pi_A = 0.8$ y $\pi_B = 0.2$ se suma $\ln(0.2/0.8) \approx -1.386$, y la frontera pasa a $x = 4 + 1.386 \approx 5.39$, la misma del ejemplo. **Si las dispersiones fueran distintas** (QDA), los $x^2$ no se cancelan y la frontera es una curva.
+
+**Entonces, ¿para qué dos métodos?** LDA y la regresión logística llegan a la misma forma, una S sobre una combinación lineal, pero la estiman distinto. LDA calcula medias y una varianza común suponiendo campanas Normales; la logística ajusta los $\beta$ directamente por máxima verosimilitud, sin suponer nada sobre cómo se reparte $X$. Si las campanas son de verdad Normales, LDA aprovecha esa información y necesita menos datos; si no lo son (variables 0/1, asimetrías, valores atípicos), la logística es más robusta.`,
+        sources: [
+          'Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 4.3 (LDA) y 4.4.5 (¿regresión logística o LDA?)',
+          'Ng y Jordan, "On Discriminative vs. Generative Classifiers: A comparison of logistic regression and naive Bayes", *NIPS* (2001)',
+        ],
       },
       {
         type: 'extra',
@@ -476,11 +551,6 @@ export const module5Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`Igual que LDA, pero **cada clase tiene su propia matriz de covarianza** $\Sigma_k$. Las fronteras resultan **cuadráticas** (curvas). Es más flexible, pero **estima muchos más parámetros**. *Ejemplo:* con $p=50$ variables, la matriz de covarianza tiene $50\cdot51/2 = 1275$ parámetros; LDA estima una, y QDA con 3 clases estima $3\times1275 = 3825$. Es un compromiso entre rigidez y flexibilidad (sesgo frente a varianza): **LDA** tiene más sesgo y menos varianza (mejor con pocos datos); **QDA**, menos sesgo y más varianza (mejor con muchos datos y covarianzas realmente distintas).`,
-      },
-      {
-        type: 'intuition',
-        title: 'QDA: cada clase con su propia forma',
-        text: t`**QDA: cada clase con su propia forma.** Es más flexible y las fronteras son curvas, pero necesita estimar muchísimos más números. Con 50 variables y 3 clases, son 3825 parámetros contra 1275 de LDA. LDA es más rígido y rinde mejor con pocos datos; QDA es más flexible y rinde mejor con muchos datos y clases realmente distintas.`,
       },
       { type: 'subheading', text: 'Naive Bayes' },
       {
@@ -499,9 +569,20 @@ export const module5Sections: Section[] = [
         text: t`El supuesto es "ingenuo" (las palabras no son realmente independientes), pero **funciona sorprendentemente bien**, sobre todo con muchísimas variables (como el texto), porque para clasificar basta que el **orden** de las probabilidades sea correcto, no que sean exactas. Es rápido, necesita pocos datos y se adapta bien a alta dimensión. *Problema típico:* si una palabra nunca apareció en una clase, su probabilidad es 0 y anula todo el producto; se corrige con **suavizado de Laplace** (sumar una pequeña cantidad a todos los conteos).`,
       },
       {
-        type: 'intuition',
-        title: 'Naive Bayes: ingenuo pero útil',
-        text: t`**Naive Bayes: ingenuo pero útil.** "Ingenuo" porque supone que, dentro de cada clase, las variables no se influyen entre sí (por ejemplo, que las palabras de un correo aparecen independientes unas de otras). Eso no es cierto, pero permite multiplicar las probabilidades de cada una por separado, que es rapidísimo. Con "oferta" y "reunión" en un correo, la cuenta de la guía da una probabilidad de spam de $0.625$. Y funciona bien porque para clasificar alcanza con que el **orden** de las probabilidades sea correcto, no que sean exactas. Un cuidado: si una palabra nunca apareció en una clase, su probabilidad es cero y anula todo el producto. Se arregla sumando una pequeña cantidad a todos los conteos (suavizado de Laplace).`,
+        type: 'deepDive',
+        title: 'Qué se rompe cuando las variables no son independientes',
+        text: t`Supongamos que la palabra "gratis" aparece **exactamente** en los mismos correos que "oferta": es la misma pista dicha dos veces. Con las cifras del ejemplo ($P(\text{spam}) = 0.4$; "oferta" en el 50 % del spam y en el 5 % del correo legítimo), tomemos un correo que tiene las dos.
+
+**La cuenta correcta** usa la pista una sola vez: $0.4 \times 0.5 = 0.20$ contra $0.6 \times 0.05 = 0.03$, y la probabilidad de spam es $0.20/0.23 \approx 0.87$.
+
+**Naive Bayes** multiplica las dos palabras como si fueran independientes: $0.4 \times 0.5 \times 0.5 = 0.1$ contra $0.6 \times 0.05 \times 0.05 = 0.0015$, y da $0.1/0.1015 \approx 0.985$.
+
+Las dos cuentas dicen "spam", así que **la clasificación no cambia**: es el "orden correcto" del que habla el texto. Pero la probabilidad quedó exagerada porque la misma evidencia se contó dos veces. Con cientos de palabras relacionadas entre sí, Naive Bayes suele dar probabilidades pegadas a 0 o a 1: ordena bien, pero **está mal calibrado** (como el modelo "a la mitad" de la sección 5.2, con el error hacia el otro lado). Si hacen falta probabilidades creíbles y no solo una clase, hay que recalibrarlas o usar otro modelo.`,
+        sources: [
+          'Domingos y Pazzani, "On the Optimality of the Simple Bayesian Classifier under Zero-One Loss", *Machine Learning* (1997)',
+          'Niculescu-Mizil y Caruana, "Predicting Good Probabilities with Supervised Learning", *ICML* (2005)',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
       {
         type: 'extra',
@@ -517,11 +598,6 @@ export const module5Sections: Section[] = [
           ['**QDA**', 'Generativo', t`$X$ Normal por clase, $\Sigma_k$ propias`, 'Cuadrática', 'Muchos datos, covarianzas distintas'],
           ['**Naive Bayes**', 'Generativo', 'Variables independientes dentro de cada clase', 'Depende del tipo', 'Alta dimensión (texto), pocos datos'],
         ],
-      },
-      {
-        type: 'intuition',
-        title: '¿Cuál elijo?',
-        text: t`**¿Cuál elijo?** Si querés odds ratios y poco supuesto, la logística. Con pocos datos y clases bien separadas, LDA. Con muchos datos y formas distintas, QDA. Con muchísimas variables, como texto, Naive Bayes.`,
       },
     ],
   },

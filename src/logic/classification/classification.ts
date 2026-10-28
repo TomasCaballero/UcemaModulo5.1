@@ -84,6 +84,22 @@ export function logLikelihood(probabilities: readonly number[], labels: readonly
   return probabilities.reduce((sum, p, i) => sum + (labels[i] === 1 ? Math.log(p) : Math.log(1 - p)), 0)
 }
 
+/**
+ * AUC contado por pares: proporción de pares (positivo, negativo) en que el positivo tiene mayor
+ * probabilidad (los empates cuentan medio). Es el área bajo la curva ROC.
+ */
+export function aucByPairs(probabilities: readonly number[], labels: readonly (0 | 1)[]): number {
+  if (probabilities.length !== labels.length) throw new RangeError('probabilities y labels deben tener la misma longitud')
+  const positives = probabilities.filter((_, i) => labels[i] === 1)
+  const negatives = probabilities.filter((_, i) => labels[i] === 0)
+  if (positives.length === 0 || negatives.length === 0) throw new RangeError('hacen falta positivos y negativos')
+  const wins = positives.reduce(
+    (sum, pos) => sum + negatives.reduce((acc, neg) => acc + (pos > neg ? 1 : pos === neg ? 0.5 : 0), 0),
+    0,
+  )
+  return wins / (positives.length * negatives.length)
+}
+
 /** Odds de una probabilidad: p / (1 - p). */
 export const odds = (p: number): number => p / (1 - p)
 

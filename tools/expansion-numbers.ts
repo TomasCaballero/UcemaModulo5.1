@@ -1,5 +1,5 @@
 import type { CourseContent } from '@/content/types'
-import { entropy, f1 } from '@/logic/classification/classification'
+import { aucByPairs, entropy, f1, logistic, logLikelihood, THRESHOLD_EXAMPLE } from '@/logic/classification/classification'
 import { euclidean, kDistances, neighborhoodSide } from '@/logic/clustering/distance'
 import { bayes } from '@/logic/simulations/bayes'
 import { mean, sampleVariance } from '@/logic/statistics/descriptive'
@@ -127,9 +127,68 @@ const module4Examples: NumericExample[] = [
   ),
 ]
 
+// Ampliaciones de 5.2: los 8 pasajeros de 4.3 y un segundo modelo con la mitad de cada probabilidad.
+const passengers = THRESHOLD_EXAMPLE.probabilities as readonly number[]
+const survived = THRESHOLD_EXAMPLE.labels
+const halved = passengers.map((p) => p / 2)
+// Separación perfecta: x = 0 no sobrevive, x = 1 sobrevive, z = β (x - 0.5).
+const separatedLogLikelihood = (beta: number) => logLikelihood([logistic(-beta / 2), logistic(beta / 2)], [0, 1])
+// Ejemplo LDA de 5.4: A ~ N(2, 2²), B ~ N(6, 2²); verosimilitudes relativas como en la guía.
+const ldaPosteriorB = (x: number) => {
+  const a = Math.exp(-((x - 2) ** 2) / 8)
+  const b = Math.exp(-((x - 6) ** 2) / 8)
+  return b / (a + b)
+}
+
+const module5Examples: NumericExample[] = [
+  example('5.1-varianza-bernoulli', r`$0.9 \times 0.1^2 + 0.1 \times 0.9^2 = 0.009 + 0.081 = 0.09$`, 0.09, 6, () => 0.9 * 0.1 ** 2 + 0.1 * 0.9 ** 2),
+  example('5.1-logistica-en-1', r`en $z = 1$ la curva da $0.731$`, 0.731, 3, () => logistic(1)),
+  example('5.1-tangente-en-1', r`$0.5 + 1/4 = 0.75$`, 0.75, 6, () => logistic(0) + 1 / 4),
+  example('5.2-log-odds-0.8', r`$\ln 4 \approx 1.386$`, 1.386, 3, () => Math.log(0.8 / 0.2)),
+  example('5.2-log-odds-0.2', r`$\ln 0.25 \approx -1.386$`, -1.386, 3, () => Math.log(0.2 / 0.8)),
+  example('5.2-log-odds-0.99', r`$\ln 99 \approx 4.595$`, 4.595, 3, () => Math.log(0.99 / 0.01)),
+  ...([
+    [0.9, r`$-\ln 0.9 \approx 0.105$`, 0.105],
+    [0.1, r`$-\ln 0.1 \approx 2.303$`, 2.303],
+    [0.01, r`$-\ln 0.01 \approx 4.605$`, 4.605],
+  ] as const).map(([p, snippet, loss]) => example(`5.2-log-loss-${p}`, snippet, loss, 3, () => -logLikelihood([p], [1]))),
+  example('5.2-cuadrado-0.1', r`$(1 - 0.1)^2 = 0.81$`, 0.81, 6, () => (1 - 0.1) ** 2),
+  example('5.2-cuadrado-0.01', r`$(1 - 0.01)^2 \approx 0.98$`, 0.98, 2, () => (1 - 0.01) ** 2),
+  example('5.2-separacion-2', r`**$\beta = 2$:** $\ell \approx -0.627$`, -0.627, 3, () => separatedLogLikelihood(2)),
+  example('5.2-separacion-10', r`**$\beta = 10$:** $\ell \approx -0.0134$`, -0.0134, 4, () => separatedLogLikelihood(10)),
+  example('5.2-separacion-20', r`**$\beta = 20$:** $\ell \approx -0.0001$`, -0.0001, 4, () => separatedLogLikelihood(20)),
+  example('5.2-auc-pares', r`$2 + 4 + 5 = 11$ pares de 15`, 11, 6, () => 15 * aucByPairs(passengers, survived)),
+  example('5.2-auc', r`$11/15 \approx 0.733$`, 0.733, 3, () => aucByPairs(passengers, survived)),
+  example('5.2-auc-mitad', r`su AUC sigue siendo $0.733$`, 0.733, 3, () => aucByPairs(halved, survived)),
+  example('5.2-promedio-original', r`en promedio $0.506$`, 0.506, 3, () => mean([...passengers])),
+  example('5.2-promedio-mitad', r`y este, $0.253$`, 0.253, 3, () => mean(halved)),
+  example('5.2-sobrevivientes', r`5 de 8 ($0.625$)`, 0.625, 3, () => mean(survived.map(Number))),
+  example('5.2-loglik-original', r`pasa de $-4.67$ a $-7.29$`, -4.67, 2, () => logLikelihood(passengers, survived)),
+  example('5.2-loglik-mitad', r`pasa de $-4.67$ a $-7.29$`, -7.29, 2, () => logLikelihood(halved, survived)),
+  example('5.3-desvio-logistica', r`$\pi/\sqrt{3} \approx 1.81$`, 1.81, 2, () => Math.PI / Math.sqrt(3)),
+  example('5.3-densidad-normal-0', r`$1/\sqrt{2\pi} \approx 0.399$`, 0.399, 3, () => 1 / Math.sqrt(2 * Math.PI)),
+  example('5.3-pendiente-logistica-0', r`la logística sube a razón de $1/4$`, 0.25, 6, () => (logistic(1e-6) - logistic(-1e-6)) / 2e-6),
+  example('5.3-factor-1.6', r`$0.399/0.25 \approx 1.6$`, 1.6, 1, () => 1 / Math.sqrt(2 * Math.PI) / 0.25),
+  example('5.3-phi-1', r`$\Phi(1) \approx 0.841$`, 0.841, 3, () => normalCdf(1)),
+  example('5.3-logistica-1.6', r`la logística evaluada en $1.6 \times 1$ da $0.832$`, 0.832, 3, () => logistic(1.6)),
+  example('5.4-lda-posterior', r`$1/(1+e^{-1}) \approx 0.731$`, 0.731, 3, () => ldaPosteriorB(5)),
+  example('5.4-lda-es-logistica', r`la función logística de la sección 5.2 aplicada a $x - 4$`, 0, 6, () =>
+    [0, 3, 5, 7.5].reduce((acc, x) => acc + Math.abs(ldaPosteriorB(x) - logistic(x - 4)), 0),
+  ),
+  example('5.4-ln-priors', r`$\ln(0.2/0.8) \approx -1.386$`, -1.386, 3, () => Math.log(0.2 / 0.8)),
+  example('5.4-frontera-priors', r`$x = 4 + 1.386 \approx 5.39$`, 5.39, 2, () => (2 + 6) / 2 - (4 * Math.log(0.8 / 0.2)) / (2 - 6)),
+  example('5.4-correcta-spam', r`$0.4 \times 0.5 = 0.20$`, 0.2, 6, () => 0.4 * 0.5),
+  example('5.4-correcta-legitimo', r`$0.6 \times 0.05 = 0.03$`, 0.03, 6, () => 0.6 * 0.05),
+  example('5.4-correcta', r`$0.20/0.23 \approx 0.87$`, 0.87, 2, () => bayes({ prevalence: 0.4, sensitivity: 0.5, falsePositiveRate: 0.05 }).posterior as number),
+  example('5.4-naive-spam', r`$0.4 \times 0.5 \times 0.5 = 0.1$`, 0.1, 6, () => 0.4 * 0.5 * 0.5),
+  example('5.4-naive-legitimo', r`$0.6 \times 0.05 \times 0.05 = 0.0015$`, 0.0015, 6, () => 0.6 * 0.05 * 0.05),
+  example('5.4-naive', r`$0.1/0.1015 \approx 0.985$`, 0.985, 3, () => (0.4 * 0.25) / (0.4 * 0.25 + 0.6 * 0.0025)),
+]
+
 export const expansionExamples: NumericExample[] = [
   ...module0Examples,
   ...module4Examples,
+  ...module5Examples,
   {
     id: '2.2-desvios-suman-cero',
     section: '2.2',
