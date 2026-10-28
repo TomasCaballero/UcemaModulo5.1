@@ -1,8 +1,18 @@
 <script setup lang="ts">
+import { latexToReadable } from '@/content/plainText'
 import type { BlockOf } from '@/content/types'
 import RichText from './RichText.vue'
 
 defineProps<{ block: BlockOf<'table'> }>()
+
+// Un encabezado que es solo una fórmula ("$z$", "$-4$", "$\lambda$") se dibuja como texto con el
+// símbolo Unicode: el texto de KaTeX no cuenta como contenido del encabezado para todas las
+// tecnologías de asistencia, y un <th> sin texto no se puede leer.
+const ONLY_MATH = /^\$([^$]+)\$$/
+const plainHeader = (header: string): string | undefined => {
+  const match = ONLY_MATH.exec(header)
+  return match ? latexToReadable(match[1] as string) : undefined
+}
 </script>
 
 <template>
@@ -15,6 +25,7 @@ defineProps<{ block: BlockOf<'table'> }>()
             <template v-for="(header, index) in block.headers" :key="index">
               <!-- Un encabezado vacío (esquina de la tabla) no puede ser un <th> sin texto. -->
               <td v-if="header === ''" />
+              <th v-else-if="plainHeader(header)" scope="col" class="table-block__math-header">{{ plainHeader(header) }}</th>
               <th v-else scope="col"><RichText :text="header" /></th>
             </template>
           </tr>
@@ -30,6 +41,10 @@ defineProps<{ block: BlockOf<'table'> }>()
 </template>
 
 <style scoped>
+.table-block__math-header {
+  font-family: KaTeX_Main, 'Times New Roman', serif;
+}
+
 .table-block {
   margin: 1rem 0;
 }

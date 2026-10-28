@@ -4,11 +4,13 @@ import SimulationBlock from '@/components/simulations/SimulationBlock.vue'
 import type { BlockType } from '@/content/types'
 import AnalogyBlock from './AnalogyBlock.vue'
 import CalloutBlock from './CalloutBlock.vue'
+import DeepDiveBlock from './DeepDiveBlock.vue'
 import ExtraExampleBlock from './ExtraExampleBlock.vue'
 import FormulaBlock from './FormulaBlock.vue'
 import IntuitionBlock from './IntuitionBlock.vue'
 import ListBlock from './ListBlock.vue'
 import ParagraphBlock from './ParagraphBlock.vue'
+import RecallBlock from './RecallBlock.vue'
 import SubheadingBlock from './SubheadingBlock.vue'
 import TableBlock from './TableBlock.vue'
 import WorkedExampleBlock from './WorkedExampleBlock.vue'
@@ -26,6 +28,8 @@ export const blockComponents: Record<BlockType, Component> = {
   analogy: AnalogyBlock,
   extra: ExtraExampleBlock,
   intuition: IntuitionBlock,
+  deepDive: DeepDiveBlock,
+  recall: RecallBlock,
   table: TableBlock,
   miniCheck: MiniCheckBlock,
   simulation: SimulationBlock,

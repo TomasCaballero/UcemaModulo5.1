@@ -3,7 +3,8 @@
 **Estado:** v2 (hallazgos de la auditoría 1 aprobados y aplicados; pendiente segunda auditoría)
 **Confirmado por el usuario:** SPA estática sin backend; progreso, historial y repetición espaciada; preguntas redactadas desde la guía; 8 módulos completos desde el inicio; funciones extra RF-20, RF-30, RF-31, RF-40, RF-42 y RNF-13; cifras de los RNF; decisiones técnicas propuestas.
 **Cambio posterior (2026-10-24):** se agrega sincronización **opcional** del progreso entre dispositivos con Supabase (Google Auth), manteniendo el enfoque local-first; ver RNF-21 y AC-48. El resto del PRD no cambia.
-**Fuente de contenido:** `recorrido-guias-de-aprendizaje-v3.md` (Módulos 0 a 7, Glosario, Cuadro síntesis)
+**Cambio posterior (2026-10-28):** el curso puede **ir más allá de la guía** con una capa de ampliaciones rotulada ("Ampliación" y "¿Te acordás?") para explicar el porqué, repasar conceptos previos y quitar redundancias; ver RNF-24 y AC-65. El contenido de la guía se mantiene completo y verificado (RNF-17/18).
+**Fuente de contenido:** `recorrido-guias-de-aprendizaje-v3.md` (Módulos 0 a 7, Glosario, Cuadro síntesis) como base obligatoria; las ampliaciones se apoyan en bibliografía estándar citada en cada bloque.
 
 ---
 
@@ -200,6 +201,7 @@ Cada fila es un componente que debe existir (RF-17). La columna "Guía" indica e
 - **RNF-18:** El 100 % de los resultados numéricos de los ejemplos de la guía deben coincidir con los calculados por el curso (tolerancia de redondeo a 3 decimales), verificado por tests automatizados.
 - **RNF-19:** El 100 % de las preguntas de autoevaluación de la guía (M0: 7, M1: 6, M2: 10, M3: 11, M4: 10, M5: 11, M6: 15, M7: 12; total 82) deben tener al menos una pregunta de opción múltiple equivalente en el banco.
 - **RNF-20:** Cada módulo debe tener ≥ 12 preguntas en su banco de evaluación.
+- **RNF-24:** El contenido que no sale de la guía (ampliaciones, repasos de conceptos previos, ejemplos extra) debe mostrarse rotulado y distinguible del de la guía; cada ampliación debe citar al menos una fuente, y el 100 % de sus cifras debe recalcularse con la lógica del curso en un test automatizado (`npm run verify:expansion`). RNF-17 y RNF-18 siguen aplicándose solo al contenido de la guía.
 
 **Privacidad**
 - **RNF-21:** Sin sesión iniciada, el sistema debe enviar 0 datos de progreso o respuestas del usuario a servidores externos. Con sesión iniciada, solo debe enviar el documento de progreso del propio usuario a su fila en Supabase (protegida por reglas de acceso por usuario) y 0 datos a cualquier otro destino, sin analítica ni terceros.
@@ -308,6 +310,7 @@ Los patrones "propuestos" se consideran aprobados salvo que el usuario indique l
 - **AC-62 (RNF-11):** Dado el catálogo, cuando se valida, entonces los 67 interactivos tienen descripción textual no vacía.
 - **AC-63 (RNF-12):** Dado la suite end-to-end, cuando se ejecuta en Chrome, Safari, Firefox y Edge (2 últimas versiones), entonces los flujos de inicio, sección, simulación y evaluación pasan en los 4.
 - **AC-64 (RNF-23):** Dado una pregunta nueva agregada solo al archivo de datos, cuando se abre la evaluación, entonces la pregunta aparece sin cambios en componentes de interfaz.
+- **AC-65 (RNF-24):** Dado el script de ampliaciones, cuando se ejecuta, entonces cada cifra declarada figura en una ampliación de su sección y coincide con la calculada por el curso; y el validador de contenido rechaza una ampliación sin fuentes.
 
 ---
 
@@ -335,6 +338,7 @@ Los patrones "propuestos" se consideran aprobados salvo que el usuario indique l
 | :--- | :--- |
 | **Alcance enorme:** 67 interactivos + ≥ 96 preguntas + todo el contenido. | Motor genérico de simulaciones y de preguntas (RNF-23); implementar por módulo en orden; cada módulo se entrega solo si pasa sus tests de cobertura (AC-46, AC-47). |
 | **Errores numéricos o conceptuales** al reescribir contenido y simulaciones. | Tests automatizados contra los números verificados de la guía (RNF-18); revisión manual de cada módulo por el usuario. |
+| **Errores en las ampliaciones** (contenido propio, sin la guía como red). | Cifras recalculadas en tests (RNF-24), fuentes citadas en cada bloque, rótulo visible para no confundirlas con la guía y revisión del usuario. |
 | **Preguntas con distractores débiles** (respuestas obvias). | Distractores basados en los "errores más comunes" de la guía; revisión del usuario sobre el banco antes del lanzamiento. |
 | **Rendimiento de simulaciones en celular.** | Presupuesto de 100 ms/30 fps (RNF-03/04), carga bajo demanda, tamaños de datos acotados, medición en dispositivo de referencia. |
 | **Pérdida de progreso** (el almacenamiento local puede ser borrado por el navegador). | Exportar/importar (RF-40), aviso cuando el almacenamiento no esté disponible (RNF-15). |
@@ -342,7 +346,7 @@ Los patrones "propuestos" se consideran aprobados salvo que el usuario indique l
 | **Carga cognitiva:** pasar de un apunte a una app puede fragmentar la lectura. | Respetar el orden y numeración de la guía; mini-chequeos cortos; progreso visible. |
 
 **Dependencias:**
-- `recorrido-guias-de-aprendizaje-v3.md` como única fuente de contenido (cualquier cambio a la guía requiere actualizar el curso).
+- `recorrido-guias-de-aprendizaje-v3.md` como fuente base del contenido (cualquier cambio a la guía requiere actualizar el curso); las ampliaciones se apoyan además en la bibliografía que cita cada una (RNF-24).
 - Librería de renderizado de fórmulas (KaTeX o equivalente).
 - Hosting estático (a elegir; gratuito alcanza).
 - Decisión del usuario sobre los patrones de diseño concretos (sección Lineamientos).

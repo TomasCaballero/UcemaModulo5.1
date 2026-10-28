@@ -1,7 +1,8 @@
 import type { ContentBlock, Section } from '../types'
 
-// Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 6. Los bloques `extra` son ejemplos
-// agregados (cotidianos o clásicos): no son de la guía y se muestran rotulados.
+// Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 6. Los bloques `extra` (ejemplos
+// cotidianos o clásicos), `deepDive` (ampliaciones) y `recall` (repasos de lo previo) no son de la
+// guía y se muestran rotulados; las cifras de las ampliaciones se verifican en tools/expansion-numbers.ts.
 const t = String.raw
 
 /** Apertura del módulo, previa a la sección 6.1. */
@@ -18,6 +19,23 @@ export const module6Sections: Section[] = [
     moduleId: 6,
     title: 'Aprendizaje supervisado y no supervisado',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué era el sobreajuste?`,
+            answer: t`Un modelo que rinde muy bien con los datos con que se construyó y mal con datos nuevos: aprendió el ruido en lugar del patrón. Por eso los datos se separan en entrenamiento y prueba. Lo viste en Módulo 4.3.`,
+          },
+          {
+            question: t`¿Qué buscaba el agrupamiento?`,
+            answer: t`Organizar los registros en grupos de parecidos **sin una clase conocida**; para decir "se parecen" hace falta una medida de distancia. DBSCAN, por ejemplo, arma los grupos por densidad. Lo viste en Módulo 4.5.`,
+          },
+          {
+            question: t`¿Por qué la varianza muestral divide por $n-1$?`,
+            answer: t`Porque los desvíos se miden respecto de $\bar{x}$, que se calculó con los mismos datos y queda "pegada" a ellos: los cuadrados suman menos que alrededor de la media verdadera. Dividir por $n-1$ compensa esa ventaja. Lo viste en Módulo 2.2.`,
+          },
+        ],
+      },
       {
         type: 'list',
         items: [
@@ -53,13 +71,20 @@ export const module6Sections: Section[] = [
         text: t`Un modelo más flexible **tiende a bajar siempre el error de entrenamiento**, pero el error de prueba no necesariamente.`,
       },
       {
-        type: 'intuition',
-        title: 'La trampa del examen con las mismas preguntas',
-        text: t`**La trampa del examen con las mismas preguntas.** Hay dos errores. El **de entrenamiento**, medido con los mismos datos con que se armó el modelo, casi siempre es optimista: es como el puntaje que sacás repitiendo los ejercicios que ya estudiaste. El **de prueba**, medido con datos nuevos, es el que realmente importa. Un modelo más flexible casi siempre mejora el primero, pero el segundo no necesariamente.`,
-      },
-      {
-        type: 'extra',
-        text: t`Aprender con respuestas conocidas es como estudiar con un libro de ejercicios con soluciones al final (supervisado: ves la "etiqueta" correcta). Ordenar tu discoteca por "parecido" sin que nadie te diga las categorías es no supervisado: tú descubres los grupos. Y un ejemplo de MSE: si la temperatura real fue $(20, 22, 25)$ y el modelo predijo $(19, 24, 22)$, los errores son $1, -2, 3$ y el MSE es $(1+4+9)/3 \approx 4.67$.`,
+        type: 'deepDive',
+        title: t`Por qué el error de entrenamiento es optimista`,
+        text: t`El modelo eligió sus parámetros **mirando esos mismos datos**, ruido incluido, así que se acomoda a ellos mejor que a cualquier dato nuevo. Se ve hasta con el modelo más simple de todos: predecir siempre con el promedio $\bar{y}$.
+
+**En entrenamiento**, cada dato tiró del promedio hacia sí mismo al calcularlo. Es lo mismo que pasaba con la varianza muestral: alrededor de $\bar{y}$ los cuadrados suman menos que alrededor de la media verdadera. En promedio, el error cuadrático de entrenamiento es $\tfrac{n-1}{n}\,\sigma^2$, donde $\sigma^2$ es la varianza del ruido.
+
+**En prueba**, el dato nuevo no participó del cálculo. Su error suma dos cosas: el ruido propio del dato, $\sigma^2$, y lo que se equivoca el promedio por haber salido de una muestra, $\sigma^2/n$. Total: $\left(1 + \tfrac{1}{n}\right)\sigma^2$.
+
+Con $n = 5$ y $\sigma^2 = 4$, el error de entrenamiento esperado es $\tfrac{4}{5} \times 4 = 3.2$ y el de prueba, $\tfrac{6}{5} \times 4 = 4.8$: la misma regla, medida dos veces, da un 50 % más de error con datos nuevos. Y la brecha crece con la flexibilidad: un modelo con tantos parámetros como datos puede llevar el error de entrenamiento a cero sin haber aprendido nada.`,
+        sources: [
+          'Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 7.4 (el optimismo del error de entrenamiento)',
+          'James, Witten, Hastie y Tibshirani, *An Introduction to Statistical Learning*, cap. 2.2',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
     ],
   },
@@ -68,6 +93,19 @@ export const module6Sections: Section[] = [
     moduleId: 6,
     title: 'El equilibrio sesgo-varianza',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué significaban "insesgado" y "eficiente"?`,
+            answer: t`Un estimador es insesgado si, en promedio sobre muchas muestras, da el valor verdadero; entre los insesgados, el eficiente es el de menor varianza. Uno habla del centro de la distribución de resultados; el otro, de su ancho. Lo viste en Módulo 3.6.`,
+          },
+          {
+            question: t`¿Cuánto varía el promedio de una muestra?`,
+            answer: t`Su varianza es $\sigma^2/n$ y su desviación típica, el error estándar $\sigma/\sqrt{n}$: con más datos, el promedio cambia menos de una muestra a otra. Lo viste en Módulo 2.5.`,
+          },
+        ],
+      },
       { type: 'paragraph', text: 'Para un punto nuevo, el error de prueba esperado se descompone en tres partes:' },
       {
         type: 'formula',
@@ -90,11 +128,6 @@ export const module6Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`**Metáfora de la regla y la cuerda de hule.** Un modelo de alto sesgo es una **regla rígida de madera**: no se dobla para seguir el terreno real. Uno de alta varianza es una **cuerda de hule** muy flexible que se amolda a cada grano de polvo y pierde la forma general.`,
-      },
-      {
-        type: 'intuition',
-        title: 'La regla de madera y la cuerda de hule',
-        text: t`**La regla y la cuerda.** Un modelo de sesgo alto es una **regla de madera**: no se dobla, y si el terreno es curvo, no lo sigue (subajuste). Uno de varianza alta es una **cuerda de hule** muy flexible: se amolda a cada grano de polvo y pierde la forma general (sobreajuste).`,
       },
       {
         type: 'table',
@@ -128,20 +161,30 @@ export const module6Sections: Section[] = [
       {
         type: 'intuition',
         title: 'El que memoriza',
-        text: t`**El que memoriza.** Quien se aprende de memoria las respuestas de exámenes de años anteriores tiene error casi cero en esos ejercicios y se desorienta con una pregunta nueva. En el ejemplo de la guía, un polinomio de grado 9 pasa por todos los puntos de entrenamiento (error $0.0$) pero falla con datos nuevos (error $25.0$). El de grado 3 es el mejor equilibrio: error de prueba de $3.1$.`,
+        text: t`**El que memoriza.** Quien se aprende de memoria las respuestas de exámenes de años anteriores tiene error casi cero en esos ejercicios y se desorienta con una pregunta nueva: es el polinomio de grado 9 de la tabla.`,
       },
       {
         type: 'paragraph',
         text: t`**El objetivo no es minimizar el error de entrenamiento, sino hallar el punto de equilibrio** con menor error de prueba. Las secciones siguientes son herramientas para encontrarlo y controlarlo.`,
       },
       {
-        type: 'intuition',
-        title: 'Lo que importa de verdad',
-        text: t`**Lo que importa de verdad.** El objetivo no es bajar el error con el que entrenaste, sino encontrar el punto de equilibrio entre ser demasiado simple y demasiado flexible. La curva del error de prueba tiene forma de U, y el mejor modelo está en el fondo. Las secciones que siguen son herramientas para encontrar ese punto.`,
-      },
-      {
-        type: 'extra',
-        text: t`El clásico del tiro al blanco. Un tirador con **sesgo alto y varianza baja** agrupa todos los dardos en el mismo lugar, pero lejos del centro. Uno con **sesgo bajo y varianza alta** acierta en promedio al centro, pero sus dardos quedan esparcidos. Y quien se aprende de memoria las respuestas de los exámenes de años anteriores tiene error de entrenamiento casi cero, pero se desorienta ante preguntas nuevas: sobreajuste.`,
+        type: 'deepDive',
+        title: t`La descomposición con números: cuándo conviene aceptar sesgo`,
+        text: t`Para un estimador $\hat\theta$ de un valor $\theta$, el error cuadrático medio se parte en dos: $E[(\hat\theta - \theta)^2] = \text{Sesgo}^2 + \text{Varianza}$, donde el sesgo es $E(\hat\theta) - \theta$. Es la fórmula de la sección sin el error irreducible: acá no hay un dato nuevo con ruido propio, solo un valor que estimar.
+
+**Un estimador insesgado no siempre es el mejor.** Para estimar una media $\mu$ con $\bar{x}$, supongamos que $\text{Var}(\bar{x}) = 4$. Como $\bar{x}$ es insesgado, su error es solo la varianza: $4$.
+
+Ahora probá un estimador "encogido" hacia cero: $0.8\,\bar{x}$. Su varianza baja a $0.8^2 \times 4 = 2.56$, pero aparece un sesgo: en promedio da $0.8\mu$ y se queda corto en $0.2\mu$.
+
+**Si $\mu = 2$**, el sesgo es $0.4$ y su cuadrado, $0.16$. Error total: $0.16 + 2.56 = 2.72$, **mejor que el 4 del insesgado**.
+
+**Si $\mu = 10$**, el sesgo es $2$ y su cuadrado, $4$. Error total: $4 + 2.56 = 6.56$, peor.
+
+Encoger conviene cuando la varianza que ahorra es mayor que el sesgo que agrega: cuando los datos son ruidosos y el valor verdadero no está lejos de donde se encoge. Más adelante en este módulo vas a ver métodos que aplican esta idea a los coeficientes de una regresión.`,
+        sources: [
+          'Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 7.3 (descomposición sesgo-varianza)',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
     ],
   },
@@ -151,13 +194,21 @@ export const module6Sections: Section[] = [
     title: 'Remuestreo: validación cruzada y bootstrap',
     blocks: [
       {
-        type: 'paragraph',
-        text: t`Como no siempre hay un conjunto de prueba aparte, se **reutilizan** los datos de forma inteligente.`,
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué era la filtración?`,
+            answer: t`Que información del conjunto de prueba llegue al entrenamiento, por ejemplo al imputar con la mediana de todos los datos: la evaluación queda optimista. Cada transformación se aprende solo con el entrenamiento y después se aplica a la prueba. Lo viste en Módulo 4.3.`,
+          },
+          {
+            question: t`¿Cómo se calculaba la probabilidad de que pasen dos cosas independientes?`,
+            answer: t`Multiplicando: dos caras seguidas es $0.5 \times 0.5 = 0.25$. Así se calcula, por ejemplo, la chance de que un dato no salga en ninguna de varias extracciones. Lo viste en Módulo 0.2.`,
+          },
+        ],
       },
       {
-        type: 'intuition',
-        title: 'No siempre hay datos de sobra',
-        text: t`**No siempre hay datos de sobra.** Si no podés apartar un grupo de prueba, hay una salida: reutilizar los mismos datos de forma inteligente.`,
+        type: 'paragraph',
+        text: t`Como no siempre hay un conjunto de prueba aparte, se **reutilizan** los datos de forma inteligente.`,
       },
       {
         type: 'paragraph',
@@ -181,33 +232,34 @@ export const module6Sections: Section[] = [
       {
         type: 'intuition',
         title: 'Validación cruzada: rotar al evaluador',
-        text: t`**Validación cruzada: rotar al evaluador.** Ensayás una presentación frente a cinco amigos. Un día la hacés frente a cuatro y la evalúa el quinto. Al día siguiente rotás, hasta que los cinco hayan sido evaluadores una vez. Promediando los cinco comentarios te formás una idea más justa que con un solo oyente. Con datos es igual: se divide en $k$ partes, se entrena con $k-1$ y se evalúa con la que queda, y se repite $k$ veces. Con 100 datos y $k = 5$, cada ajuste usa 80 para entrenar y 20 para evaluar. Sirve especialmente para elegir los "diales" del modelo (los hiperparámetros, que se fijan antes de entrenar), probando varios valores y quedándose con el de menor error.`,
-      },
-      {
-        type: 'extra',
-        text: t`Imagina que ensayas una presentación frente a cinco amigos. Un día la haces frente a cuatro y la revisa el quinto; al día siguiente rotas quién es el evaluador, hasta que los cinco hayan sido evaluadores una vez. Promediando los cinco comentarios te formas una idea más justa que con un solo oyente: es lo mismo que la validación cruzada de 5 particiones.`,
+        text: t`**Validación cruzada: rotar al evaluador.** Ensayás una presentación frente a cinco amigos. Un día la hacés frente a cuatro y la evalúa el quinto. Al día siguiente rotás, hasta que los cinco hayan sido evaluadores una vez. Promediando los cinco comentarios te formás una idea más justa que con un solo oyente. Sirve especialmente para elegir los "diales" del modelo (los hiperparámetros, que se fijan antes de entrenar), probando varios valores y quedándose con el de menor error.`,
       },
       {
         type: 'paragraph',
         text: t`**Bootstrap.** Una muestra *bootstrap* se obtiene **sacando $n$ datos con reemplazo** de los $n$ originales (un mismo dato puede repetirse y otros quedar afuera). *Ejemplo:* de $\{1,2,3,4,5\}$ podría salir $\{2,2,4,5,1\}$. Permite simular "otras muestras" a partir de una sola y estimar la variabilidad de cualquier estadístico.`,
       },
       {
-        type: 'intuition',
-        title: 'Bootstrap: sacar bolillas devolviéndolas',
-        text: t`**Bootstrap: sacar bolillas devolviéndolas.** Imaginá una bolsa con bolillas numeradas. Sacás una, anotás el número y **la devolvés**; así hasta tener tantas como la bolsa original. Algunas bolillas aparecen más de una vez y otras no aparecen. De los datos $\{1,2,3,4,5\}$ podría salir $\{2,2,4,5,1\}$. Así se simulan "otras muestras" a partir de una sola, para ver cuánto varía cualquier número que calcules.`,
-      },
-      {
         type: 'paragraph',
         text: t`Un dato dado queda **fuera** de una muestra bootstrap con probabilidad $(1-1/n)^n \to 1/e \approx 0.368$. Es decir, **cada muestra bootstrap contiene en promedio ~63 % de los datos distintos y deja ~37 % afuera**. Esto se usa en el bagging.`,
       },
       {
-        type: 'intuition',
-        title: 'Un dato curioso: el 63 % y el 37 %',
-        text: t`**Un dato curioso.** La chance de que un dato quede fuera de una muestra así tiende a $0.368$. Eso significa que cada muestra contiene en promedio cerca del 63 % de los datos distintos y deja afuera el 37 %. Esa parte que queda afuera se aprovecha después, en los ensambles.`,
-      },
-      {
         type: 'extra',
         text: t`El bootstrap es sacar bolillas de una bolsa devolviéndolas cada vez. Con 10 bolillas numeradas, una en particular queda fuera de una muestra de 10 extracciones con probabilidad $(1-1/10)^{10} = 0.9^{10} \approx 0.349$, ya muy cerca del límite de 0.368.`,
+      },
+      {
+        type: 'deepDive',
+        title: t`El bootstrap sin azar: todas las muestras posibles de tres datos`,
+        text: t`Con pocos datos se pueden escribir **todas** las muestras bootstrap en lugar de sortearlas. Con los datos $(2, 4, 9)$, cada una de las 3 extracciones puede dar cualquiera de los 3 valores: hay $3^3 = 27$ muestras posibles, todas igual de probables. Algunas: $(2, 2, 2)$ con media $2$, $(2, 4, 9)$ con media $5$ y $(9, 9, 4)$ con media $7.33$.
+
+**El error estándar sale de mirar cuánto varían esas 27 medias.** Su promedio es $5$, la media original. Su desviación típica es $\approx 1.70$, que es exactamente $\sqrt{(26/3)/3}$: la varianza de los tres datos tratados como si fueran toda la población ($26/3$), dividida por $n = 3$. Es la fórmula $\sigma^2/n$ del error estándar, con la muestra en el lugar de la población.
+
+**Por qué entonces sortear.** Con 3 datos alcanza con 27 casos; con 20 datos serían $20^{20}$, un número de 27 cifras. Sortear unas mil muestras da casi el mismo resultado. Y la ventaja es que sirve para cualquier número que calcules (una mediana, un AUC), aunque no tenga una fórmula de error estándar.
+
+**El 37 % aparece contando.** El dato $2$ queda afuera en las muestras armadas solo con $4$ y $9$: son $2^3 = 8$ de las 27, o sea $(2/3)^3 \approx 0.296$. Con 10 datos la chance era $0.349$, y con muchos se acerca a $0.368$.`,
+        sources: [
+          'Efron y Tibshirani, *An Introduction to the Bootstrap*, cap. 6 (el error estándar bootstrap)',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
     ],
   },
@@ -217,13 +269,25 @@ export const module6Sections: Section[] = [
     title: 'Regularización y reducción de dimensión',
     blocks: [
       {
-        type: 'paragraph',
-        text: t`Cuando hay **muchas variables** (incluso más variables que observaciones, $p > n$), OLS tiene alta varianza o directamente no tiene solución única. La idea de la **regularización** es **aceptar un poco de sesgo a cambio de bajar mucho la varianza**, penalizando coeficientes grandes.`,
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué era la colinealidad perfecta?`,
+            answer: t`Que una columna se obtenga combinando otras ("edad en años" y "edad en meses"). Entonces no hay una única forma de repartir el efecto entre ellas: muchos juegos de coeficientes dan las mismas predicciones. Lo viste en Módulo 0.3.`,
+          },
+          {
+            question: t`¿Qué hacían L1, L2 y el parámetro C en la regresión logística?`,
+            answer: t`Le sumaban al error una penalización por coeficientes grandes: L2 los modera y L1 puede dejar algunos en cero. En *scikit-learn*, C es el **inverso** de la fuerza (C chico, regularización fuerte). Acá la fuerza se escribe $\lambda$ y va al revés: $\lambda$ grande, castigo fuerte. Lo viste en Módulo 5.2.`,
+          },
+          {
+            question: t`¿Qué hacía la estandarización?`,
+            answer: t`Restar la media y dividir por la desviación típica, $z = (x - \bar{x})/s$: todas las variables quedan con media 0 y desviación 1, sin importar sus unidades. Lo viste en Módulo 4.2.`,
+          },
+        ],
       },
       {
-        type: 'intuition',
-        title: 'El problema de tener demasiadas variables',
-        text: t`**El problema.** Cuando tenés muchísimas variables, incluso más que observaciones, la recta del módulo 3 se vuelve inestable o directamente no tiene una solución única. La idea de la regularización es **aceptar perder algo de precisión a cambio de ganar estabilidad**, castigando los pesos demasiado grandes.`,
+        type: 'paragraph',
+        text: t`Cuando hay **muchas variables** (incluso más variables que observaciones, $p > n$), OLS tiene alta varianza o directamente no tiene solución única. La idea de la **regularización** es **aceptar un poco de sesgo a cambio de bajar mucho la varianza**, penalizando coeficientes grandes.`,
       },
       {
         type: 'paragraph',
@@ -252,11 +316,6 @@ export const module6Sections: Section[] = [
         ],
       },
       {
-        type: 'intuition',
-        title: 'El dial lambda',
-        text: t`**El dial $\lambda$.** Controla qué tan estricto es el límite de peso. Con $\lambda = 0$ no hay castigo y se vuelve a la recta común. Con $\lambda$ muy grande, todos los pesos tienden a cero. Se elige probando valores con validación cruzada. Antes de aplicar estos métodos conviene poner todas las variables en la misma escala, porque el castigo depende de la escala de cada una.`,
-      },
-      {
         type: 'paragraph',
         text: t`*Ejemplo ilustrativo (cifras inventadas) de coeficientes al aumentar $\lambda$:*`,
       },
@@ -271,8 +330,26 @@ export const module6Sections: Section[] = [
         illustrative: true,
       },
       {
-        type: 'extra',
-        text: t`Armar una valija con límite de peso. **Lasso** es dejar cosas en casa: decides qué no llevar (coeficiente exactamente cero) y el resto pasa tal cual. **Ridge** es llevar un poco menos de cada cosa: todo viaja, pero más liviano. En ambos casos aceptas perder algo (sesgo) a cambio de una valija más manejable (menos varianza).`,
+        type: 'deepDive',
+        title: t`Por qué Lasso pone ceros y Ridge no`,
+        text: t`Se ve con el caso más simple: **una sola variable**, estandarizada de modo que $\sum x_i^2 = 1$, y sin constante. Llamemos $\hat\beta$ al coeficiente de mínimos cuadrados (el de $\lambda = 0$). Desarrollando el cuadrado, el RSS queda, salvo una constante, $\beta^2 - 2\hat\beta\beta$, y a eso se le suma la penalización.
+
+**Ridge** minimiza $\beta^2 - 2\hat\beta\beta + \lambda\beta^2$. Derivando e igualando a cero (Módulo 0.4), $2\beta - 2\hat\beta + 2\lambda\beta = 0$, o sea:
+
+$\beta_{\text{Ridge}} = \dfrac{\hat\beta}{1 + \lambda}$
+
+Ridge **divide**: achica todo en la misma proporción, y una división nunca da exactamente cero.
+
+**Lasso** minimiza $\beta^2 - 2\hat\beta\beta + \lambda|\beta|$. Para $\beta > 0$, la derivada es $2\beta - 2\hat\beta + \lambda$, que se anula en $\beta = \hat\beta - \lambda/2$. Lasso **resta** una cantidad fija, y si $\hat\beta$ no alcanza a cubrirla, el mínimo queda clavado en la punta del valor absoluto: $\beta = 0$.
+
+**Con $\lambda = 2$:** si $\hat\beta = 3$, Ridge da $3/3 = 1$ y Lasso $3 - 1 = 2$. Si $\hat\beta = 0.5$, Ridge da $0.5/3 \approx 0.167$ y Lasso da **exactamente 0**, porque $0.5$ no llega a cubrir el $1$ que hay que restar.
+
+Fijate el contraste: con el coeficiente grande, Lasso castigó menos que Ridge; con el chico, lo eliminó. Es la "esquina" de la intuición geométrica de arriba, vista en una sola dimensión.`,
+        sources: [
+          'Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 3.4 (Ridge y Lasso con variables ortonormales)',
+          'Tibshirani (1996), "Regression Shrinkage and Selection via the Lasso", *Journal of the Royal Statistical Society B*',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
       {
         type: 'subheading',
@@ -305,15 +382,11 @@ export const module6Sections: Section[] = [
       {
         type: 'intuition',
         title: 'PCA: un talle en lugar de tres medidas',
-        text: t`**PCA: un talle en lugar de tres medidas.** Es una técnica distinta, que no mira la respuesta. Los talles de ropa son una "primera componente" casual: en vez de dar altura, peso y contorno por separado, el talle (S, M, L) resume en una sola dimensión lo que más varía entre las personas. Se pierde algo, pero se conserva lo esencial con mucho menos información. PCA arma nuevas variables que ya no se repiten entre sí, ordenadas de mayor a menor variación. En el ejemplo, la primera de cuatro variables ya explica el 70 % y las dos primeras el 92.5 %, así que se puede trabajar con 2 en vez de 4.`,
+        text: t`**PCA: un talle en lugar de tres medidas.** Es una técnica distinta, que no mira la respuesta. Los talles de ropa son una "primera componente" casual: en vez de dar altura, peso y contorno por separado, el talle (S, M, L) resume en una sola dimensión lo que más varía entre las personas. Se pierde algo (dos personas del mismo talle pueden tener proporciones distintas), pero se conserva lo esencial con mucho menos información.`,
       },
       {
         type: 'paragraph',
         text: t`*Usos:* reducir dimensión, visualizar datos, eliminar colinealidad y alimentar otros modelos (regresión sobre componentes principales). *Advertencia:* se deben **estandarizar** las variables antes (si no, domina la de mayor escala), y como PCA **ignora $Y$**, las componentes con más varianza no tienen por qué ser las más útiles para predecir.`,
-      },
-      {
-        type: 'extra',
-        text: t`Los talles de ropa son una "primera componente" casual: en vez de dar altura, peso y contorno por separado, el talle (S, M, L) resume en una sola dimensión lo que más varía entre las personas. Se pierde algo (dos personas del mismo talle pueden tener proporciones distintas), pero se conserva lo esencial con mucho menos información.`,
       },
     ],
   },
@@ -323,13 +396,21 @@ export const module6Sections: Section[] = [
     title: 'Métodos de ensamble',
     blocks: [
       {
-        type: 'paragraph',
-        text: t`Un **ensamble** combina muchos modelos "débiles" para obtener uno fuerte. Los modelos base casi siempre son **árboles de decisión** (Módulo 4.3), que tienen la desventaja de ser **inestables**: un pequeño cambio en los datos puede cambiar mucho el árbol (alta varianza).`,
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Por qué un árbol de decisión sobreajusta con facilidad?`,
+            answer: t`Si se lo deja dividir hasta que cada hoja tenga un solo registro, memoriza el entrenamiento. Se controla limitando la profundidad, exigiendo un mínimo de registros por hoja o podando ramas. Lo viste en Módulo 4.3.`,
+          },
+          {
+            question: t`¿Qué calculaba la distribución binomial?`,
+            answer: t`La probabilidad de obtener $k$ éxitos en $n$ intentos independientes, cada uno con probabilidad $p$: $\binom{n}{k} p^k (1-p)^{n-k}$. Sirve para contar cuántos de varios modelos aciertan a la vez. Lo viste en Módulo 2.4.`,
+          },
+        ],
       },
       {
-        type: 'intuition',
-        title: 'Muchos modelos mediocres que se corrigen entre sí',
-        text: t`**Muchos modelos mediocres que se corrigen entre sí.** Un solo árbol de decisión es inestable: si cambian un poco los datos, puede cambiar mucho. Pero muchos árboles juntos pueden dar una respuesta firme. Es la sabiduría de las multitudes: en una feria, ninguna persona acertó el peso de un buey, pero el promedio de todas estuvo muy cerca. Funciona porque los errores individuales, si son independientes, se compensan.`,
+        type: 'paragraph',
+        text: t`Un **ensamble** combina muchos modelos "débiles" para obtener uno fuerte. Los modelos base casi siempre son **árboles de decisión** (Módulo 4.3), que tienen la desventaja de ser **inestables**: un pequeño cambio en los datos puede cambiar mucho el árbol (alta varianza).`,
       },
       { type: 'miniCheck', questionIds: ['m6-q08'] },
       {
@@ -342,13 +423,32 @@ export const module6Sections: Section[] = [
         text: t`Si fueran independientes ($\rho=0$) la varianza caería a $\sigma^2/B$. Pero si están muy correlacionados, **promediar no ayuda**: el primer término queda. *Ejemplo:* $\sigma^2=4$, $B=100$. Con $\rho=0$, varianza $=0.04$. Con $\rho=0.5$, varianza $= 2 + 0.02 = 2.02$. **Hay que lograr modelos distintos entre sí.**`,
       },
       {
-        type: 'intuition',
-        title: 'La condición oculta: que los modelos sean distintos',
-        text: t`**La condición oculta.** Si todos copian la respuesta del vecino, el promedio es tan malo como cada uno. Lo que hace falta son modelos **distintos entre sí**. Con 100 modelos de varianza $4$, si fueran independientes, el promedio tendría varianza de $0.04$. Si se parecen mucho (correlación de $0.5$), la varianza del promedio queda en $2.02$: casi no ayudó.`,
-      },
-      {
         type: 'extra',
         text: t`La sabiduría de las multitudes es el ejemplo clásico: en 1906, Francis Galton analizó las estimaciones que unas 800 personas hicieron en una feria sobre el peso de un buey; ninguna fue exacta, pero el promedio quedó a menos del 1 % del peso real. Funciona porque los errores individuales, si son independientes, se compensan. Si todos copiaran la respuesta del vecino (correlación alta), el promedio sería tan malo como cada uno.`,
+      },
+      {
+        type: 'deepDive',
+        title: t`El voto de mayoría: cuándo suma y cuándo resta`,
+        text: t`La fórmula de arriba mira el promedio de números. Para clasificar, los árboles **votan**, y ahí se ve lo mismo contando.
+
+**Cinco clasificadores independientes**, cada uno con 70 % de acierto, votan y gana la mayoría. El voto acierta cuando aciertan al menos 3 de los 5. Con la binomial:
+
+$P(3) = 10 \times 0.7^3 \times 0.3^2 \approx 0.309$
+
+$P(4) = 5 \times 0.7^4 \times 0.3 \approx 0.360$
+
+$P(5) = 0.7^5 \approx 0.168$
+
+En total, el comité acierta el **83.7 %**: bastante más que cualquiera de sus miembros. Los errores de cada uno caen en casos distintos, y casi siempre quedan en minoría.
+
+**Si los cinco se copian**, aciertan y se equivocan juntos, y el voto acierta el 70 %: lo mismo que uno solo. Es el término $\rho\,\sigma^2$ de la fórmula, que no baja por más modelos que se agreguen.
+
+**Y si cada uno es peor que tirar una moneda**, el voto empeora las cosas: con 45 % de acierto individual, el comité acierta el 40.7 %. Votar amplifica lo que hay. Por eso un ensamble necesita modelos **distintos entre sí y mejores que el azar**, aunque sea por poco.`,
+        sources: [
+          'Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 8.7 (bagging y la sabiduría de las multitudes) y cap. 15',
+          'Kuncheva, *Combining Pattern Classifiers* (voto de mayoría)',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
       { type: 'subheading', text: 'Bagging (Bootstrap Aggregation)' },
       {
@@ -367,11 +467,6 @@ export const module6Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`**Estimación Out-Of-Bag (OOB).** Como cada árbol ve solo ~63 % de los datos, **el ~37 % restante son datos que ese árbol "no vio"**. Para cada observación se promedian las predicciones de los árboles que **no la usaron** y se compara con el valor real. El error OOB resultante es una **estimación honesta del error de prueba, sin necesidad de validación cruzada**.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Bagging: muchos árboles en paralelo',
-        text: t`**Bagging: muchos árboles en paralelo.** Se arman muchas muestras como en el truco de las bolillas, se entrena un árbol profundo en cada una y se combinan: promedio (para números) o voto (para categorías). Reduce la varianza. A cambio, ya no se puede leer un solo árbol. Cada árbol deja cerca del 37 % de los datos sin ver, y esos datos sirven para estimar el error de prueba sin necesidad de validación cruzada (estimación *out-of-bag*).`,
       },
       { type: 'subheading', text: 'Bosques aleatorios (Random Forests)' },
       {
@@ -397,11 +492,6 @@ export const module6Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`**Cómo se obtiene la predicción final.** Cada árbol entrega una **probabilidad**; el bosque **promedia esas probabilidades** y luego aplica un umbral. *Ejemplo de clase (5 árboles, para un hombre de 30 años en 3.ª clase):* probabilidades $0.125, 0.500, 0.333, 0.143$ y $0.000$; promedio $= 1.101/5 \approx 0.220$; con umbral $0.50$, $0.220 < 0.50$ y la predicción es "no sobrevive". En la práctica se usan muchos más árboles (por ejemplo, 100).`,
-      },
-      {
-        type: 'intuition',
-        title: 'Bosque aleatorio: un comité con consultas distintas',
-        text: t`**Bosque aleatorio: un comité con consultas distintas.** Si en un panel de médicos hay un especialista muy dominante, todos los diagnósticos se parecen. Si a cada médico solo se le permite consultar un grupo aleatorio de síntomas, las opiniones se diversifican y el voto es más robusto. Eso es un bosque: en cada pregunta de cada árbol, solo se mira una parte de las variables. Agregar más árboles no causa sobreajuste. En el ejemplo, los cinco árboles dieron un promedio de $0.220$, por debajo del umbral $0.50$: la predicción es "no sobrevive".`,
       },
       { type: 'miniCheck', questionIds: ['m6-q18'] },
       {
@@ -483,7 +573,7 @@ export const module6Sections: Section[] = [
       {
         type: 'intuition',
         title: 'Boosting: el simulacro de examen',
-        text: t`**Boosting: el simulacro de examen.** Tras cada simulacro revisás solo lo que fallaste y estudiás eso, sin repasar lo que ya sabías. Cada ronda corrige los errores de la anterior, y el conocimiento final es la suma de todas esas correcciones pequeñas. Con datos, se entrenan árboles pequeños **en secuencia**, cada uno ajustándose a lo que el anterior no explicó, y se suma una fracción de cada uno. En la caricatura numérica, el error baja de $100$ a $90$ y luego a $72.9$: avanza de a pasos chicos a propósito.`,
+        text: t`**Boosting: el simulacro de examen.** Tras cada simulacro revisás solo lo que fallaste y estudiás eso, sin repasar lo que ya sabías. Cada ronda corrige los errores de la anterior, y el conocimiento final es la suma de todas esas correcciones pequeñas.`,
       },
       {
         type: 'paragraph',
@@ -508,15 +598,6 @@ export const module6Sections: Section[] = [
           ['Sensibilidad a los hiperparámetros', 'Baja', 'Alta'],
         ],
       },
-      {
-        type: 'intuition',
-        title: 'Cuál usar',
-        text: t`**Cuál usar.** El bosque trabaja en paralelo, con árboles profundos, y es difícil de arruinar. El boosting trabaja en secuencia, con árboles chicos, es más sensible a los ajustes y sí puede sobreajustar si pones demasiados árboles. Y en el ejemplo del Titanic, qué modelo sale "mejor" depende de la métrica que elijas.`,
-      },
-      {
-        type: 'extra',
-        text: t`Boosting es como preparar un examen con simulacros: tras cada simulacro revisas solo lo que fallaste y estudias eso, sin repasar de nuevo lo que ya sabías. Cada ronda corrige los errores de la anterior y el conocimiento final es la suma de todas esas correcciones pequeñas. Y la varianza de un promedio de 10 árboles con $\sigma^2=4$ y $\rho=0.2$ es $0.2\cdot4 + 0.8\cdot4/10 = 1.12$: más cerca de lo que permite la correlación que del ideal $0.4$.`,
-      },
     ],
   },
   {
@@ -524,6 +605,19 @@ export const module6Sections: Section[] = [
     moduleId: 6,
     title: 'Máquinas de Vectores de Soporte (SVM)',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué era un hiperplano?`,
+            answer: t`La frontera $w \cdot x + b = 0$: una recta en el plano, un plano en el espacio. El signo de $w \cdot x + b$ dice de qué lado cae cada punto, y $w \cdot x$ es un producto interno: multiplicar posición por posición y sumar. Lo viste en Módulo 0.3.`,
+          },
+          {
+            question: t`¿Qué hacía el parámetro C en la regresión logística de scikit-learn?`,
+            answer: t`Era el inverso de la fuerza de la regularización: C chico, modelo más moderado. En las SVM de *scikit-learn* se mantiene esa convención, que es la opuesta a la del libro. Lo viste en Módulo 5.2.`,
+          },
+        ],
+      },
       { type: 'paragraph', text: t`Las SVM son clasificadores que buscan **la mejor frontera lineal** entre dos clases.` },
       {
         type: 'paragraph',
@@ -540,10 +634,6 @@ export const module6Sections: Section[] = [
         text: t`**La mejor frontera es la que deja más espacio.** Imaginá un salón con alumnos de dos cursos que deben quedar en lados opuestos. En vez de trazar el pasillo en cualquier lugar, buscás el pasillo **más ancho posible** entre los dos grupos. Los alumnos que quedan pegados al borde del pasillo son los **vectores de soporte**: si alguien del fondo se cambia de silla, el pasillo no se mueve; si se mueve uno de los pegados al borde, sí.`,
       },
       {
-        type: 'extra',
-        text: t`Imagina un salón con alumnos de dos cursos que deben quedar en lados opuestos. En vez de trazar el pasillo en cualquier lugar, buscas el pasillo más ancho posible entre los dos grupos. Los alumnos que quedan pegados al borde del pasillo son los vectores de soporte: si alguien del fondo se cambia de silla, el pasillo no se mueve; si se mueve uno de los pegados al borde, sí.`,
-      },
-      {
         type: 'paragraph',
         text: t`**Margen blando (*support vector classifier*).** Con clases que se solapan no existe una recta perfecta. Se permite que algunos puntos queden **dentro del margen o del lado equivocado**, midiendo cuánto se pasan con **variables de holgura** $\xi_i$ y controlando la tolerancia con un hiperparámetro:`,
       },
@@ -555,19 +645,9 @@ export const module6Sections: Section[] = [
         ],
       },
       {
-        type: 'intuition',
-        title: 'Cuando los grupos se mezclan un poco',
-        text: t`**Cuando los grupos se mezclan un poco.** En la vida real los grupos se solapan. Entonces se tolera que algunos queden dentro del pasillo o del lado equivocado, con una tolerancia que se regula. Más tolerancia: pasillo ancho, más puntos "violan", más sesgo y menos varianza. Menos tolerancia: pasillo angosto, ajuste ceñido, menos sesgo y más varianza.`,
-      },
-      {
         type: 'callout',
         kind: 'cuidado',
         text: t`con la notación del parámetro $C$. En el libro *An Introduction to Statistical Learning* $C$ es un "presupuesto" de violaciones (**más $C$ = más tolerancia**). En muchas librerías (por ejemplo, scikit-learn) $C$ es el **peso de la penalización** de las violaciones (**más $C$ = menos tolerancia**). Son opuestos: verifica siempre la definición de tu herramienta.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Cuidado con el nombre C',
-        text: t`**Cuidado con el nombre $C$.** En el libro del curso, $C$ es un "presupuesto" de violaciones (más $C$ = más tolerancia). En muchas librerías es el peso de la penalización (más $C$ = menos tolerancia). Son opuestos: verificá siempre la definición de tu herramienta.`,
       },
       {
         type: 'paragraph',
@@ -580,7 +660,7 @@ export const module6Sections: Section[] = [
       {
         type: 'intuition',
         title: 'El truco de mirar desde otra altura: el kernel',
-        text: t`**El truco de mirar desde otra altura.** Imaginá una pista circular de patinaje con los buenos en el centro y los novatos en un anillo alrededor. Ninguna recta los separa sobre el mapa. Pero si, en vez de la posición, usás la **distancia al centro** de la pista, los dos grupos quedan de un lado y del otro de un umbral. Eso es el truco del *kernel*: cambiar la forma de mirar los datos para que una frontera recta sirva. En la guía, el ejemplo es poner $x^2$: los puntos de la clase $+$ en $\pm 3$ pasan a $(\pm 3, 9)$ y los otros a alturas de $0$ y $1$, y la recta $x^2 = 5$ los separa.`,
+        text: t`**El truco de mirar desde otra altura.** Imaginá una pista circular de patinaje con los buenos en el centro y los novatos en un anillo alrededor. Ninguna recta los separa sobre el mapa. Pero si, en vez de la posición, usás la **distancia al centro** de la pista, los dos grupos quedan de un lado y del otro de un umbral. Eso es el truco del *kernel*: cambiar la forma de mirar los datos para que una frontera recta sirva.`,
       },
       {
         type: 'paragraph',
@@ -594,17 +674,26 @@ export const module6Sections: Section[] = [
         ],
       },
       {
-        type: 'intuition',
-        title: 'Lo notable: no hace falta construir las variables nuevas',
-        text: t`**Lo notable.** El algoritmo no necesita construir esas variables nuevas: solo necesita medir "qué tan parecidos" son dos puntos, y una función llamada kernel lo calcula directamente. Por eso funciona incluso en espacios enormes. El kernel radial mide similitud local: con $\gamma$ grande la influencia de cada punto es muy local y la frontera se vuelve irregular (sobreajuste); con $\gamma$ pequeño, queda suave.`,
+        type: 'deepDive',
+        title: t`El truco del kernel con números`,
+        text: t`**El producto interno sin construir las variables.** En el plano, tomá la transformación que arma todos los productos de grado 2: $\varphi(x_1, x_2) = (x_1^2,\ \sqrt{2}\,x_1x_2,\ x_2^2)$. Para $x = (1, 2)$ y $z = (3, 1)$:
+
+**Por el camino largo**, $\varphi(x) = (1,\ 2\sqrt{2},\ 4)$ y $\varphi(z) = (9,\ 3\sqrt{2},\ 1)$. Su producto interno es $9 + 12 + 4 = 25$.
+
+**Por el atajo**, $x \cdot z = 3 + 2 = 5$, y $5^2 = 25$. Lo mismo, sin pasar por el espacio de tres dimensiones.
+
+Pasa siempre: $(x \cdot z)^2 = \varphi(x) \cdot \varphi(z)$ (es el kernel polinómico de la lista, sin el $1$). Con 100 variables y grado 2, el espacio ampliado tendría 5050 coordenadas, pero el atajo sigue siendo un producto interno de 100 términos y un cuadrado. Como la SVM solo usa productos internos, nunca necesita las coordenadas nuevas.
+
+**La escala del kernel radial.** Para dos puntos a distancia 1, $K = e^{-\gamma}$. Con $\gamma = 1$, $K = e^{-1} \approx 0.368$: todavía se "ven" bastante. Con $\gamma = 10$, $K = e^{-10} \approx 0.00005$: para el kernel ya casi no tienen nada que ver. Por eso un $\gamma$ grande deja que cada punto influya solo en su vecindad inmediata, y la frontera se arruga alrededor de cada uno.`,
+        sources: [
+          'Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 12.3 (SVM y kernels)',
+          'Schölkopf y Smola, *Learning with Kernels*, cap. 2',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
       {
         type: 'paragraph',
         text: t`Para más de dos clases, se combinan varias SVM binarias (una contra todas, o una contra una). Los hiperparámetros ($C$, $\gamma$, $d$) se eligen por validación cruzada.`,
-      },
-      {
-        type: 'extra',
-        text: t`Para ver el truco en la vida real: en una pista circular de patinaje, los patinadores "buenos" van en el centro y los "novatos" en un anillo alrededor. Ninguna recta separa los dos grupos sobre el mapa. Pero si en lugar de la posición usas la distancia al centro de la pista (una variable nueva), los dos grupos quedan de un lado y del otro de un umbral. Eso es lo que logra un kernel sin tener que construir la variable a mano.`,
       },
     ],
   },
@@ -613,6 +702,19 @@ export const module6Sections: Section[] = [
     moduleId: 6,
     title: 'Agrupamiento no supervisado: K-Means y clustering jerárquico',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué valor minimiza la suma de los cuadrados de las distancias a unos datos?`,
+            answer: t`El promedio; con valor absoluto, en cambio, gana la mediana. Por eso el centro de cada grupo de esta sección es un promedio. Lo viste en Módulo 0.4.`,
+          },
+          {
+            question: t`¿Por qué hay que escalar antes de agrupar?`,
+            answer: t`Porque la distancia euclídea suma diferencias en las unidades de cada variable: un ingreso en pesos aplasta a una edad en años. Elegir cómo escalar es elegir qué significa "parecerse". Lo viste en Módulo 4.5.`,
+          },
+        ],
+      },
       { type: 'paragraph', text: 'Complementa el agrupamiento por densidad del Módulo 4.5.' },
       { type: 'subheading', text: 'K-Means' },
       {
@@ -636,7 +738,7 @@ export const module6Sections: Section[] = [
       {
         type: 'intuition',
         title: 'K-Means: ubicar estaciones de servicio',
-        text: t`**K-Means: ubicar estaciones de servicio.** Elegís cuántos grupos querés ($K$) y ubicás $K$ "estaciones" (centroides) en la ciudad de datos. Cada conductor va a la más cercana. Después movés cada estación al centro de los conductores que la usan, y repetís hasta que nadie cambie de estación. El centro de cada grupo es el promedio de sus puntos, y se usa el promedio porque, como viste en el módulo 0, es el valor que minimiza la suma de los cuadrados de las distancias.`,
+        text: t`**K-Means: ubicar estaciones de servicio.** Elegís cuántos grupos querés ($K$) y ubicás $K$ "estaciones" (centroides) en la ciudad de datos. Cada conductor va a la más cercana. Después movés cada estación al centro de los conductores que la usan, y repetís hasta que nadie cambie de estación.`,
       },
       {
         type: 'paragraph',
@@ -650,11 +752,6 @@ export const module6Sections: Section[] = [
           t`Se reasigna: nada cambia, el algoritmo termina. $\text{SSE} \approx 4.67 + 4.67 = 9.33$.`,
         ],
       },
-      {
-        type: 'intuition',
-        title: 'K-Means con números',
-        text: t`**Con números.** Con los puntos $1, 2, 4, 10, 11, 13$ y dos estaciones iniciales en $1$ y $10$, quedan los grupos $\{1,2,4\}$ y $\{10,11,13\}$, con centros en $2.33$ y $11.33$. Al reasignar no cambia nadie y termina.`,
-      },
       { type: 'simulation', simulationId: 'IN-58' },
       {
         type: 'paragraph',
@@ -665,9 +762,20 @@ export const module6Sections: Section[] = [
         text: t`**Limitaciones:** hay que **elegir $K$** (el SSE siempre baja al aumentar $K$, así que no sirve minimizarlo; se usa el **método del codo**: graficar el SSE contra $K$ y buscar donde la mejora se aplana); el resultado depende de la **inicialización** (se prueban varios arranques y se elige el mejor); asume grupos **compactos y redondeados**; es sensible a **valores atípicos** y a la **escala** de las variables (estandarizar primero).`,
       },
       {
-        type: 'intuition',
-        title: 'Los límites de K-Means',
-        text: t`**Sus límites.** Hay que decidir cuántos grupos de antemano. Como el error siempre baja al sumar grupos, se mira el "codo": el punto donde la mejora se aplana. El resultado depende del arranque (se prueban varios), prefiere grupos compactos y redondeados, y es sensible a los valores raros y a la escala (conviene estandarizar). Con clientes de una verdulería, si el gasto está en miles de pesos y la frecuencia en visitas por mes, el gasto dominaría las distancias si no estandarizás.`,
+        type: 'deepDive',
+        title: t`Por qué K-Means siempre baja la SSE, y aun así puede quedarse en un mal lugar`,
+        text: t`**Cada paso solo puede bajar la SSE.** Al **asignar**, cada punto se va al centroide más cercano: su distancia al cuadrado no puede subir. Al **recentrar**, cada centroide pasa al promedio de su grupo, y el promedio es el valor que hace mínima la suma de cuadrados: tampoco puede subir. En el ejemplo de la guía, con los centroides iniciales en $1$ y $10$, la SSE de la primera asignación es $(0 + 1 + 9) + (0 + 1 + 9) = 20$; al mover los centroides a $2.33$ y $11.33$ baja a $9.33$, y ahí se detiene.
+
+**Pero baja hasta el valle más cercano, no hasta el más profundo.** Tomá cuatro puntos en las esquinas de un rectángulo ancho y bajo, $(0, 0)$, $(10, 0)$, $(0, 1)$ y $(10, 1)$, con $K = 2$. Los grupos naturales son "izquierda" y "derecha", con SSE $= 4 \times 0.5^2 = 1$.
+
+Si los centroides arrancan en $(0, 0)$ y $(0, 1)$, el punto $(10, 0)$ está a distancia al cuadrado $100$ del primero y $101$ del segundo, así que se va con el primero. Quedan los grupos "abajo" y "arriba", con centroides $(5, 0)$ y $(5, 1)$. Cada punto está a $25$ de su centroide y a $26$ del otro: nadie cambia, y el algoritmo termina con SSE $= 4 \times 25 = 100$, **cien veces peor** que la solución natural.
+
+El algoritmo no tiene cómo salir de ahí: con esos centroides nadie quiere cambiar de grupo, y sin cambios los centroides no se mueven. Por eso se prueban varios arranques y se elige el de menor SSE.`,
+        sources: [
+          'Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 14.3.6 (K-medias)',
+          'Lloyd (1982), "Least squares quantization in PCM", *IEEE Transactions on Information Theory*',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
       {
         type: 'extra',
@@ -689,11 +797,6 @@ export const module6Sections: Section[] = [
         text: t`El historial de fusiones se dibuja como un **dendrograma** (árbol). **Cortando** el dendrograma a cierta altura se obtiene el número de grupos que se desee.`,
       },
       {
-        type: 'intuition',
-        title: 'Clustering jerárquico: un árbol genealógico',
-        text: t`**Clustering jerárquico: un árbol genealógico.** No hace falta decidir cuántos grupos antes. Cada punto empieza solo, y se van juntando los dos grupos más cercanos, una y otra vez, hasta formar uno solo. El historial se dibuja como un árbol (dendrograma), y **cortarlo a cierta altura** es elegir cuántos grupos querés: un corte bajo da muchos grupos muy parecidos por dentro; uno alto, pocos y amplios.`,
-      },
-      {
         type: 'paragraph',
         text: t`Falta definir qué es "distancia entre grupos". Es el criterio de **enlace (*linkage*)**:`,
       },
@@ -711,11 +814,6 @@ export const module6Sections: Section[] = [
         text: t`*Ejemplo con los mismos puntos:* tras fusionar $\{1,2,4\}$ y $\{10,11,13\}$, la distancia entre ambos grupos es **6** con enlace simple ($10-4$), **12** con enlace completo ($13-1$) y **9** con enlace promedio (promedio de las 9 distancias entre pares). La elección del enlace puede cambiar el resultado.`,
       },
       {
-        type: 'intuition',
-        title: 'Cuán cerca están dos grupos',
-        text: t`**¿Cuán cerca están dos grupos?** Hay que elegir cómo medirlo. Con los mismos puntos de antes, la distancia entre $\{1,2,4\}$ y $\{10,11,13\}$ es $6$ si se mide entre los más cercanos, $12$ si es entre los más lejanos y $9$ si se promedian todos los pares. La elección del criterio puede cambiar el resultado.`,
-      },
-      {
         type: 'extra',
         text: t`Un dendrograma se parece a un árbol genealógico o a la clasificación de los seres vivos: primero se juntan los individuos más parecidos (dos gatos domésticos), luego esos grupos se unen con otros cercanos (felinos), y así hasta que todo queda en un solo árbol. Elegir dónde cortar es elegir cuántos grupos quieres: un corte bajo da muchos grupos muy parecidos por dentro; uno alto, pocos grupos amplios.`,
       },
@@ -726,6 +824,23 @@ export const module6Sections: Section[] = [
     moduleId: 6,
     title: 'PCA en profundidad y análisis de correspondencias',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué medían la covarianza y la correlación?`,
+            answer: t`La covarianza dice si dos variables suben y bajan juntas, pero depende de las unidades; la correlación la divide por las dos desviaciones típicas y queda entre $-1$ y $1$. Lo viste en Módulo 0.3.`,
+          },
+          {
+            question: t`¿Qué era el puntaje $z$?`,
+            answer: t`Cuántas desviaciones típicas se aleja un valor de la media: $z = (x - \mu)/\sigma$. Estandarizar todas las variables así es lo que hace el PCA con la matriz de correlación. Lo viste en Módulo 2.4.`,
+          },
+          {
+            question: t`¿Por qué la colinealidad vuelve inestables los coeficientes?`,
+            answer: t`Si dos variables casi se repiten, hay muchos repartos del efecto entre ellas que predicen casi igual, y un cambio chico en los datos hace saltar de un reparto a otro. Lo viste en Módulo 0.3.`,
+          },
+        ],
+      },
       {
         type: 'paragraph',
         text: t`Amplía el PCA del Módulo 6.4 con lo trabajado en la clase de aprendizaje no supervisado: por qué hace falta, cómo se interpreta, cuántos componentes conservar y qué hacer cuando las variables son categóricas.`,
@@ -809,9 +924,20 @@ export const module6Sections: Section[] = [
         latex: t`\text{Varianza explicada por } CP_k = \frac{\lambda_k}{\lambda_1 + \lambda_2 + \dots + \lambda_p}`,
       },
       {
-        type: 'intuition',
-        title: 'El autovalor como porción de la historia',
-        text: t`**El autovalor como porción de la historia.** Si la varianza total es la "historia completa" de los datos, el autovalor de cada componente es el capítulo que cuenta. Con los valores propios $2.8,\ 0.9,\ 0.2,\ 0.1$ del Módulo 6.4 y varianza total $4$, el primer componente cuenta el $70\,\%$ de la historia y los dos primeros, el $92.5\,\%$.`,
+        type: 'deepDive',
+        title: t`Dos variables con correlación $r$: el PCA hecho a mano`,
+        text: t`Con dos variables estandarizadas, la matriz de correlación tiene unos en la diagonal y la correlación $r$ afuera. Sus autovalores son $1 + r$ y $1 - r$, y se puede comprobar sin fórmulas: multiplicar la matriz por la dirección $(1, 1)$ da $(1 + r,\ r + 1)$, la misma dirección estirada por $1 + r$; multiplicarla por $(1, -1)$ da $(1 - r,\ r - 1)$, estirada por $1 - r$. Eso es ser un vector propio: la matriz no lo gira, solo lo estira.
+
+**Los componentes son la suma y la diferencia.** El primero va en la dirección $(1, 1)$: lo que las dos variables tienen en común. El segundo, en $(1, -1)$: en qué se diferencian.
+
+**Con $r = 0.9$** (los dos termómetros casi pegados), los autovalores son $1.9$ y $0.1$, y la varianza total es $2$. El primer componente explica $1.9/2 = 95$ %: casi toda la información está en el promedio de los dos. El segundo explica apenas el 5 %.
+
+**Con $r = 0$**, los dos autovalores valen $1$ y cada componente explica el 50 %: no hay nada que resumir, porque cada variable aporta algo propio. El PCA rinde más cuanto más se repiten las variables.`,
+        sources: [
+          'Jolliffe, *Principal Component Analysis*, cap. 1 y 2',
+          'Johnson y Wichern, *Applied Multivariate Statistical Analysis*, cap. 8 (componentes principales)',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
       { type: 'subheading', text: 'Cargas factoriales y círculo de correlaciones' },
       {
@@ -848,11 +974,6 @@ export const module6Sections: Section[] = [
         text: t`Con la matriz de correlación, cada variable original aporta $1$ unidad de varianza, así que la varianza total es igual al número de variables $p$.`,
       },
       {
-        type: 'intuition',
-        title: 'Metros contra kilómetros',
-        text: t`**Metros contra kilómetros.** Si medís una distancia en metros y otra en kilómetros, los números de la primera serán mil veces más grandes y parecerán "variar más", aunque no sea así. Estandarizar es pasar todo a la misma vara (cuántos desvíos se aleja cada dato de su promedio) para que ninguna variable gane solo por sus unidades.`,
-      },
-      {
         type: 'extra',
         text: t`Con la edad de los clientes (desvío típico de unos 10 años, o sea varianza $100$) y su ingreso en pesos (desvío típico de unos $100.000$, o sea varianza $10^{10}$), el PCA sin estandarizar daría un primer componente que es casi puro ingreso: la edad no pesaría nada. Con la matriz de correlación, las dos variables arrancan con varianza $1$ y compiten en igualdad.`,
       },
@@ -875,11 +996,6 @@ export const module6Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`Los criterios pueden no coincidir. *Ejemplo con los valores propios $2.8,\ 0.9,\ 0.2,\ 0.1$ del Módulo 6.4 (4 variables estandarizadas):* Kaiser retiene solo el primero ($2.8>1$); la varianza acumulada es $70\,\%$ con uno y $92.5\,\%$ con dos. Por eso conviene **triangular**: usar varios criterios y decidir con criterio.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Resumir una película',
-        text: t`**Resumir una película.** Con una frase contás el $70\,\%$ del argumento; con dos, el $92.5\,\%$; lo que sigue es puro detalle. Los criterios te ayudan a decidir cuándo el resumen ya alcanza. El de Horn es el más exigente: compara cada componente con el que saldría de datos inventados al azar, y solo conserva el que le gana al azar.`,
       },
       { type: 'miniCheck', questionIds: ['m6-q22'] },
       { type: 'subheading', text: 'Casos de la clase: pizzas y gorriones' },

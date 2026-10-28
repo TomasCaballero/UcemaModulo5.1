@@ -17,6 +17,10 @@
   --color-salvedad-border: #0a4fb3;
   --color-analogy-bg: #eaf6ee;
   --color-analogy-border: #1d6b3a;
+  --color-deepdive-bg: #f4f0fb;
+  --color-deepdive-border: #5b2d9e;
+  --color-recall-bg: #e7f4f5;
+  --color-recall-border: #0b5f66;
   /* Paleta categórica de gráficos (validada con validate_palette.js, modo claro, todos los pares). */
   --series-1: #2a78d6;
   --series-2: #eb6834;

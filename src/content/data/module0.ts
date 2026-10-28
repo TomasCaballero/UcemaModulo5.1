@@ -1,7 +1,8 @@
 import type { Section } from '../types'
 
-// Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 0. Los bloques `extra` son ejemplos
-// agregados (cotidianos o clásicos): no son de la guía y se muestran rotulados.
+// Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 0. Los bloques `extra` (ejemplos
+// cotidianos o clásicos), `deepDive` (ampliaciones) y `recall` (repasos de lo previo) no son de la
+// guía y se muestran rotulados; las cifras de las ampliaciones se verifican en tools/expansion-numbers.ts.
 const t = String.raw
 
 export const module0Sections: Section[] = [
@@ -55,21 +56,18 @@ export const module0Sections: Section[] = [
         text: t`**Regla útil:** letra latina ($x$, $y$) suele ser un dato observado; letra griega ($\beta$, $\mu$) suele ser algo desconocido de la realidad; letra con sombrero ($\hat{\beta}$) es nuestra **estimación** de esa cantidad desconocida.`,
       },
       {
-        type: 'intuition',
-        title: 'Letras de lo que vemos y letras de lo que no vemos',
-        text: t`**Letras de lo que vemos y letras de lo que no vemos.** Una regla fácil para no perderte:
-Letra común ($x$, $y$): un dato que realmente anotamos.
+        type: 'deepDive',
+        title: 'Cómo leer una fórmula sin asustarse',
+        text: t`Una fórmula es una **receta escrita en abreviaturas**. El truco es leerla de adentro hacia afuera y traducir cada símbolo en voz alta. Tomemos la del promedio:
 
-Letra griega ($\beta$, $\mu$): algo verdadero de la realidad que no podemos ver directamente y queremos averiguar.
+$\bar{x} = \dfrac{1}{n}\sum_{i=1}^{n} x_i$
 
-Letra griega con sombrero ($\hat{\beta}$): nuestra mejor suposición de esa cantidad escondida.
+**Adentro:** $x_i$, "el dato número $i$". **Alrededor:** $\sum_{i=1}^{n}$, "repetí para $i = 1, 2, \dots, n$ y sumá todo". **Afuera:** $\dfrac{1}{n}$, "dividí por la cantidad de datos". En voz alta: *sumá todos los datos y dividí por cuántos son*. Con la lista $(4, 7, 9)$: $(4 + 7 + 9)/3 = 20/3 \approx 6.67$.
 
+El índice $i$ es solo un **contador**: no significa nada por sí mismo, y podría llamarse $j$ o $k$ sin cambiar el resultado.
 
-Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla: casi siempre es una de estas ideas.`,
-      },
-      {
-        type: 'extra',
-        text: t`Ticket del supermercado: pagaste 120, 80 y 200 pesos por tres productos. Esa es tu lista $x = (120, 80, 200)$ con $n = 3$. La sumatoria $\sum x_i = 400$ es el total del ticket y $\bar{x} = 400/3 \approx 133.33$ es lo que costó un producto en promedio. Y si el pronóstico del clima dijo 19 °C y la temperatura real fue $y = 21$ °C, la predicción es $\hat{y} = 19$ y el error es $y - \hat{y} = 2$.`,
+**Dos reglas que vas a usar sin darte cuenta.** Un número que multiplica a todos los términos puede salir afuera de la suma: $\sum 2x_i = 2\sum x_i$, o sea $8 + 14 + 18 = 2 \times 20 = 40$. Y la suma de una resta es la resta de las sumas: $\sum (x_i - \bar{x}) = \sum x_i - n\bar{x} = 20 - 3 \times \tfrac{20}{3} = 0$. Esa última cuenta dice algo importante: **las distancias de los datos a su promedio siempre suman cero**. Los que quedan arriba compensan exactamente a los que quedan abajo, y por eso el promedio es el "punto de equilibrio".`,
+        sources: ['Notación estándar; ver Wooldridge, *Introducción a la econometría*, apéndice A (el operador sumatoria)'],
       },
     ],
   },
@@ -95,11 +93,6 @@ Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla:
           t`**Complemento**: la probabilidad de que $A$ **no** ocurra es $1 - P(A)$. Si llover tiene probabilidad 0.3, no llover tiene 0.7.`,
         ],
       },
-      {
-        type: 'intuition',
-        title: 'La probabilidad es una escala de 0 a 1',
-        text: t`**La probabilidad es una escala de 0 a 1.** El 0 significa "imposible" y el 1 significa "seguro". Si todos los resultados tienen la misma chance, alcanza con contar: casos que te sirven sobre casos posibles. En un dado, la chance de que salga par es $3/6 = 0.5$. Y lo que **no** ocurre es lo que falta para llegar a 1: si llover tiene chance $0.3$, no llover tiene $0.7$.`,
-      },
       { type: 'miniCheck', questionIds: ['m0-q02'] },
       { type: 'subheading', text: 'Independencia' },
       {
@@ -116,6 +109,16 @@ Si te trabás con un símbolo en cualquier parte del curso, volvé a esta tabla:
       {
         type: 'extra',
         text: t`Si la probabilidad de que llueva el sábado es 0.3 y la de que llueva el domingo es 0.3, y suponemos que un día no influye en el otro, la probabilidad de que llueva los dos días es $0.3 \times 0.3 = 0.09$ (9 %). En la realidad el clima de dos días seguidos no suele ser independiente: multiplicar solo vale si de verdad lo son.`,
+      },
+      {
+        type: 'deepDive',
+        title: 'Independientes no es lo mismo que excluyentes',
+        text: t`Es una confusión muy común, y las dos ideas son casi opuestas.
+
+**Excluyentes** quiere decir que no pueden pasar juntos: en una sola tirada de un dado, "sale 1" y "sale 2" son excluyentes. **Independientes** quiere decir que uno no cambia la chance del otro. Y dos eventos excluyentes son **muy dependientes**: si sabés que salió 1, la probabilidad de que haya salido 2 pasa de $1/6$ a $0$. Si fueran independientes, la probabilidad de ambos sería $\tfrac{1}{6} \times \tfrac{1}{6} = \tfrac{1}{36}$, pero en realidad es $0$.
+
+**La falacia del jugador.** Si salieron cinco caras seguidas, ¿"tiene que" salir cruz? No: la moneda no tiene memoria, y la sexta tirada sigue teniendo probabilidad $0.5$. Lo que sí es raro es la racha completa: seis caras seguidas, vistas antes de empezar, tienen probabilidad $0.5^6 \approx 0.016$. Pero una vez que ya salieron cinco, solo queda en juego la última tirada.`,
+        sources: ['Ross, *A First Course in Probability*, cap. 3 (independencia)'],
       },
       { type: 'subheading', text: 'Probabilidad condicional' },
       {
@@ -163,6 +166,22 @@ De las 990 sanas, el test se equivoca con el 5 %: unas **49.5 dan positivo**.
 
 Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/58.5 \approx 0.154$, es decir **15.4 %**. El test parece muy bueno, pero hay tantos sanos que sus pocos errores se juntan y superan a los aciertos. Por eso importa saber **qué tan frecuente es la enfermedad antes de testear**.`,
       },
+      {
+        type: 'deepDive',
+        title: 'Bayes es una forma de actualizar lo que creés',
+        text: t`La fórmula de Bayes se puede leer como una regla para **cambiar de opinión con evidencia**: partís de lo que creías antes de ver el dato ($P(A)$, el 1 % de enfermos) y lo ajustás según qué tan bien explica el dato cada posibilidad. Lo que creías antes se llama **probabilidad a priori**; lo que creés después, **a posteriori**.
+
+**Un segundo test.** Después del primer positivo, tu probabilidad de estar enfermo ya no es $0.01$, sino $0.154$. Si te hacés un segundo test independiente y también da positivo, se repite la misma cuenta, pero partiendo de $0.154$:
+
+Positivo y enfermo: $0.154 \times 0.90 \approx 0.138$.
+
+Positivo y sano: $0.846 \times 0.05 \approx 0.042$.
+
+$P(\text{enfermo} \mid \text{dos positivos}) \approx 0.138 / (0.138 + 0.042) \approx 0.766$.
+
+Con dos positivos pasa de 15 % a casi 77 %. Cada dato nuevo mueve la creencia, y **la a posteriori de hoy es la a priori de mañana**. Por eso, en la práctica, un positivo en una enfermedad rara se confirma con un segundo test antes de diagnosticar.`,
+        sources: ['Gigerenzer, *Calculated Risks* (frecuencias naturales en pruebas médicas)'],
+      },
       { type: 'simulation', simulationId: 'IN-03' },
       {
         type: 'extra',
@@ -203,13 +222,22 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`*¿Por qué al cuadrado?* Porque si no, las desviaciones positivas y negativas se cancelarían y el promedio daría 0.`,
       },
       {
-        type: 'intuition',
-        title: 'Esperanza y varianza: el centro y el desparramo',
-        text: t`**Esperanza y varianza.** La esperanza es el "promedio de largo plazo": si tirás un dado muchísimas veces, el promedio se acerca a $3.5$ aunque nunca salga ese número. Es el punto de equilibrio, como el centro de una balanza. La varianza mide qué tan **desparramados** están los resultados alrededor de ese centro. Se eleva al cuadrado para que los desvíos hacia arriba y hacia abajo no se cancelen entre sí.`,
-      },
-      {
         type: 'extra',
         text: t`Una rifa de 1000 números en la que el único premio es de 50 000 pesos y cada número cuesta 100. La ganancia de un número es una variable aleatoria: con probabilidad $1/1000$ ganas 50 000 y con probabilidad $999/1000$ ganas 0. Su esperanza es $E = 50\,000 \times \tfrac{1}{1000} = 50$ pesos, menos que los 100 que pagaste: en promedio, cada número "pierde" 50 pesos.`,
+      },
+      {
+        type: 'deepDive',
+        title: 'Misma esperanza, distinto riesgo',
+        text: t`La esperanza sola no alcanza para decidir. Compará dos opciones:
+
+**Opción A:** te dan $50$ pesos seguros.
+
+**Opción B:** tirás una moneda; con cara ganás $100$ y con cruz, $0$.
+
+Las dos tienen la misma esperanza: $E(B) = 0.5 \times 100 + 0.5 \times 0 = 50$. Pero no son iguales: la A tiene varianza $0$ (nunca te alejás de $50$) y la B tiene varianza $0.5 \times (100-50)^2 + 0.5 \times (0-50)^2 = 2500$, o sea, una desviación típica de $50$ pesos. **La esperanza dice dónde está el centro; la varianza, cuánto te podés alejar de él.** En finanzas, esa varianza es una forma de medir el **riesgo**, y por eso las dos cifras se reportan juntas.
+
+**Por qué la esperanza es "promedio de largo plazo".** Si jugaras B mil veces, ganarías unas 500 veces $100$ y unas 500 veces $0$: en promedio, cerca de $50$ por jugada. Cuantas más veces juegues, más se acerca el promedio a la esperanza. Pero si jugás una sola vez, nunca vas a ganar $50$.`,
+        sources: ['Ross, *A First Course in Probability*, cap. 4 (esperanza y varianza)'],
       },
       { type: 'subheading', text: 'Esperanza condicional' },
       {
@@ -217,9 +245,16 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`$E(Y \mid X)$ es el valor promedio de $Y$ **entre quienes tienen un valor dado de $X$**. *Ejemplo:* $E(\text{salario} \mid \text{15 años de estudio})$ es el salario promedio de quienes estudiaron 15 años. Es un promedio, pero restringido al grupo que cumple una condición, igual que $P(A \mid B)$ restringe la probabilidad a los casos donde ocurrió $B$.`,
       },
       {
-        type: 'intuition',
-        title: 'Esperanza condicional: un promedio dentro de un grupo',
-        text: t`**Esperanza condicional.** Es un promedio, pero solo dentro de un grupo. El salario promedio de **quienes estudiaron 15 años** es el mismo tipo de idea que la probabilidad condicional: primero elegís el grupo y después calculás.`,
+        type: 'deepDive',
+        title: 'Promedios por grupo y el promedio de todos',
+        text: t`Supongamos (cifras inventadas) que en una empresa el 60 % de los empleados estudió 12 años y gana en promedio $30$ mil, y el 40 % estudió 16 años y gana en promedio $40$ mil. Entonces:
+
+$E(\text{salario} \mid 12 \text{ años}) = 30$ y $E(\text{salario} \mid 16 \text{ años}) = 40$.
+
+**El promedio general es el promedio de los promedios, ponderado por el tamaño de cada grupo:** $0.6 \times 30 + 0.4 \times 40 = 34$. Es la misma idea que la esperanza, $\sum x \cdot P(X = x)$, pero con promedios de grupo en lugar de valores sueltos.
+
+**Por qué importa tanto.** Si te piden predecir el salario de alguien y no sabés nada, lo mejor es decir $34$. Si sabés que estudió 16 años, mejor decir $40$. La esperanza condicional es **la mejor predicción posible usando la información que tenés**, y casi todo lo que viene en el curso (estimar cómo cambia el salario con los años de estudio, clasificar clientes, predecir) son formas de aproximarla cuando hay muchas variables y pocos datos por grupo.`,
+        sources: ['Angrist y Pischke, *Mostly Harmless Econometrics*, cap. 3 (la función de esperanza condicional)', 'Cifras inventadas para el ejemplo'],
       },
     ],
   },
@@ -228,6 +263,19 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
     moduleId: 0,
     title: 'Álgebra lineal mínima',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué significaban $x_i$ y $\sum$?`,
+            answer: t`$x_i$ es el dato que está en el lugar $i$ de una lista, y $\sum$ manda a sumar todos los términos: $\sum_{i=1}^{3} x_i = 4 + 7 + 9 = 20$. El producto interno es una sumatoria de productos. Lo viste en Módulo 0.1.`,
+          },
+          {
+            question: '¿Qué medía la varianza?',
+            answer: t`Cuánto se alejan los valores de su centro, en promedio y al cuadrado. La covarianza, al final de esta sección, es la misma idea pero para dos variables a la vez. Lo viste en Módulo 0.2.`,
+          },
+        ],
+      },
       { type: 'subheading', text: 'Vectores y matrices' },
       {
         type: 'list',
@@ -268,13 +316,24 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`*Ejemplo:* si $\beta_0 = 1000$, $\beta_1 = 50$ (por año de edad) y $\beta_2 = 200$ (por año de estudio), para una persona de 30 años con 12 de estudio: $1000 + 50\cdot30 + 200\cdot12 = 4900$.`,
       },
       {
-        type: 'intuition',
-        title: 'Combinación lineal: una receta con precios',
-        text: t`**Combinación lineal: una receta con pesos.** Es una suma donde cada ingrediente se multiplica por un número que dice "cuánto pesa". Con $1000$ de base, $50$ por cada año de edad y $200$ por cada año de estudio, para una persona de 30 años con 12 de estudio queda $1000 + 50 \cdot 30 + 200 \cdot 12 = 4900$. Los números $\beta$ son los precios; el resultado es el total de la cuenta.`,
-      },
-      {
         type: 'extra',
         text: t`El costo de un envío a domicilio es una combinación lineal: 300 pesos de base, más 40 por kilómetro, más 25 por kilo. Para un paquete de 2 kg que viaja 5 km: $300 + 40\cdot5 + 25\cdot2 = 550$ pesos. Es un producto interno entre los coeficientes $(300, 40, 25)$ y los datos del pedido $(1, 5, 2)$.`,
+      },
+      {
+        type: 'deepDive',
+        title: t`$X\beta$: todas las predicciones de una sola vez`,
+        text: t`La notación $X\beta$ parece abstracta, pero es solo la combinación lineal aplicada **a cada fila de la planilla a la vez**. Tomemos la matriz $X$ de arriba (edad y años de estudio de 3 personas) y los pesos del ejemplo: $1000$ de base, $50$ por año de edad y $200$ por año de estudio.
+
+Persona 1 (25 años, 12 de estudio): $1000 + 50 \cdot 25 + 200 \cdot 12 = 4650$.
+
+Persona 2 (40 años, 16 de estudio): $1000 + 50 \cdot 40 + 200 \cdot 16 = 6200$.
+
+Persona 3 (31 años, 14 de estudio): $1000 + 50 \cdot 31 + 200 \cdot 14 = 5350$.
+
+Cada resultado es el producto interno de una fila por el vector de pesos. Multiplicar una matriz por un vector es exactamente eso: repetir el producto interno fila por fila. Para que la base de $1000$ entre en la misma cuenta, se agrega a la planilla una **columna de unos**: cada fila pasa a ser $(1, \text{edad}, \text{estudio})$ y el vector de pesos, $(1000, 50, 200)$.
+
+**Por qué conviene escribirlo así.** Da lo mismo tener 3 personas o 3 millones, y 2 variables o 200: la cuenta se escribe igual, $X\beta$, y la computadora la resuelve de una sola vez.`,
+        sources: ['Strang, *Introduction to Linear Algebra*, cap. 1 y 2 (producto de matriz por vector)'],
       },
       { type: 'subheading', text: 'Dependencia lineal (colinealidad)' },
       {
@@ -282,9 +341,20 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`Si una columna de $X$ se puede obtener combinando otras columnas, la información es **redundante**. *Ejemplo:* si incluyes "edad en años" y "edad en meses", una columna es 12 veces la otra. Eso se llama **colinealidad perfecta** y hace imposible repartir el efecto de forma única: cualquier combinación lineal que use las dos columnas puede reproducirse con solo una de ellas, así que no hay manera de decidir cuánto corresponde a cada columna.`,
       },
       {
-        type: 'intuition',
-        title: 'Colinealidad: pedir lo mismo dos veces',
-        text: t`**Colinealidad: pedir lo mismo dos veces.** Si la planilla tiene "edad en años" y "edad en meses", una columna es siempre 12 veces la otra. Es información repetida. Si el resultado final sube con la edad, no hay forma de saber cuánto se lo debemos a una columna y cuánto a la otra, porque se mueven exactamente juntas.`,
+        type: 'deepDive',
+        title: 'Por qué con colinealidad perfecta no hay una única respuesta',
+        text: t`Supongamos que el efecto real de la edad es $50$ pesos por año, y que la planilla tiene "edad en años" y "edad en meses" ($= 12 \times$ años). Para una persona de 30 años (360 meses), todas estas combinaciones dan **exactamente la misma predicción**:
+
+$50 \cdot 30 + 0 \cdot 360 = 1500$.
+
+$0 \cdot 30 + \tfrac{50}{12} \cdot 360 = 1500$.
+
+$25 \cdot 30 + \tfrac{25}{12} \cdot 360 = 1500$.
+
+Y lo mismo para cualquier persona, porque la columna de meses siempre es 12 veces la de años. Hay **infinitas** maneras de repartir el efecto entre las dos columnas, y los datos no tienen forma de preferir una: todas encajan igual de bien. No es que el método falle; la pregunta "¿cuánto se debe a cada columna?" no tiene respuesta con esos datos.
+
+**El caso parecido, pero no perfecto.** Si dos columnas son casi iguales (por ejemplo, años de experiencia y edad), sí hay una respuesta, pero muy inestable: pequeños cambios en los datos hacen saltar mucho el reparto entre las dos.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, cap. 3 (colinealidad perfecta)'],
       },
       { type: 'subheading', text: 'Hiperplano' },
       {
@@ -306,9 +376,14 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`Cuando tienes varias variables, se resume su variabilidad en una tabla cuadrada: en la **diagonal** están las varianzas de cada variable, y fuera de la diagonal las **covarianzas** (cuánto tienden a moverse juntas dos variables). Si dos variables tienen covarianza positiva (por ejemplo, años de estudio y salario), tienden a subir juntas; si es negativa, una sube cuando la otra baja.`,
       },
       {
-        type: 'intuition',
-        title: 'Covarianza: quiénes se mueven juntos',
-        text: t`**Covarianza: quiénes se mueven juntos.** Es una tabla que anota si dos datos tienden a subir juntos (más años de estudio y más salario) o a moverse en sentidos opuestos (cuando uno sube, el otro baja).`,
+        type: 'deepDive',
+        title: 'Cómo se calcula la covarianza, y por qué se la estandariza',
+        text: t`**La receta.** Para cada persona, se mide cuánto se aleja cada variable de su propio promedio y se **multiplican** esos dos desvíos. Si los dos están por encima del promedio, el producto es positivo; si los dos están por debajo, también (menos por menos). Si uno está arriba y el otro abajo, es negativo. La covarianza promedia esos productos: si dominan los positivos, las variables suben juntas.
+
+**Con números.** Años de estudio $8, 10, 12, 14, 16$ y salario (en miles) $22, 26, 28, 36, 38$. Los promedios son $12$ y $30$. Los desvíos del estudio son $-4, -2, 0, 2, 4$ y los del salario, $-8, -4, -2, 6, 8$. Los productos son $32, 8, 0, 12, 32$, que suman $84$. Dividiendo por $n - 1 = 4$, la covarianza es $21$: positiva, suben juntas.
+
+**El problema de las unidades.** Ese $21$ está en "años × miles de pesos". Si midieras el salario en pesos en vez de miles, la covarianza sería mil veces más grande, aunque la relación sea la misma. Por eso se la divide por las dos desviaciones típicas, y se obtiene la **correlación**, que siempre está entre $-1$ y $1$: $84 / \sqrt{40 \times 184} \approx 0.98$. Un valor tan cercano a $1$ indica que los puntos caen casi sobre una recta que sube.`,
+        sources: ['Freedman, Pisani y Purves, *Statistics*, cap. 8 (correlación)'],
       },
     ],
   },
@@ -317,6 +392,19 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
     moduleId: 0,
     title: 'Cálculo mínimo: derivada y optimización',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué eran $\sum$, $\bar{x}$ e $\hat{y}$?`,
+            answer: t`$\sum$ manda a sumar todos los términos, $\bar{x}$ es el promedio y la letra con sombrero, $\hat{y}$, es un valor predicho, no el real. Lo viste en Módulo 0.1.`,
+          },
+          {
+            question: '¿Por qué la varianza eleva los desvíos al cuadrado?',
+            answer: t`Para que los desvíos hacia arriba y hacia abajo no se cancelen. Esos mismos cuadrados son los que se minimizan en esta sección. Lo viste en Módulo 0.2.`,
+          },
+        ],
+      },
       { type: 'subheading', text: 'Derivada = pendiente' },
       {
         type: 'paragraph',
@@ -326,10 +414,6 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         type: 'intuition',
         title: 'La derivada es la pendiente de una cuesta',
         text: t`**La derivada es la pendiente.** Imaginá que caminás por una cuesta. Si sube, la pendiente es positiva; si baja, negativa; y si el piso está plano, la pendiente es **cero**. Un lugar plano solo puede ser una cima o el fondo de un valle. La derivada es lo mismo que el velocímetro del auto: te dice cuánto cambia algo por cada pequeño paso que das.`,
-      },
-      {
-        type: 'extra',
-        text: t`El velocímetro del auto es una derivada: marca cuánto cambia tu posición por cada hora que pasa. Si a las 10:00 estás en el kilómetro 100 y a las 10:30 en el 145, la velocidad media fue $(145-100)/0.5 = 90$ km/h. Con velocidad positiva avanzas; con velocidad cero, estás detenido (o justo en el punto donde cambias de sentido).`,
       },
       { type: 'miniCheck', questionIds: ['m0-q11'] },
       { type: 'subheading', text: 'Minimizar una función' },
@@ -342,9 +426,14 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`*Ejemplo:* $f(b) = (b - 3)^2 + 1$. Su derivada es $2(b-3)$. Igualando a cero: $b = 3$. Ahí está el mínimo: $f(3) = 1$.`,
       },
       {
-        type: 'intuition',
-        title: 'Minimizar es buscar el fondo del valle',
-        text: t`**Minimizar es buscar el fondo del valle.** En todo el curso vamos a querer que el error sea lo más chico posible. Si dibujás el error como un paisaje, el mejor punto es el fondo del valle, y ahí el suelo es plano. Por eso se busca el punto donde la derivada vale cero. En el ejemplo $f(b) = (b-3)^2 + 1$, el fondo está en $b = 3$, y ahí vale $1$.`,
+        type: 'deepDive',
+        title: 'De dónde sale la derivada: acercar dos puntos',
+        text: t`**La pendiente entre dos puntos** es "cuánto subió" dividido "cuánto avanzaste". La derivada es esa misma cuenta con los dos puntos casi pegados. Con $f(b) = (b-3)^2 + 1$ en $b = 5$: $f(5) = 5$ y $f(5.001) = 5.004001$, así que la pendiente es $0.004001 / 0.001 = 4.001$. Cuanto más se acercan los puntos, más se acerca a $4$, que es justo lo que da la fórmula $2(b-3) = 2 \times 2 = 4$.
+
+**Las tres reglas que alcanzan para casi todo el curso.** La derivada de una constante es $0$, porque no cambia. La de $b^2$ es $2b$. Y si adentro del cuadrado hay algo, como $(b-3)^2$, la derivada es $2 \times (b-3)$ multiplicado por la derivada de lo de adentro, que acá es $1$. Con eso se deriva la suma de errores al cuadrado del ejemplo que sigue.
+
+**Cómo saber si es un mínimo o un máximo.** Que la derivada valga cero solo dice que el piso está plano. En $f(b) = (b-3)^2 + 1$, a la izquierda de $3$ la derivada es negativa (baja) y a la derecha es positiva (sube): es un valle. En los problemas de minimizar errores al cuadrado, la función siempre tiene forma de valle, así que el punto plano es el mínimo.`,
+        sources: ['Stewart, *Cálculo de una variable*, cap. 2 y 3 (la derivada y las reglas de derivación)'],
       },
       { type: 'subheading', text: 'Ejemplo central: por qué el promedio es "el mejor resumen"' },
       {
@@ -361,13 +450,24 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
         text: t`**El promedio es la solución de mínimos cuadrados** cuando el modelo es solo "una constante": un único número que resume todos los datos. La idea es general: elegir el resumen que minimice la suma de los errores al cuadrado.`,
       },
       {
-        type: 'intuition',
-        title: 'Por qué el promedio es un buen resumen',
-        text: t`**Por qué el promedio es un buen resumen.** Si te piden un único número que represente a todos tus datos, y querés que quede lo más cerca posible de todos al mismo tiempo (midiendo las distancias al cuadrado), el que mejor funciona es el **promedio**. Es el punto de encuentro que deja al grupo menos incómodo. Por eso el promedio no es solo una costumbre: es la mejor respuesta a esa pregunta.`,
-      },
-      {
         type: 'extra',
         text: t`Tres compañeros de oficina prefieren el aire acondicionado a 20, 22 y 27 °C. ¿Qué temperatura incomoda menos al grupo, medido como suma de las diferencias al cuadrado? A 23 °C (el promedio): $3^2 + 1^2 + 4^2 = 26$. A 22 °C: $2^2 + 0^2 + 5^2 = 29$. A 24 °C: $4^2 + 2^2 + 3^2 = 29$. Cualquier otro valor da más que 26: el mínimo está en el promedio, $\bar{y} = 23$.`,
+      },
+      {
+        type: 'deepDive',
+        title: 'Si medís el error de otra forma, cambia el mejor resumen',
+        text: t`El promedio gana porque el error se mide **al cuadrado**. Si en cambio se mide con la distancia sin signo (el valor absoluto), el mejor resumen es otro: **el valor del medio** de los datos ordenados, que se llama **mediana**.
+
+Con las temperaturas del ejemplo ($20, 22, 27$), sumando distancias sin elevar al cuadrado:
+
+En $22$ (el valor del medio): $2 + 0 + 5 = 7$.
+
+En $23$ (el promedio): $3 + 1 + 4 = 8$.
+
+Ahora gana el $22$. **¿Por qué la diferencia?** Al cuadrado, un error grande pesa muchísimo (un error de $5$ cuenta $25$), así que el promedio se corre hacia el dato lejano para no dejarlo tan incómodo. Con el valor absoluto, un error de $5$ cuenta solo $5$, y al resumen no le importa tanto el extremo. Por eso el promedio se deja arrastrar por valores extremos y la mediana no.
+
+**La idea general:** elegir cómo medir el error es elegir qué te importa. Los cuadrados castigan mucho los errores grandes; el valor absoluto los trata a todos por igual.`,
+        sources: ['Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 2 (funciones de pérdida)'],
       },
       { type: 'subheading', text: 'Gradiente y descenso por gradiente' },
       {
@@ -382,6 +482,18 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
       {
         type: 'extra',
         text: t`Con la función de antes, $f(b) = (b-3)^2 + 1$, partimos de $b = 0$ y damos pasos de tamaño $0.25$ contra la derivada $2(b-3)$. Primer paso: la derivada vale $-6$, así que $b = 0 - 0.25\cdot(-6) = 1.5$. Segundo paso: la derivada vale $-3$ y $b = 1.5 - 0.25\cdot(-3) = 2.25$. Cada paso se acerca al mínimo en $b = 3$, y los pasos se achican porque la pendiente se aplana.`,
+      },
+      {
+        type: 'deepDive',
+        title: 'El tamaño del paso importa',
+        text: t`En el ejemplo de arriba, cada paso es $0.25$ por la pendiente. Ese $0.25$ se llama **tasa de aprendizaje**, y elegirlo bien es más delicado de lo que parece.
+
+**Si es demasiado grande, se pasa de largo.** Con un paso de $1$ en lugar de $0.25$, desde $b = 0$: la derivada vale $-6$, así que $b = 0 - 1 \cdot (-6) = 6$. Ahí la derivada vale $+6$, y vuelve a $b = 6 - 1 \cdot 6 = 0$. Rebota entre $0$ y $6$ para siempre, sin acercarse nunca al $3$. Con pasos todavía más grandes, se aleja cada vez más.
+
+**Si es demasiado chico, tarda muchísimo.** Con un paso de $0.01$, cada iteración avanza apenas un poco y hacen falta cientos de pasos para llegar.
+
+**Por qué los pasos se achican solos.** El paso es la tasa por la pendiente, y cerca del fondo la pendiente es casi cero. Por eso, con una tasa razonable, el método frena por sí mismo al llegar.`,
+        sources: ['Goodfellow, Bengio y Courville, *Deep Learning*, cap. 4 (optimización basada en gradientes)'],
       },
     ],
   },
@@ -400,7 +512,7 @@ Hay $9 + 49.5 = 58.5$ positivos en total y solo 9 están realmente enfermos: $9/
       { type: 'paragraph', text: 'Valores para tener a mano:' },
       {
         type: 'table',
-        headers: [t`$x$`, t`$\ln(x)$`],
+        headers: [t`Número ($x$)`, t`Logaritmo natural ($\ln(x)$)`],
         rows: [
           ['1', '0'],
           ['2', '0.693'],
@@ -435,6 +547,16 @@ Por ejemplo, para calcular $2 \times 4 = 8$ buscás en la libreta el código del
 Acá vuelven los códigos: el código de la meta (duplicar) es $\ln(2) \approx 0.693$ y el del paso anual es $\ln(1.10) \approx 0.0953$. Los pasos necesarios son la meta dividida por el paso: $0.693 / 0.0953 \approx 7.3$ años.
 
 **El atajo: la "regla del 72":** dividir decimales de memoria es incómodo. Con una tasa chica, $\ln(1+r) \approx r$, así que los años son aproximadamente $69.3$ dividido por la tasa en porcentaje. Se usa $72$ en lugar de $69.3$ porque se divide exacto por muchos números ($2, 3, 4, 6, 8, 9, 12$). Al 10 %: $72/10 = 7.2$ años, muy cerca del $7.3$ exacto.`,
+      },
+      {
+        type: 'deepDive',
+        title: 'Por qué las diferencias de logaritmos son cambios porcentuales',
+        text: t`**Una diferencia de logaritmos es un cociente disfrazado.** Por la propiedad estrella, $\ln(110) - \ln(100) = \ln(110/100) = \ln(1.10) \approx 0.0953$. Es decir, la diferencia de logaritmos solo depende de **en qué proporción** cambió el valor, no de su tamaño: pasar de $100$ a $110$ y pasar de $1000$ a $1100$ dan la misma diferencia. Y para cambios chicos, $\ln(1 + r) \approx r$: un $0.0953$ está muy cerca de un aumento del 10 %.
+
+**Los porcentajes comunes no son simétricos; los logaritmos sí.** Si un precio sube de $100$ a $110$ (un 10 %) y vuelve a $100$, la bajada es de $10/110 \approx 9.09$ %. Los porcentajes no se compensan. En logaritmos, la subida es $+0.0953$ y la bajada $-0.0953$: se cancelan exactamente. Por eso, cuando se trabaja con precios, salarios o crecimiento, se prefiere medir los cambios en logaritmos.
+
+**De dónde sale $e$.** Si un banco te paga un 100 % anual pero lo acredita en partes, tu dinero se multiplica por $(1 + 1/n)^n$ en un año. Acreditando una vez, por $2$. Una vez por mes, por $(1 + 1/12)^{12} \approx 2.613$. Una vez por día, por $(1 + 1/365)^{365} \approx 2.715$. Si se acredita en forma continua, el límite es $e \approx 2.718$. Por eso $e$ aparece cada vez que algo crece en proporción a lo que ya tiene.`,
+        sources: ['Stewart, *Cálculo de una variable*, cap. 6 (funciones exponenciales y logarítmicas)'],
       },
     ],
   },

@@ -27,9 +27,26 @@ export type ContentBlock =
   | { type: 'extra'; text: RichText }
   /** Explicación intuitiva o modelo mental cotidiano presentado en acordeón desplegable. */
   | { type: 'intuition'; title?: string; text: RichText }
+  /**
+   * Ampliación: explicación propia que va más allá de la guía (el porqué, un ejemplo numérico, una
+   * conexión con otro tema). No es contenido de la guía: se muestra rotulada, con sus fuentes, y sus
+   * cifras se verifican aparte (`npm run verify:expansion`).
+   */
+  | { type: 'deepDive'; title: RichText; text: RichText; sources: RichText[] }
+  /**
+   * "¿Te acordás?": conceptos previos que la sección da por sabidos. Cada respuesta se despliega
+   * para intentar recordarla antes de leerla y remite a la sección donde se vio ("Módulo N.M").
+   */
+  | { type: 'recall'; items: RecallItem[] }
   | { type: 'workedExample'; title: RichText; steps: RichText[]; result: RichText }
   | { type: 'miniCheck'; questionIds: string[] }
   | { type: 'simulation'; simulationId: string }
+
+export interface RecallItem {
+  /** La pregunta, p. ej. "¿Qué era el error estándar?". */
+  question: RichText
+  answer: RichText
+}
 
 export type BlockType = ContentBlock['type']
 

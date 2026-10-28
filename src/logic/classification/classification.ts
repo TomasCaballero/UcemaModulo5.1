@@ -51,6 +51,14 @@ export const recall = (c: Confusion): number => ratio(c.tp, c.tp + c.fn)
 /** Especificidad: de los negativos reales, cuántos se identificaron como tales. */
 export const specificity = (c: Confusion): number => ratio(c.tn, c.tn + c.fp)
 export const accuracy = (c: Confusion): number => ratio(c.tp + c.tn, c.tp + c.fp + c.fn + c.tn)
+/** F1: media armónica de precisión y recall. */
+export const f1 = (precisionValue: number, recallValue: number): number =>
+  ratio(2 * precisionValue * recallValue, precisionValue + recallValue)
+
+/** Entropía en bits de una distribución de proporciones: $-\sum p \log_2 p$ (los ceros no aportan). */
+export function entropy(proportions: readonly number[]): number {
+  return proportions.reduce((sum, p) => (p > 0 ? sum - p * Math.log2(p) : sum), 0)
+}
 
 /** Función logística 1 / (1 + e^-z). */
 export const logistic = (z: number): number => 1 / (1 + Math.exp(-z))
@@ -74,6 +82,22 @@ export function vif(rSquared: number): number {
 export function logLikelihood(probabilities: readonly number[], labels: readonly (0 | 1)[]): number {
   if (probabilities.length !== labels.length) throw new RangeError('probabilities y labels deben tener la misma longitud')
   return probabilities.reduce((sum, p, i) => sum + (labels[i] === 1 ? Math.log(p) : Math.log(1 - p)), 0)
+}
+
+/**
+ * AUC contado por pares: proporción de pares (positivo, negativo) en que el positivo tiene mayor
+ * probabilidad (los empates cuentan medio). Es el área bajo la curva ROC.
+ */
+export function aucByPairs(probabilities: readonly number[], labels: readonly (0 | 1)[]): number {
+  if (probabilities.length !== labels.length) throw new RangeError('probabilities y labels deben tener la misma longitud')
+  const positives = probabilities.filter((_, i) => labels[i] === 1)
+  const negatives = probabilities.filter((_, i) => labels[i] === 0)
+  if (positives.length === 0 || negatives.length === 0) throw new RangeError('hacen falta positivos y negativos')
+  const wins = positives.reduce(
+    (sum, pos) => sum + negatives.reduce((acc, neg) => acc + (pos > neg ? 1 : pos === neg ? 0.5 : 0), 0),
+    0,
+  )
+  return wins / (positives.length * negatives.length)
 }
 
 /** Odds de una probabilidad: p / (1 - p). */

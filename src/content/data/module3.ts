@@ -1,7 +1,8 @@
 import type { Section } from '../types'
 
-// Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 3. Los bloques `extra` son ejemplos
-// agregados (cotidianos o clásicos): no son de la guía y se muestran rotulados.
+// Fuente: recorrido-guias-de-aprendizaje-v3.md, Módulo 3. Los bloques `extra` (ejemplos
+// cotidianos o clásicos), `deepDive` (ampliaciones) y `recall` (repasos de lo previo) no son de la
+// guía y se muestran rotulados; las cifras de las ampliaciones se verifican en tools/expansion-numbers.ts.
 const t = String.raw
 
 export const module3Sections: Section[] = [
@@ -57,15 +58,6 @@ export const module3Sections: Section[] = [
         type: 'paragraph',
         text: t`La diferencia entre el acumulado y el panel es clave: en el panel puedes seguir la **trayectoria de cada unidad**, y eso permite controlar características propias de cada una (sección 3.8).`,
       },
-      {
-        type: 'intuition',
-        title: 'Por qué la diferencia importa',
-        text: t`**Por qué la diferencia importa.** Solo en el panel podés seguir la trayectoria de cada persona o empresa. Eso permite quitar de la comparación todo lo que es propio de cada una y no cambia, que es uno de los trucos más poderosos que vas a ver más adelante en este módulo (sección 3.8).`,
-      },
-      {
-        type: 'extra',
-        text: t`Piensa en las fotos de tu familia. La foto de todos los alumnos de un curso el primer día de clases es un corte transversal. Tu peso medido cada mes durante cinco años es una serie de tiempo. Dos fotos de cursos de distintos años, con alumnos diferentes, son un corte acumulado. Y la foto del mismo grupo de amigos cada cumpleaños, durante diez años, es un panel: puedes ver cómo cambió cada persona.`,
-      },
     ],
   },
   {
@@ -99,13 +91,14 @@ export const module3Sections: Section[] = [
         text: t`Un **experimento aleatorio** resuelve el problema porque el azar hace que los grupos sean comparables. Con datos observacionales (sin azar) hay que apoyarse en modelos y supuestos, y por eso importa conocer cuándo fallan.`,
       },
       {
-        type: 'intuition',
-        title: 'La mejor solución: el azar',
-        text: t`**La mejor solución.** Un experimento al azar: si el sorteo decide quién recibe el tratamiento, los dos grupos quedan parecidos en todo, salvo en lo que querés medir. Sin azar, hay que apoyarse en modelos y supuestos, y por eso importa saber cuándo fallan.`,
-      },
-      {
-        type: 'extra',
-        text: t`Cuantos más bomberos llegan a un incendio, mayor suele ser el daño: ¿los bomberos causan el daño? No: el confusor es el tamaño del incendio, que atrae a más bomberos y también produce más daño. Y con el contrafactual pasa igual que con una aspirina: si te tomas una y se te va el dolor de cabeza, nunca sabrás qué habría pasado en esa misma tarde, con ese mismo dolor, sin tomarla.`,
+        type: 'deepDive',
+        title: 'Por qué el sorteo arregla todo',
+        text: t`El problema de comparar "los que estudiaron más" contra "los que estudiaron menos" es que no eligieron al azar: los más hábiles o con más recursos tienden a estudiar más. Cualquier diferencia de salario mezcla el efecto del estudio con esas otras diferencias.
+
+Si en cambio **un sorteo** decide quién recibe el tratamiento, nada de lo que caracteriza a una persona (habilidad, familia, motivación) puede influir en qué grupo le toca. Con grupos grandes, el azar reparte esas características **parecido en los dos grupos**, incluso las que nadie midió. Entonces la única diferencia sistemática que queda entre los grupos es el tratamiento, y la diferencia de resultados lo mide.
+
+Todo lo que viene en el resto del módulo (controles, efectos fijos, instrumentos, diferencias en diferencias) son formas de **imitar ese sorteo** cuando no lo tenés.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, cap. 1', 'Angrist y Pischke, *Mastering \'Metrics*, cap. 1'],
       },
     ],
   },
@@ -114,6 +107,31 @@ export const module3Sections: Section[] = [
     moduleId: 3,
     title: 'Regresión lineal simple y mínimos cuadrados ordinarios (OLS)',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué medían la varianza y la desviación típica?',
+            answer: t`Cuánto se **desparraman** los datos alrededor de la media. La varianza promedia las distancias a la media elevadas al cuadrado; la desviación típica es su raíz y queda en las mismas unidades que los datos. Lo viste en Módulo 2.2.`,
+          },
+          {
+            question: '¿Por qué el promedio "minimiza los cuadrados"?',
+            answer: t`Entre todos los números que podrías elegir para resumir una lista, el promedio es el que hace **más chica la suma de las distancias al cuadrado**. OLS es la misma idea, pero eligiendo una recta en vez de un número. Lo viste en Módulo 0.4.`,
+          },
+          {
+            question: '¿Qué era el error estándar?',
+            answer: t`La desviación típica **de un estimador**: cuánto cambiaría el resultado (por ejemplo, la media muestral) si repitieras el estudio con otra muestra. Para la media vale $s/\sqrt{n}$, así que baja cuando hay más datos. Lo viste en Módulo 2.5.`,
+          },
+          {
+            question: '¿Qué hacían el estadístico $t$ y el p-valor?',
+            answer: t`Se parte de suponer que no hay efecto ($H_0$) y se mide **a cuántos errores estándar** de eso quedó el resultado: eso es el $t$. El p-valor dice qué tan raro sería un resultado así si $H_0$ fuera cierta; si es menor que $\alpha$ (casi siempre $0.05$), se rechaza $H_0$. Lo viste en Módulo 2.7.`,
+          },
+          {
+            question: '¿Qué era un intervalo de confianza?',
+            answer: t`Estimación $\pm$ valor crítico $\times$ error estándar: un rango de valores plausibles para el parámetro. "Al 95 %" quiere decir que el método acierta en el 95 % de las muestras. Lo viste en Módulo 2.6.`,
+          },
+        ],
+      },
       { type: 'paragraph', text: '**Vocabulario:**' },
       {
         type: 'list',
@@ -166,8 +184,8 @@ export const module3Sections: Section[] = [
       },
       {
         type: 'table',
-        headers: [t`$x$`, '8', '10', '12', '14', '16'],
-        rows: [[t`$y$`, '22', '26', '28', '36', '38']],
+        headers: [t`Años de estudio ($x$)`, '8', '10', '12', '14', '16'],
+        rows: [[t`Salario ($y$)`, '22', '26', '28', '36', '38']],
       },
       {
         type: 'workedExample',
@@ -183,11 +201,6 @@ export const module3Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`Cada año adicional de estudio se asocia con **2.1 mil más** de salario. Predicción para 15 años: $4.8 + 31.5 = 36.3$.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Con los números de la guía',
-        text: t`**Con los números de la guía.** Con 5 personas, la recta queda $\hat{y} = 4.8 + 2.1x$: cada año de estudio se asocia con **2.1 mil más de salario**. Para 15 años, la predicción es $36.3$. Los residuos suman cero, porque la recta queda "equilibrada" entre los puntos.`,
       },
       {
         type: 'paragraph',
@@ -209,11 +222,6 @@ export const module3Sections: Section[] = [
         kind: 'cuidado',
         text: t`un $R^2$ alto **no** prueba causalidad ni que el modelo esté bien especificado. Y agregar variables nunca baja el $R^2$, aunque sean irrelevantes; para comparar modelos con distinto número de variables se usa el **$R^2$ ajustado**, que penaliza ese efecto.`,
       },
-      {
-        type: 'intuition',
-        title: '¿Qué tan bien encaja? El R cuadrado',
-        text: t`**¿Qué tan bien encaja? El $R^2$.** Es un número de 0 a 1 que dice qué parte de las variaciones del salario explica el modelo. Acá es $0.96$: explica el 96 % de la variación de esta muestra. Cuidado: un $R^2$ alto no prueba que haya causalidad, y agregar variables nunca lo baja aunque sean inútiles, así que para comparar modelos conviene el $R^2$ ajustado.`,
-      },
       { type: 'paragraph', text: t`**Inferencia sobre $\beta_1$** (aplicando el Módulo 2):` },
       {
         type: 'list',
@@ -226,9 +234,20 @@ export const module3Sections: Section[] = [
       },
       { type: 'paragraph', text: '(Una muestra de 5 es solo didáctica: en la práctica se necesitan muchos más datos.)' },
       {
-        type: 'intuition',
-        title: '¿La pendiente es real o casualidad?',
-        text: t`**¿La pendiente es real o casualidad?** Aplicás lo que viste en el módulo 2: error estándar, estadístico $t$ y un intervalo de confianza. Acá la pendiente queda entre aproximadamente $1.30$ y $2.90$ con 95 % de confianza. Con solo 5 datos todo esto es didáctico; en la práctica hacen falta muchos más.`,
+        type: 'deepDive',
+        title: t`Qué miden el contraste $t$ y el contraste $F$`,
+        text: t`**La pregunta de fondo.** Con otras 5 personas, la pendiente no daría exactamente $2.1$: cada muestra da un número algo distinto. El **error estándar** ($0.25$) mide cuánto se movería la pendiente de muestra en muestra. La pregunta es: si en realidad el estudio no tuviera nada que ver con el salario ($\beta_1 = 0$), ¿podría haber salido $2.1$ por pura casualidad?
+
+**El $t$ es una regla graduada en errores estándar.** $t = \text{estimación} / \text{error estándar}$ dice a cuántos "márgenes de error" del cero quedó la pendiente. Sin redondear, $t \approx 8.34$: la pendiente quedó a más de ocho márgenes de error del cero. Si $\beta_1$ fuera $0$, con 3 grados de libertad un valor más allá de $\pm 3.18$ aparecería solo el 5 % de las veces. Ocho está muy lejos de eso, así que la casualidad no es una explicación creíble.
+
+**La consecuencia que importa después:** el $t$ es una división. Si el error estándar está mal calculado, **el $t$ queda mal aunque la pendiente esté bien**, y con él el p-valor y el intervalo. Por eso, en la sección 3.7, cuando un supuesto falla, el problema no es la recta sino la medición de su incertidumbre.
+
+**El $F$ pregunta lo mismo para varias variables juntas.** "¿Alguna de estas variables explica algo, o todo el modelo podría ser ruido?" Para responderlo, compara dos modelos: uno **sin** las variables en duda y otro **con** ellas. Si sacarlas hace crecer mucho el error (la SSR) en relación con el error que queda en el modelo completo, esas variables aportan:
+
+$F = \dfrac{(\text{SSR}_{\text{sin}} - \text{SSR}_{\text{con}})/q}{\text{SSR}_{\text{con}}/(n-k-1)}$
+
+donde $q$ es la cantidad de variables que se sacan y $n-k-1$ son los grados de libertad del modelo completo. Con los datos de la guía: sin el estudio, la mejor predicción es la media y su error es la SST ($184$); con el estudio, la SSR baja a $7.6$. Entonces $F = \dfrac{(184 - 7.6)/1}{7.6/3} \approx 69.6$, que es exactamente $t^2$: **con una sola variable, el $F$ y el $t$ dicen lo mismo**. El $F$ es útil cuando hay varias, porque una variable puede no ser significativa sola y el conjunto sí (o al revés). Si las variables en duda no aportaran nada, este número seguiría la distribución $F$ que viste en el Módulo 2.4, donde los valores grandes son raros: un $F$ grande es evidencia en contra de esa hipótesis.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, cap. 4 (contrastes $t$ y $F$)'],
       },
       {
         type: 'extra',
@@ -241,6 +260,23 @@ export const module3Sections: Section[] = [
     moduleId: 3,
     title: 'Regresión lineal múltiple',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué era *ceteris paribus*?',
+            answer: t`"Manteniendo todo lo demás constante": para medir el efecto de $X$ sobre $Y$ hay que comparar situaciones que **solo** difieren en $X$. Lo viste en Módulo 3.2.`,
+          },
+          {
+            question: '¿Qué era una variable de confusión?',
+            answer: t`Una tercera variable que afecta a las dos que estás mirando y crea una relación aparente entre ellas, como el calor con los helados y los ahogamientos. Lo viste en Módulo 3.2.`,
+          },
+          {
+            question: t`¿Qué significaba $y = X\beta + u$?`,
+            answer: t`Es el mismo modelo escrito con matrices: $X$ es una tabla con una fila por observación y una columna por variable, y $\beta$ es la lista de coeficientes. Multiplicarlos da la predicción de cada fila de una sola vez. Lo viste en Módulo 0.3.`,
+          },
+        ],
+      },
       { type: 'paragraph', text: 'Se agregan **más variables explicativas**:' },
       { type: 'formula', latex: t`y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_k x_k + u` },
       {
@@ -259,11 +295,6 @@ export const module3Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`**Por qué incluir más variables:** para controlar factores que confunden y para explicar mejor $y$.`,
-      },
-      {
-        type: 'intuition',
-        title: 'Manteniendo lo demás igual',
-        text: t`**"Manteniendo lo demás igual".** El número de cada ingrediente se lee como el efecto de **ese** ingrediente cuando los otros no cambian. Si el modelo dice que un año más de estudio suma $1.8$ al salario, significa: entre personas con **la misma experiencia**, el que estudió un año más gana $1.8$ más. Por eso agregar variables sirve para limpiar la comparación.`,
       },
       { type: 'subheading', text: 'Sesgo por variable omitida' },
       {
@@ -284,13 +315,20 @@ export const module3Sections: Section[] = [
         text: t`Regla del signo del sesgo: (efecto de la omitida sobre $y$) × (correlación entre la omitida y $x_1$). Positivo × positivo = sesgo positivo.`,
       },
       {
-        type: 'intuition',
-        title: 'Cómo adivinar hacia dónde se tuerce',
-        text: t`**Cómo adivinar hacia dónde se tuerce.** Es una cuenta de signos: ¿la variable olvidada sube el resultado? ¿Está relacionada de forma positiva con lo que medís? Si las dos respuestas son positivas, vas a **sobreestimar** el efecto. En el ejemplo de la educación, se sobreestima porque la habilidad hace ganar más y también lleva a estudiar más.`,
-      },
-      {
-        type: 'extra',
-        text: t`Un clásico: quienes toman vitaminas viven más años. Pero quienes las toman también suelen comer mejor, hacer ejercicio y controlarse con el médico. Si en la regresión de la longevidad sobre "toma vitaminas" omites los hábitos saludables (que alargan la vida y se correlacionan positivamente con tomar vitaminas), el coeficiente de las vitaminas queda sesgado hacia arriba: sobreestimas su efecto.`,
+        type: 'deepDive',
+        title: 'El sesgo, con números: de dónde sale la regla del signo',
+        text: t`Supongamos un mundo inventado donde sabemos la verdad: el salario (en miles) es exactamente $2 \times \text{estudio} + 3 \times \text{habilidad}$. Cada año de estudio vale $2$, ni más ni menos. Cinco personas, con sus años de estudio $10, 12, 14, 16, 18$, su habilidad (un puntaje de 1 a 3) $1, 1, 2, 3, 3$ y, por lo tanto, sus salarios $23, 27, 34, 41, 45$.
+
+Los que estudiaron más también son más hábiles. Si hacés la regresión del salario **solo** sobre el estudio, la pendiente da $\tilde\beta_1 = 116/40 = 2.9$, no $2$. ¿De dónde salen los $0.9$ de más?
+
+**Paso 1.** La habilidad "viaja" junto con el estudio. Si hacés la regresión de la habilidad sobre el estudio, la pendiente da $\tilde\delta_1 = 12/40 = 0.3$: cada año extra de estudio viene, en promedio, con $0.3$ puntos más de habilidad.
+
+**Paso 2.** Esos $0.3$ puntos valen $3$ cada uno en el salario. Como la regresión simple no ve la habilidad, le atribuye al estudio también lo que paga la habilidad: $2.9 = 2 + 3 \times 0.3$.
+
+Esa es la fórmula general: **sesgo = (efecto de la omitida sobre $y$) $\times$ (cuánto se mueve la omitida con $x_1$)**. De ahí sale la regla del signo: si los dos factores son positivos, el sesgo es positivo. Si incluís la habilidad en la regresión múltiple, el coeficiente del estudio vuelve a ser $2$: eso es "controlar" una variable.
+
+**Ojo:** el sesgo no se va con más datos. Con un millón de personas, la regresión simple seguiría dando cerca de $2.9$, porque el problema es **qué** comparás, no cuántos casos tenés.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, cap. 3 (sesgo de variable omitida)', 'Datos inventados para el ejemplo'],
       },
     ],
   },
@@ -299,6 +337,15 @@ export const module3Sections: Section[] = [
     moduleId: 3,
     title: 'Variables ficticias y logaritmos',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: t`¿Qué era el logaritmo natural $\ln(x)$?`,
+            answer: t`La operación inversa de la exponencial: responde "¿a qué potencia hay que elevar $e \approx 2.718$ para obtener $x$?". Su propiedad estrella es convertir productos en sumas: $\ln(a \cdot b) = \ln(a) + \ln(b)$. Lo viste en Módulo 0.5.`,
+          },
+        ],
+      },
       {
         type: 'list',
         items: [
@@ -316,8 +363,12 @@ export const module3Sections: Section[] = [
 **Por qué se usa tanto.** Un aumento de mil pesos significa mucho para quien gana poco y casi nada para quien gana mucho. En cambio, un aumento del 8 % se siente parecido en ambos casos. Es la razón por la que salarios y precios se miden con logaritmos.`,
       },
       {
-        type: 'extra',
-        text: t`En el precio de los departamentos, una variable ficticia puede ser "tiene balcón" (1 = sí, 0 = no). Si su coeficiente estimado es 5, los departamentos con balcón cuestan en promedio 5 mil dólares más que los que no lo tienen, a igual superficie y antigüedad. Y si el modelo fuera $\ln(\text{precio}) = 3 + 0.012\,\text{metros}$, cada metro cuadrado adicional se asociaría con un precio aproximadamente 1.2 % mayor.`,
+        type: 'deepDive',
+        title: 'Por qué un coeficiente en logaritmos es un porcentaje (y cuándo deja de serlo)',
+        text: t`Si $\ln(y)$ sube en $\beta_1$, entonces $y$ queda multiplicado por $e^{\beta_1}$, porque la exponencial deshace el logaritmo. Con $\beta_1 = 0.08$, $e^{0.08} \approx 1.083$: el salario se multiplica por $1.083$, es decir, sube un $8.3$ %. Por eso "$100 \cdot \beta_1$ %" es una aproximación: dice $8$ % cuando el valor exacto es $8.3$ %.
+
+Para coeficientes chicos la aproximación es muy buena, pero empeora a medida que crecen. Con $\beta_1 = 0.5$, la regla diría "50 % más", y el cambio real es $e^{0.5} - 1 \approx 64.9$ %. Si el coeficiente pasa de $0.1$ o $0.2$, conviene calcular $100 \cdot (e^{\beta_1} - 1)$ %.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, cap. 2 y 6 (formas funcionales con logaritmos)'],
       },
     ],
   },
@@ -326,6 +377,23 @@ export const module3Sections: Section[] = [
     moduleId: 3,
     title: 'Supuestos de Gauss-Markov y propiedad BLUE',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué era la distribución muestral?',
+            answer: t`Si repitieras el muestreo muchas veces, un estimador (la media, una pendiente) daría un número distinto cada vez. La distribución de todos esos resultados es su **distribución muestral**; su desviación típica es el error estándar. "Insesgado" y "eficiente" hablan de esa distribución: dónde está su centro y qué tan angosta es. Lo viste en Módulo 2.5.`,
+          },
+          {
+            question: '¿Qué decía el Teorema del Límite Central?',
+            answer: t`Que el promedio de muchas observaciones tiene una distribución aproximadamente **Normal** aunque los datos originales no lo sean, si la muestra es suficientemente grande. Lo viste en Módulo 2.5.`,
+          },
+          {
+            question: '¿Qué era la colinealidad?',
+            answer: t`Que una columna de datos se pueda armar exactamente combinando otras, como "edad en meses" $= 12 \times$ "edad en años". Entonces la tabla no tiene información para separar el efecto de cada una. Lo viste en Módulo 0.3.`,
+          },
+        ],
+      },
       { type: 'paragraph', text: 'Primero, dos conceptos:' },
       {
         type: 'list',
@@ -383,8 +451,18 @@ export const module3Sections: Section[] = [
         text: t`**Qué se obtiene con cada una.** Con las primeras cuatro, la recta acierta en promedio (insesgada). Con las cinco, el **Teorema de Gauss-Markov** dice que es la mejor entre las rectas insesgadas, es decir, la más precisa. Eso es lo que significa **BLUE**. Con muestras pequeñas, para que las pruebas sean exactas se pide además que los errores sigan una campana (Normal); con muestras grandes, el Teorema del Límite Central lo vuelve innecesario.`,
       },
       {
-        type: 'extra',
-        text: t`Imagina dos balanzas de baño. La primera marca, en promedio, tu peso verdadero, pero cada vez que te subes da un número distinto (a veces 2 kg de más, a veces de menos): es insesgada, pero poco precisa. La segunda marca siempre casi lo mismo, pero 3 kg de más: es precisa pero sesgada. "Insesgado" habla de acertar en promedio; "eficiente" habla de variar poco. BLUE es el mejor estimador entre los que aciertan en promedio y son lineales.`,
+        type: 'deepDive',
+        title: 'Para qué sirve cada supuesto',
+        text: t`Los supuestos no son una lista para memorizar: cada uno protege una cosa distinta, y conviene saber **qué se rompe** cuando falla cada uno.
+
+**MLR.1 a MLR.3 hacen que la cuenta se pueda hacer.** Sin ellos, OLS directamente no estima lo que creés (MLR.1), no representa a la población (MLR.2) o no puede separar el efecto de cada variable (MLR.3).
+
+**MLR.4 protege la pendiente.** Si falla, la pendiente está **mal**: sesgada, y más datos no la arreglan. Es el problema grave, porque te lleva a conclusiones equivocadas sobre causas.
+
+**MLR.5 protege la medición de la incertidumbre.** Si falla, la pendiente sigue bien en promedio, pero la fórmula usual del error estándar está mal, y con ella los $t$, los $F$, los p-valores y los intervalos. Es un problema más leve, porque se arregla cambiando la fórmula del error estándar sin tocar la pendiente.
+
+Esa distinción, **"¿se rompe la estimación o se rompe la medición de su precisión?"**, es la que ordena toda la sección 3.7.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, cap. 3 y 8'],
       },
     ],
   },
@@ -393,6 +471,27 @@ export const module3Sections: Section[] = [
     moduleId: 3,
     title: 'Cuando fallan los supuestos',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué decían MLR.4 y MLR.5?',
+            answer: t`**MLR.4 (exogeneidad):** lo que quedó en el error no está relacionado con las variables explicativas; si falla, la pendiente queda sesgada. **MLR.5 (homocedasticidad):** el error se desparrama igual para cualquier valor de $x$; si falla, la pendiente sigue bien pero su error estándar no. Lo viste en Módulo 3.6.`,
+          },
+          {
+            question: '¿Qué eran "insesgado" y "eficiente"?',
+            answer: t`Insesgado: acierta en promedio sobre muchas muestras. Eficiente: entre los insesgados, el que menos varía de muestra en muestra. Lo viste en Módulo 3.6.`,
+          },
+          {
+            question: t`¿Qué eran los contrastes $t$ y $F$?`,
+            answer: t`El $t$ divide un coeficiente por su error estándar: dice a cuántos márgenes de error del cero quedó, y así decide si el efecto es real o casualidad. El $F$ hace la misma pregunta para varias variables juntas. Los dos dependen de que el error estándar esté **bien calculado**. Lo viste en Módulo 3.3.`,
+          },
+          {
+            question: '¿Qué era el sesgo por variable omitida?',
+            answer: t`Si falta una variable que afecta a $y$ y se mueve junto con $x_1$, el coeficiente de $x_1$ se queda con parte de su efecto. En el ejemplo, la habilidad infla el efecto del estudio. Lo viste en Módulo 3.4.`,
+          },
+        ],
+      },
       { type: 'subheading', text: 'Heterocedasticidad (falla MLR.5)' },
       {
         type: 'paragraph',
@@ -406,9 +505,18 @@ export const module3Sections: Section[] = [
         ],
       },
       {
-        type: 'intuition',
-        title: 'Dispersión que cambia (heterocedasticidad)',
-        text: t`**Dispersión que cambia (heterocedasticidad).** Si gastás en entretenimiento, entre hogares pobres casi todos gastan parecido, y entre hogares ricos la diferencia es enorme. El error es chico en un extremo y grande en el otro; al graficarlo se ve un megáfono. La recta sigue acertando en promedio, pero los márgenes de error que calcula están mal. Solución habitual: calcular los errores de otra manera, más robusta.`,
+        type: 'deepDive',
+        title: 'Por qué la heterocedasticidad arruina los contrastes y no la recta',
+        text: t`**La recta sigue bien.** Que la dispersión cambie con $x$ no empuja los puntos hacia arriba ni hacia abajo de forma sistemática: los errores siguen promediando cero en cada nivel de $x$. Por eso la pendiente sigue siendo insesgada.
+
+**Lo que se rompe es la fórmula del error estándar.** La fórmula usual (la de la sección 3.3) supone que hay **una sola** dispersión $\sigma^2$ para todos los puntos y la estima promediando todos los residuos. Pero los puntos con $x$ en los extremos son los que más "mueven" la pendiente. Si justo ahí el error es más grande (el megáfono abierto), la pendiente es más inestable de lo que la fórmula cree. En ese caso típico, la fórmula usual da un error estándar **demasiado chico** (en otros casos puede errar para el otro lado).
+
+**Por qué eso es peligroso.** El $t$ es estimación dividida por error estándar. Si el divisor es demasiado chico, el $t$ sale inflado. Por ejemplo, un coeficiente de $0.6$ con el error estándar usual de $0.25$ da $t = 0.6/0.25 = 2.4$, que supera $1.96$ y parece significativo al 5 %. Si el error estándar correcto fuera $0.4$, el $t$ sería $0.6/0.4 = 1.5$, y ya no podrías descartar que sea casualidad. **La heterocedasticidad te puede hacer creer en efectos que no podés distinguir del ruido.**
+
+**Cómo lo arreglan los errores robustos (de White).** En lugar de suponer una sola $\sigma^2$, usan el residuo de **cada** punto para medir su propia dispersión, y le dan más peso a los puntos que más influyen en la pendiente. Solo cambia el divisor del $t$; la pendiente queda igual. Por eso, en la práctica, muchos reportan errores robustos siempre: si no había heterocedasticidad, dan casi lo mismo.
+
+**La correlación serial es el mismo tipo de problema.** Si el error de hoy se parece al de ayer, $100$ meses de datos no son $100$ datos independientes: hay menos información de la que parece, y en el caso típico (errores que se parecen a los del período anterior) la fórmula usual vuelve a dar errores estándar demasiado chicos. Newey-West es la versión robusta para ese caso.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, cap. 8 (heterocedasticidad) y cap. 12 (correlación serial)'],
       },
       {
         type: 'extra',
@@ -418,11 +526,6 @@ export const module3Sections: Section[] = [
       {
         type: 'paragraph',
         text: t`El error de un período se **relaciona con el de períodos anteriores** (una crisis que se arrastra). Consecuencia parecida: los errores estándar usuales dejan de ser válidos. Solución habitual: errores estándar robustos a autocorrelación (Newey-West).`,
-      },
-      {
-        type: 'intuition',
-        title: 'El error que arrastra memoria (correlación serial)',
-        text: t`**El error que arrastra memoria (correlación serial).** En series de tiempo, una crisis no desaparece de golpe: el error de hoy se parece al de ayer. Tiene la misma consecuencia: los márgenes de error usuales dejan de servir. Se arregla con un cálculo robusto a esa memoria.`,
       },
       { type: 'subheading', text: 'Endogeneidad (falla MLR.4)' },
       {
@@ -439,9 +542,14 @@ export const module3Sections: Section[] = [
         ],
       },
       {
-        type: 'intuition',
-        title: 'El problema serio: la endogeneidad',
-        text: t`**El problema serio: la endogeneidad.** Pasa cuando una variable que usás está relacionada con lo que quedó en el error. Entonces la estimación es **sesgada e inconsistente**: aunque tengas infinitos datos, no te acerca a la verdad. Más datos no lo arreglan. Tres causas típicas: olvidar una variable importante, medir mal una variable (lo que tiende a acercar el efecto a cero) y que las dos cosas se influyan mutuamente, como precio y cantidad en un mercado.`,
+        type: 'deepDive',
+        title: 'Las tres causas, vistas por dentro',
+        text: t`**Por qué más datos no ayudan.** Con más datos, OLS se acerca cada vez más a **lo que compara**. Si lo que compara está contaminado (los que estudian más también son más hábiles), se acerca cada vez con más precisión a un número equivocado. En el ejemplo de la sección 3.4, con un millón de personas la pendiente seguiría cerca de $2.9$ en vez de $2$.
+
+**Error de medición: por qué el efecto se achica.** Supongamos que los años de estudio se registran con errores al azar (gente que redondea, que se olvida). Ese ruido **desparrama los puntos hacia los costados** sin moverlos hacia arriba ni hacia abajo, porque el salario depende del estudio real, no del anotado. La recta que mejor ajusta una nube estirada horizontalmente es **más plana**. La pendiente tiende a $\beta_1 \times \dfrac{\text{Var}(x \text{ real})}{\text{Var}(x \text{ real}) + \text{Var}(\text{ruido})}$. Si la mitad de la variación de la variable medida es ruido (por ejemplo, varianza real $4$ y del ruido $4$), el factor es $0.5$ y un efecto verdadero de $2$ aparece como $1$. Ojo: esto vale para el ruido en $x$; el ruido en $y$ no sesga la pendiente, solo la vuelve menos precisa.
+
+**Simultaneidad: quién empuja a quién.** En un mercado, si el precio sube, la gente compra menos (demanda), pero si la gente quiere comprar más, el precio sube (oferta). Los puntos que observás son los **cruces** de las dos curvas, y una recta por esos puntos no es ni la demanda ni la oferta: mezcla las dos. Para separar una necesitás algo que mueva solo a la otra, y esa es justamente la idea del instrumento.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, cap. 9 (error de medición) y cap. 16 (simultaneidad)'],
       },
       { type: 'subheading', text: 'Variables instrumentales (IV) y mínimos cuadrados en dos etapas (2SLS)' },
       {
@@ -469,11 +577,16 @@ export const module3Sections: Section[] = [
         text: t`*Ejemplo:* educación → salario, con la habilidad omitida. Instrumento posible: la **distancia a la universidad más cercana** durante la adolescencia. Mueve cuánto estudia la persona (relevancia) y, se argumenta, no afecta directamente al salario (exclusión). *Advertencia:* la exclusión **no se puede probar con los datos**: se defiende con argumentos, y un instrumento débil (poco correlacionado con $x$) da resultados poco confiables.`,
       },
       {
-        type: 'intuition',
-        title: 'El atajo ingenioso: el instrumento',
-        text: t`**El atajo ingenioso: el instrumento.** Se busca una variable que empuje a lo que querés medir pero **sin tener ninguna otra vía** de influir en el resultado. Por ejemplo, para saber si estudiar sube el salario (con la habilidad escondida), se usa la distancia a la universidad: mueve cuánto estudia la gente, y no parece afectar el sueldo por otra vía. Se hace en dos pasos: primero se saca de la variable la parte "limpia", la que mueve el instrumento, y después se usa esa parte para explicar el resultado.
+        type: 'deepDive',
+        title: 'Por qué funciona el instrumento: una regla de tres',
+        text: t`**Las dos partes de $x$.** Cuánto estudió cada persona tiene una parte "sucia", que depende de su habilidad (la variable escondida en el error), y otras partes que no tienen nada que ver con ella. El argumento es que la distancia a la universidad es una de esas partes limpias: dónde creció alguien no depende de su habilidad. La primera etapa de 2SLS se queda **solo con la variación del estudio que se explica por la distancia** ($\hat{x}$) y tira el resto, incluida la parte contaminada.
 
-**Una advertencia honesta.** Que el instrumento no afecte al resultado por otras vías no se puede probar con los datos: se defiende con argumentos. Y un instrumento que apenas mueve la variable da resultados poco confiables.`,
+**La versión más simple es una división.** Supongamos (cifras inventadas) que quienes crecieron cerca de una universidad estudian, en promedio, $0.5$ años más que quienes crecieron lejos, y ganan $0.4$ mil más. Si la distancia solo afecta al salario **a través** del estudio (exclusión), esos $0.4$ mil se deben enteros a esos $0.5$ años. Entonces cada año vale $0.4 / 0.5 = 0.8$ mil. Es una regla de tres: **efecto del instrumento sobre $y$, dividido por su efecto sobre $x$**. Con un instrumento de dos valores (cerca/lejos), 2SLS da exactamente esa división.
+
+**Por eso importan los dos requisitos.** Si la distancia también afectara al salario por otra vía (por ejemplo, porque las ciudades con universidad pagan mejor), parte de los $0.4$ no se debería al estudio y la división quedaría inflada: se rompe la exclusión. Y si el instrumento casi no mueve el estudio (un denominador cercano a cero), cualquier pequeño error en el numerador se multiplica enormemente: es el problema del **instrumento débil**.
+
+**El precio a pagar.** Como 2SLS usa solo una parte de la variación de $x$, es mucho menos preciso que OLS: los errores estándar son más grandes. Se cambia precisión por ausencia de sesgo.`,
+        sources: ['Angrist y Pischke, *Mastering \'Metrics*, cap. 3', 'Wooldridge, *Introducción a la econometría*, cap. 15', 'Cifras inventadas para el ejemplo'],
       },
       {
         type: 'extra',
@@ -486,6 +599,23 @@ export const module3Sections: Section[] = [
     moduleId: 3,
     title: 'Datos de panel y diferencias en diferencias',
     blocks: [
+      {
+        type: 'recall',
+        items: [
+          {
+            question: '¿Qué distinguía a un panel de un corte transversal acumulado?',
+            answer: t`En el panel se siguen **las mismas** unidades a lo largo del tiempo; en el acumulado, cada período tiene unidades distintas. Solo el panel permite ver cómo cambió cada una. Lo viste en Módulo 3.1.`,
+          },
+          {
+            question: '¿Qué era la endogeneidad y por qué era grave?',
+            answer: t`Que una variable explicativa esté relacionada con el error, por ejemplo por una variable omitida. La pendiente queda sesgada y más datos no lo arreglan. Lo viste en Módulo 3.7.`,
+          },
+          {
+            question: '¿Cómo se leía el coeficiente de una variable ficticia?',
+            answer: t`Como la diferencia promedio de $y$ entre el grupo que vale 1 y el que vale 0, manteniendo lo demás constante. Lo viste en Módulo 3.5.`,
+          },
+        ],
+      },
       { type: 'subheading', text: 'Datos de panel' },
       { type: 'paragraph', text: t`Con las mismas unidades $i$ observadas en varios períodos $t$:` },
       { type: 'formula', latex: t`y_{it} = \beta_1 x_{it} + a_i + u_{it}` },
@@ -529,10 +659,6 @@ export const module3Sections: Section[] = [
         title: 'Efectos aleatorios: la alternativa',
         text: t`**Efectos aleatorios.** Es una alternativa que supone que esos rasgos propios no se relacionan con lo que estudiás. Si es cierto, es más preciso. Si es falso, queda sesgada. Si dudás, la opción más segura son los efectos fijos.`,
       },
-      {
-        type: 'extra',
-        text: t`Efectos fijos es comparar a cada persona consigo misma. Si estudias el efecto de una dieta sobre el peso, medir a las mismas 100 personas antes y después elimina todo lo que no cambia de cada una (su altura, su contextura, su genética), que de otro modo mezclarían las cosas al comparar personas distintas entre sí.`,
-      },
       { type: 'subheading', text: 'Diferencias en diferencias (DID)' },
       {
         type: 'paragraph',
@@ -565,18 +691,28 @@ export const module3Sections: Section[] = [
         text: t`$\hat\delta_{\text{DID}} = (+1) - (-2) = +3$. Sin la política, el grupo tratado habría bajado como el control; por eso el efecto estimado es $+3$.`,
       },
       {
-        type: 'intuition',
-        title: 'Diferencias en diferencias: antes, después y un grupo de control',
-        text: t`**Diferencias en diferencias: antes, después y un grupo de control.** Imaginá que una provincia sube el salario mínimo y otra no. Mirar solo "antes y después" de la provincia que cambió mezcla el efecto de la medida con lo que pasaba de todos modos en el tiempo. Entonces se resta lo que le pasó a la otra provincia. En el ejemplo, el empleo sube $1$ donde se aplicó la medida y baja $2$ en la otra: el efecto estimado es $(+1) - (-2) = +3$. Es como separar lo que cambió por la medida de lo que habría cambiado igual.`,
+        type: 'deepDive',
+        title: 'DID es una regresión con dos interruptores',
+        text: t`La fórmula de las cuatro medias se puede escribir como una regresión con dos variables ficticias (sección 3.5): $\text{Trat}$ ($1$ si la provincia subió el salario mínimo) y $\text{Post}$ ($1$ si es después del cambio), más su producto:
+
+$y = \beta_0 + \beta_1\,\text{Trat} + \beta_2\,\text{Post} + \delta\,(\text{Trat} \times \text{Post}) + u$
+
+Con la tabla del ejemplo, cada coeficiente tiene un significado concreto:
+
+**$\beta_0 = 25$:** el control antes (el punto de partida).
+
+**$\beta_1 = 20 - 25 = -5$:** cuánto difería el tratamiento del control **antes** de la política. Es una diferencia fija entre grupos y no molesta.
+
+**$\beta_2 = 23 - 25 = -2$:** cuánto cambió el control con el tiempo. Es la tendencia común.
+
+**$\delta$:** lo que le falta al tratamiento después para llegar a su valor real, $21 = 25 - 5 - 2 + \delta$, así que $\delta = 3$, el mismo efecto DID.
+
+Escribirlo como regresión tiene dos ventajas: te da el error estándar de $\delta$ (para saber si el efecto es real o casualidad) y permite **agregar controles** como en cualquier regresión múltiple.`,
+        sources: ['Wooldridge, *Introducción a la econometría*, cap. 13', 'Angrist y Pischke, *Mastering \'Metrics*, cap. 5'],
       },
       {
         type: 'paragraph',
         text: t`**Supuesto central: tendencias paralelas.** Sin la política, ambos grupos habrían evolucionado **igual**. No se puede verificar del todo, pero se evalúa mirando si sus tendencias eran paralelas **antes** de la intervención.`,
-      },
-      {
-        type: 'intuition',
-        title: 'El supuesto clave: tendencias paralelas',
-        text: t`**El supuesto clave: tendencias paralelas.** Todo funciona si, sin la medida, los dos grupos habrían evolucionado igual. No se puede comprobar del todo, pero se puede mirar si ya iban en la misma dirección **antes** de que apareciera la medida. (Esas cifras del ejemplo son inventadas para ilustrar el método.)`,
       },
       {
         type: 'extra',

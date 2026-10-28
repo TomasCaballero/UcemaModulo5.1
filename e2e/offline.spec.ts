@@ -16,7 +16,7 @@ test('tras la primera visita todo funciona sin conexión (AC-45)', async ({ page
   // Una sección con fórmulas (KaTeX y sus fuentes se cargan bajo demanda) y una simulación incrustada.
   await page.goto('/#/seccion/2.5')
   await expect(page.getByRole('heading', { level: 1 })).toContainText('2.5')
-  await expect(page.locator('.katex').first()).toBeVisible()
+  await expect(page.locator('.math-display .katex').first()).toBeVisible()
   await expect(page.locator('.clt__summary')).toContainText('Medias dibujadas')
 
   // Otra simulación, una evaluación y el glosario.

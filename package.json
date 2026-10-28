@@ -18,6 +18,7 @@
     "verify:numbers": "vitest run --config vitest.verify.config.ts verify/numbers",
     "verify:traceability": "vitest run --config vitest.verify.config.ts verify/traceability",
     "verify:bundle": "vitest run --config vitest.verify.config.ts verify/bundle",
+    "verify:expansion": "vitest run --config vitest.verify.config.ts verify/expansion",
     "verify": "vitest run --config vitest.verify.config.ts",
     "verify:strict": "cross-env VERIFY_STRICT=1 vitest run --config vitest.verify.config.ts"
   },
