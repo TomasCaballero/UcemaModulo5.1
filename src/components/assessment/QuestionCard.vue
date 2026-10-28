@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useId } from 'vue'
 import RichText from '@/components/content/RichText.vue'
+import { richTextToReadable } from '@/content/plainText'
 import { correctPosition, isCorrectChoice, type PresentedQuestion } from '@/logic/assessment/present'
 
 const props = withDefaults(defineProps<{ presented: PresentedQuestion; guideLink?: boolean }>(), { guideLink: true })
@@ -22,6 +23,12 @@ async function confirm(): Promise<void> {
   feedback.value?.focus()
 }
 
+// Una opción con fórmulas se nombra con su versión legible: el texto de KaTeX no cuenta como rótulo
+// para todas las tecnologías de asistencia. Las opciones de solo texto conservan el rótulo nativo.
+function optionLabel(text: string): string | undefined {
+  return text.includes('$') ? richTextToReadable(text) : undefined
+}
+
 function optionState(position: number): 'correct' | 'wrong' | undefined {
   if (!confirmed.value) return undefined
   if (position === answerPosition.value) return 'correct'
@@ -39,7 +46,7 @@ function optionState(position: number): 'correct' | 'wrong' | undefined {
         class="question__option"
         :class="optionState(position) && `question__option--${optionState(position)}`"
       >
-        <input v-model="selected" type="radio" :name="groupName" :value="position" />
+        <input v-model="selected" type="radio" :name="groupName" :value="position" :aria-label="optionLabel(option.text)" />
         <span class="question__text">
           <RichText :text="option.text" />
           <strong v-if="optionState(position) === 'correct'" class="question__tag"> — Respuesta correcta</strong>

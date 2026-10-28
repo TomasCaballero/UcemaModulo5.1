@@ -141,6 +141,14 @@ describe('autoevaluación del Módulo 2', () => {
     expect(new Set(radios.map((r) => r.attributes('name'))).size).toBe(1)
     expect(button(wrapper, 'Confirmar').attributes('type')).toBe('submit')
   })
+
+  it('las opciones que son solo fórmulas se nombran con su versión legible (mini-chequeo de 0.2)', async () => {
+    const wrapper = await openApp('/seccion/0.2')
+    const labels = wrapper.findAll('input[type="radio"]').map((r) => r.attributes('aria-label'))
+    expect(labels).toHaveLength(4)
+    expect(labels).toContain('1/36 ≈ 0.028')
+    for (const label of labels) expect(label).not.toMatch(/[\\$]/)
+  })
 })
 
 describe('módulo y acceso a la autoevaluación', () => {
