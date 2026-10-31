@@ -52,11 +52,11 @@ describe('lectura de la guía', () => {
     expect(autoevaluationCounts(SAMPLE)).toEqual({ 1: 2 })
   })
 
-  it('la guía real tiene las 82 preguntas del PRD y 96 términos de glosario', () => {
+  it('la guía real tiene las 86 preguntas del PRD y 100 términos de glosario', () => {
     const counts = autoevaluationCounts(guide)
     expect(counts).toEqual(PRD_QUESTION_COUNTS)
-    expect(Object.values(counts).reduce((a, b) => a + b, 0)).toBe(82)
-    expect(countBullets(guide, 'Glosario')).toBe(96)
+    expect(Object.values(counts).reduce((a, b) => a + b, 0)).toBe(86)
+    expect(countBullets(guide, 'Glosario')).toBe(100)
     expect(countNumberedItems(guide, 'Los errores más comunes (y cómo evitarlos)')).toBe(11)
   })
 })
@@ -77,7 +77,7 @@ describe('RNF-17: equivalencia de encabezados', () => {
     expect(byHeading('2.4 Distribuciones de probabilidad')?.status).toBe('covered')
     expect(byHeading('Autoevaluación del Módulo 2')).toMatchObject({ status: 'covered', detail: '12 preguntas' })
     expect(byHeading('Respuestas del Módulo 2')?.status).toBe('covered')
-    expect(byHeading('Glosario')).toMatchObject({ status: 'covered', detail: '96 términos' })
+    expect(byHeading('Glosario')).toMatchObject({ status: 'covered', detail: '100 términos' })
     expect(byHeading('Cómo usar esta guía')).toMatchObject({ status: 'covered', detail: '3 reglas' })
     expect(byHeading('Cómo estudiar con esta guía')).toMatchObject({ status: 'covered', detail: '5 puntos' })
     expect(byHeading('La escalera del conocimiento')?.status).toBe('covered')
@@ -168,11 +168,11 @@ describe('RNF-19 y RNF-20: trazabilidad', () => {
     ])
   })
 
-  it('con el curso completo, los 8 módulos cubren las 82 preguntas de la guía', () => {
+  it('con el curso completo, los 8 módulos cubren las 86 preguntas de la guía', () => {
     const traces = checkTraceability(PRD_QUESTION_COUNTS, courseContent)
     expect(traces.find((t) => t.moduleId === 2)).toMatchObject({ status: 'ok', guideCount: 10, mapped: 10, bankSize: 12 })
     expect(traces.filter((t) => t.status !== 'ok').map((t) => `${t.moduleId}: ${t.detail}`)).toEqual([])
-    expect(traces.reduce((sum, t) => sum + t.mapped, 0)).toBe(82)
+    expect(traces.reduce((sum, t) => sum + t.mapped, 0)).toBe(86)
   })
 
   it('un módulo sin banco cargado queda pendiente', () => {

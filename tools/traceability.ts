@@ -1,7 +1,7 @@
 import type { CourseContent } from '@/content/types'
 
-/** Preguntas de autoevaluación por módulo según el PRD (RNF-19): 82 en total. */
-export const PRD_QUESTION_COUNTS: Readonly<Record<number, number>> = { 0: 7, 1: 6, 2: 10, 3: 11, 4: 10, 5: 11, 6: 15, 7: 12 }
+/** Preguntas de autoevaluación por módulo según el PRD (RNF-19): 86 en total. */
+export const PRD_QUESTION_COUNTS: Readonly<Record<number, number>> = { 0: 7, 1: 6, 2: 10, 3: 11, 4: 10, 5: 11, 6: 19, 7: 12 }
 
 export const MIN_BANK_SIZE = 12
 

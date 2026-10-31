@@ -62,10 +62,10 @@ describe('encabezado', () => {
 })
 
 describe('glosario', () => {
-  it('lista los 96 términos y cuenta cuántos hay', async () => {
+  it('lista los 100 términos y cuenta cuántos hay', async () => {
     const wrapper = await openApp('/glosario')
-    expect(wrapper.findAll('.glossary__entry')).toHaveLength(96)
-    expect(wrapper.find('.count').text()).toBe('96 de 96 términos')
+    expect(wrapper.findAll('.glossary__entry')).toHaveLength(100)
+    expect(wrapper.find('.count').text()).toBe('100 de 100 términos')
   })
 
   it('escribir "heterocedasticidad" muestra el término con su definición (AC-11)', async () => {
@@ -75,7 +75,7 @@ describe('glosario', () => {
     expect(entries).toHaveLength(1)
     expect(entries[0]?.text()).toContain('Heterocedasticidad')
     expect(entries[0]?.text()).toContain('varianza del error no constante')
-    expect(wrapper.find('.count').text()).toBe('1 de 96 términos')
+    expect(wrapper.find('.count').text()).toBe('1 de 100 términos')
   })
 
   it('sin coincidencias lo avisa', async () => {

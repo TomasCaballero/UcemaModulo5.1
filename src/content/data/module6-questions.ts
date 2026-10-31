@@ -1,7 +1,7 @@
 import type { Question } from '../types'
 
-// Banco del Módulo 6. q01 a q15 cubren las 15 preguntas de "Autoevaluación del Módulo 6" de la guía
-// (`guideQuestionRef`); q16 y q17 son adicionales. Las explicaciones salen de "Respuestas del
+// Banco del Módulo 6. q01 a q15 y q27 a q30 cubren las 19 preguntas de "Autoevaluación del Módulo 6"
+// de la guía (`guideQuestionRef`); q16 a q26 son adicionales. Las explicaciones salen de "Respuestas del
 // Módulo 6". La opción correcta va primera: se mezcla al presentar.
 const t = String.raw
 
@@ -380,5 +380,65 @@ export const module6Questions: Question[] = [
     ],
     correctIndex: 0,
     explanation: t`Ángulo pequeño: correlación positiva fuerte. Ángulo recto ($90^\circ$): variables no correlacionadas. Flechas opuestas ($180^\circ$): correlación negativa fuerte. Una flecha que llega al borde del círculo está bien representada.`,
+  },
+  {
+    id: 'm6-q27',
+    moduleId: 6,
+    guideQuestionRef: 'M6-Q16',
+    sectionId: '6.7',
+    prompt: t`En el grupo $\{1,2,3,4,100\}$, ¿cuánto valen la media y la mediana? ¿Qué centro usarían K-Means y K-Medianas, y cuál se ve afectado por el atípico?`,
+    options: [
+      t`Media $22$ y mediana $3$: K-Means usa la media y queda arrastrado por el atípico; K-Medianas usa la mediana y casi no se mueve`,
+      t`Media $3$ y mediana $22$: K-Means queda arrastrado por el atípico`,
+      t`Media $22$ y mediana $3$: K-Medianas usa la media y queda arrastrado por el atípico`,
+      t`Ambas valen $22$: ningún método se ve afectado por el atípico`,
+    ],
+    correctIndex: 0,
+    explanation: t`Con $\{1,2,3,4,100\}$ la media es $22$ y la mediana es $3$. El centroide de K-Means (la media) queda arrastrado por el atípico y no representa a ningún punto del grupo; el de K-Medianas (la mediana) casi no se mueve. El medoide también sería $3$.`,
+  },
+  {
+    id: 'm6-q28',
+    moduleId: 6,
+    guideQuestionRef: 'M6-Q17',
+    sectionId: '6.7',
+    prompt: '¿Por qué K-Medoides (PAM) no escala a bases con cientos de miles de filas, y K-Means sí?',
+    options: [
+      t`Porque PAM necesita la matriz de distancias entre todos los pares de puntos (crece con $n^2$ en memoria y tiempo); K-Means solo calcula distancias punto-centroide, $O(nKp)$ por iteración`,
+      'Porque PAM solo funciona con variables categóricas',
+      'Porque K-Means no calcula distancias',
+      'Porque PAM exige que el centro sea un promedio, que es muy costoso de calcular',
+    ],
+    correctIndex: 0,
+    explanation: t`El medoide debe ser un **dato real** y para hallarlo hay que comparar los puntos de a pares: se necesita la **matriz de distancias**, que crece con $n^2$. K-Means, en cambio, solo calcula distancias punto-centroide, $O(nKp)$ por iteración. Con $n$ grande se submuestrea antes.`,
+  },
+  {
+    id: 'm6-q29',
+    moduleId: 6,
+    guideQuestionRef: 'M6-Q18',
+    sectionId: '6.8',
+    prompt: '¿Por qué en el ACM el porcentaje de inercia explicado por los primeros ejes resulta engañosamente bajo si no se corrige?',
+    options: [
+      'Porque la diagonal de la matriz de Burt cruza cada variable consigo misma y agrega inercia artificial; se corrige con Benzécri o Greenacre',
+      'Porque el ACM solo usa dos dimensiones y descarta el resto',
+      t`Porque la prueba de $\chi^2$ siempre da un valor bajo con muchas variables`,
+      'Porque las variables categóricas no tienen varianza',
+    ],
+    correctIndex: 0,
+    explanation: t`La diagonal de la matriz de Burt cruza cada variable consigo misma y agrega inercia artificial: el porcentaje bruto **subestima** lo que cada eje explica. Las correcciones de Benzécri y Greenacre la quitan.`,
+  },
+  {
+    id: 'm6-q30',
+    moduleId: 6,
+    guideQuestionRef: 'M6-Q19',
+    sectionId: '6.8',
+    prompt: '¿Qué técnica usarías para reducir dimensión en: (a) 10 variables continuas; (b) 6 variables categóricas; (c) 4 continuas y 3 categóricas?',
+    options: [
+      '(a) PCA; (b) ACM (tras comprobar la asociación con chi-cuadrado); (c) FAMD',
+      '(a) FAMD; (b) PCA; (c) ACM',
+      '(a) ACM; (b) FAMD; (c) PCA',
+      '(a) PCA; (b) PCA con las categorías numeradas; (c) PCA',
+    ],
+    correctIndex: 0,
+    explanation: t`(a) Todas continuas: PCA. (b) Todas categóricas: ACM (tras comprobar la asociación con $\chi^2$). (c) Mezcla de ambos tipos: FAMD.`,
   },
 ]

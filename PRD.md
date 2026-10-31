@@ -199,7 +199,7 @@ Cada fila es un componente que debe existir (RF-17). La columna "Guía" indica e
 **Fidelidad del contenido**
 - **RNF-17:** El 100 % de los encabezados de nivel 2 y 3 (`##`, `###`) de la guía deben tener una sección equivalente en el curso, verificado por un script automatizado.
 - **RNF-18:** El 100 % de los resultados numéricos de los ejemplos de la guía deben coincidir con los calculados por el curso (tolerancia de redondeo a 3 decimales), verificado por tests automatizados.
-- **RNF-19:** El 100 % de las preguntas de autoevaluación de la guía (M0: 7, M1: 6, M2: 10, M3: 11, M4: 10, M5: 11, M6: 15, M7: 12; total 82) deben tener al menos una pregunta de opción múltiple equivalente en el banco.
+- **RNF-19:** El 100 % de las preguntas de autoevaluación de la guía (M0: 7, M1: 6, M2: 10, M3: 11, M4: 10, M5: 11, M6: 19, M7: 12; total 86) deben tener al menos una pregunta de opción múltiple equivalente en el banco.
 - **RNF-20:** Cada módulo debe tener ≥ 12 preguntas en su banco de evaluación.
 - **RNF-24:** El contenido que no sale de la guía (ampliaciones, repasos de conceptos previos, ejemplos extra) debe mostrarse rotulado y distinguible del de la guía; cada ampliación debe citar al menos una fuente, y el 100 % de sus cifras debe recalcularse con la lógica del curso en un test automatizado (`npm run verify:expansion`). RNF-17 y RNF-18 siguen aplicándose solo al contenido de la guía.
 
@@ -265,7 +265,7 @@ Los patrones "propuestos" se consideran aprobados salvo que el usuario indique l
 
 ### Evaluaciones
 - **AC-22 (RF-22):** Dado cada uno de los módulos 0 a 7, cuando se abre su evaluación, entonces existe y contiene ≥ 12 preguntas.
-- **AC-23 (RF-23, RNF-19):** Dado el script de trazabilidad, cuando se ejecuta, entonces cada una de las 82 preguntas de autoevaluación de la guía está mapeada a ≥ 1 pregunta del banco.
+- **AC-23 (RF-23, RNF-19):** Dado el script de trazabilidad, cuando se ejecuta, entonces cada una de las 86 preguntas de autoevaluación de la guía está mapeada a ≥ 1 pregunta del banco.
 - **AC-24 (RF-24):** Dado el banco completo, cuando se valida, entonces el 100 % de las preguntas tiene 4 o 5 opciones y exactamente 1 correcta.
 - **AC-25 (RF-25):** Dado una pregunta, cuando se la presenta en 20 intentos simulados, entonces la posición de la opción correcta varía y no queda siempre en la misma.
 - **AC-26 (RF-26):** Dado una pregunta respondida mal, cuando el usuario confirma, entonces se marca incorrecta, se indica la opción correcta y se muestra la explicación.

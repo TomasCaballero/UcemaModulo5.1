@@ -11,9 +11,9 @@ describe('RNF-19 y RNF-20: trazabilidad del banco de preguntas', () => {
   const counts = autoevaluationCounts(readGuide())
   const traces = checkTraceability(counts, courseContent)
 
-  it('la guía tiene las 82 preguntas que declara el PRD', () => {
+  it('la guía tiene las 86 preguntas que declara el PRD', () => {
     expect(compareWithPrd(counts)).toEqual([])
-    expect(Object.values(counts).reduce((a, b) => a + b, 0)).toBe(82)
+    expect(Object.values(counts).reduce((a, b) => a + b, 0)).toBe(86)
   })
 
   it('informa la trazabilidad por módulo', () => {

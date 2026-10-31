@@ -1464,6 +1464,32 @@ Busca minimizar la **suma de errores al cuadrado (SSE)**: la suma de los cuadrad
 
 **Limitaciones:** hay que **elegir $K$** (el SSE siempre baja al aumentar $K$, así que no sirve minimizarlo; se usa el **método del codo**: graficar el SSE contra $K$ y buscar donde la mejora se aplana); el resultado depende de la **inicialización** (se prueban varios arranques y se elige el mejor); asume grupos **compactos y redondeados**; es sensible a **valores atípicos** y a la **escala** de las variables (estandarizar primero).
 
+#### Otras distancias
+Además de la euclídea, en dos puntos $(x_1,y_1)$ y $(x_2,y_2)$:
+* **Manhattan** (*city block*): $|x_2-x_1| + |y_2-y_1|$. Es el recorrido por las calles de una cuadrícula.
+* **Chebyshev**: $\max(|x_2-x_1|, |y_2-y_1|)$. Cuenta solo la mayor diferencia en una dimensión.
+
+*Ejemplo:* entre $(1,2)$ y $(4,6)$: euclídea $5$, Manhattan $3+4=7$, Chebyshev $\max(3,4)=4$.
+
+#### Variantes robustas: K-Medianas y K-Medoides (PAM)
+Como el centroide de K-Means es un **promedio**, un solo valor extremo lo arrastra (un cliente multimillonario entre ingresos medios). Dos variantes lo evitan:
+* **K-Medianas:** el centro es la **mediana** de cada variable y se usa la distancia Manhattan. Un atípico apenas lo mueve.
+* **K-Medoides (PAM):** el centro debe ser un **dato real** de la muestra, el **medoide**. Permite presentar a un cliente concreto como representante del grupo y admite cualquier distancia (por ejemplo, coseno).
+
+*Ejemplo:* en el grupo $\{1,2,3,4,100\}$ la media es $22$ (no se parece a ningún miembro), mientras que la mediana y el medoide valen $3$.
+
+| | K-Means | K-Medianas | K-Medoides (PAM) |
+| :--- | :--- | :--- | :--- |
+| Centro | promedio (punto abstracto) | mediana (punto abstracto) | dato real |
+| Distancia | euclídea | Manhattan | cualquiera |
+| Sensibilidad a atípicos | alta | baja | muy baja |
+| Costo | $O(nKp)$ por iteración | $O(nKp)$ por iteración | $O(K(n-K)^2)$ |
+| Escala a bases grandes | muy bien | bien | mal |
+
+El costo de PAM viene de que necesita la **matriz de distancias entre todos los pares** de puntos: con $10.000$ filas son $10^8$ distancias, y la memoria se agota mucho antes de llegar a bases grandes. Con $n$ grande hace falta submuestrear antes.
+
+**Muchas columnas.** Con decenas o cientos de variables, las distancias entre puntos se vuelven casi iguales (maldición de la dimensionalidad, Módulo 4). La práctica habitual es **reducir primero** con PCA (continuas), ACM (categóricas) o FAMD (mixtas) y luego aplicar K-Means sobre los primeros ejes.
+
 #### Clustering jerárquico y dendrogramas
 No exige fijar $K$ de antemano. En la versión **aglomerativa**:
 1. Cada punto empieza como su propio grupo.
@@ -1572,17 +1598,47 @@ Cuando las variables no son números continuos sino **categóricas** (región de
 
 **Regla de oro:** nunca hagas un análisis de correspondencias sin comprobar antes, con una prueba de $\chi^2$ sobre la tabla de contingencia (Módulo 2.4), que las variables están estadísticamente asociadas. *Demostración de la clase* (400 clientes que eligen vino y plato): en la tabla **sin asociación real**, todos los puntos del mapa se amontonaron en el centro, y interpretar distancias ahí era inventar historias sobre la nada misma; en la tabla **con asociación significativa**, platos y vinos se separaron con claridad (el tinto de Burdeos cerca de las carnes rojas, el blanco cerca de los pescados).
 
+#### Análisis de correspondencias múltiple (ACM / MCA)
+El análisis simple cruza **dos** variables categóricas en una tabla de doble entrada. Con tres o más (cuatro, diez, veinte) los datos forman un "cubo" de muchas dimensiones imposible de tabular, y se usa el **análisis de correspondencias múltiple (ACM)**, en inglés *MCA*.
+
+* **Matriz de Burt.** Es una supertabla simétrica que cruza todas las categorías de todas las variables entre sí. En su diagonal cada variable se cruza **consigo misma**, y eso agrega inercia artificial.
+* **Inercia inflada.** Por esa diagonal, los porcentajes brutos de los primeros ejes **subestiman** lo que realmente explican: puede parecer que la técnica sirve poco cuando sí funciona. Los programas corrigen esto con dos ajustes:
+  * **Benzécri** reajusta los autovalores quitando el efecto de la diagonal.
+  * **Greenacre** ajusta además el porcentaje acumulado usando el número real de variables y de categorías.
+
+> **Analogía del micrófono con eco:** analizar la matriz de Burt sin corregir es cantar con el eco al máximo: tu propia voz rebotando tapa la melodía. Las correcciones actúan como un filtro que quita ese eco.
+
+*Ejemplo didáctico* (cifras construidas para ilustrar, no son resultados de la clase). Con $Q=4$ variables y $J=12$ categorías en total, la inercia total de la tabla indicadora es $J/Q-1 = 2$ y el autovalor medio es $1/Q = 0.25$. Supongamos que solo dos autovalores superan $1/Q$: $\lambda_1 = 0.50$ y $\lambda_2 = 0.40$.
+* **Sin corregir:** $0.50/2 = 25\,\%$ y $0.40/2 = 20\,\%$. Parece poco.
+* **Benzécri:** $\lambda^{*}_k = \left(\dfrac{Q}{Q-1}\right)^{2} \left(\lambda_k - \dfrac{1}{Q}\right)^{2}$, es decir $\tfrac{16}{9}(0.25)^2 \approx 0.111$ y $\tfrac{16}{9}(0.15)^2 = 0.040$. Repartiendo entre los dos: $0.111/0.151 \approx 73.5\,\%$ y $26.5\,\%$. Los dos ejes explican casi todo lo que hay para explicar.
+
+*Caso de la clase (vinos).* 200 vinos simulados con cuatro variables categóricas (región: Bordeaux, Loire, Burgundy, Rhône; color; cuerpo: ligero, medio, robusto; crianza en barrica sí/no), 12 categorías en total. En el mapa, el primer eje separa a **Loire con cuerpo ligero** de **Bordeaux con cuerpo robusto y color tinto**, y el segundo eje aísla a **Burgundy**.
+
+*Caso de la clase (negocio).* Con 10.000 comercios minoristas de Tucumán con heladeras entregadas en comodato, el mapa separó dos perfiles: kioscos periféricos de bajo volumen con atrasos en el pago, y bares y restaurantes céntricos de alta rotación y pago al día. La decisión fue reubicar las heladeras desde los primeros hacia los segundos.
+
+Aplicaciones clásicas: Bourdieu cartografió el "espacio social" francés (educación, consumo cultural, clase social). Software: `FactoMineR` en R y `prince` en Python.
+
+#### Datos mixtos: FAMD
+Las tablas reales suelen mezclar variables continuas (edad, ingreso) y categóricas (estado civil, nivel de riesgo). El PCA no puede tratar categorías, y el ACM obligaría a convertir las continuas en rangos y perder precisión. El **análisis factorial de datos mixtos (FAMD)** (Escofier, 1979, con el nombre francés AFDM) resuelve esto:
+1. Las categóricas se pasan a columnas de $0$ y $1$ (*dummies*).
+2. Se **equilibra** el peso de cada tipo: las continuas se estandarizan (cada una aporta $1$ de varianza) y las categóricas se ponderan para que una variable con muchas categorías no domine a una continua, ni al revés. Así, la inercia total es $p + J - Q$, con $p$ variables continuas y $Q$ categóricas que suman $J$ categorías.
+
+*Ejemplo de la clase:* 100 vinos con $p=6$ continuas (pH, grado alcohólico, acidez, taninos, puntuación de calidad, intensidad de aroma) y $Q=2$ categóricas (suelo: volcánico o gravoso, 2 categorías; origen: Bordeaux, Burgundy o Loire, 3 categorías; $J=5$). Inercia total: $6 + 5 - 2 = 9$. El mapa permite ver juntas las categorías y las variables numéricas (por ejemplo, el suelo volcánico asociado a pH y grado alcohólico altos).
+
+> **Advertencia:** no usar FAMD por comodidad si todas las variables son del mismo tipo. Con solo continuas corresponde el PCA; con solo categóricas, el ACM. La herramienta más compleja sobre datos simples introduce distorsiones innecesarias.
+
 #### Mapa de decisión y lista de verificación
 Para reducir dimensión:
 * Si las variables son **continuas**: si tienen unidades o escalas distintas, PCA con la matriz de correlación ($R$); si no, con la de covarianza ($S$). En ambos casos, elegir los componentes con el gráfico de sedimentación, Kaiser ($\lambda>1$) y el análisis paralelo de Horn.
-* Si las variables son **categóricas**: comprobar la asociación con $\chi^2$. Si **no** hay asociación significativa, no hacer el mapa. Si la hay, análisis de correspondencias (simple o múltiple).
+* Si las variables son **categóricas**: comprobar la asociación con $\chi^2$. Si **no** hay asociación significativa, no hacer el mapa. Si la hay, análisis de correspondencias simple (dos variables) o múltiple (tres o más), mirando los porcentajes corregidos.
+* Si hay **ambos tipos**: FAMD.
 
 Lista de verificación para el analista:
 1. **Garantizar variabilidad:** comprobar que ninguna columna sea constante antes de modelar.
 2. **Eliminar la multicolinealidad:** usar PCA o regresión sobre componentes cuando haya variables muy correlacionadas.
 3. **Estandarizar** (matriz $R$) si las unidades de medida son heterogéneas.
 4. **Validar la cantidad de ejes** triangulando codo, Kaiser y análisis paralelo.
-5. **No forzar métodos:** PCA para continuas, análisis de correspondencias para categóricas asociadas.
+5. **No forzar métodos:** PCA para continuas, análisis de correspondencias para categóricas asociadas, FAMD solo si hay mezcla.
 
 ### Autoevaluación del Módulo 6
 
@@ -1601,6 +1657,10 @@ Lista de verificación para el analista:
 13. ¿Para qué sirve el truco del kernel? ¿Qué pasa con $\gamma$ muy grande en un kernel RBF?
 14. ¿Por qué no se elige $K$ minimizando el SSE en K-Means?
 15. En clustering jerárquico, ¿cómo se ordenan las distancias entre grupos según enlace simple, promedio y completo?
+16. En el grupo $\{1,2,3,4,100\}$, ¿cuánto valen la media y la mediana? ¿Qué centro usarían K-Means y K-Medianas, y cuál se ve afectado por el atípico?
+17. ¿Por qué K-Medoides (PAM) no escala a bases con cientos de miles de filas, y K-Means sí?
+18. ¿Por qué en el ACM el porcentaje de inercia explicado por los primeros ejes resulta engañosamente bajo si no se corrige?
+19. ¿Qué técnica usarías para reducir dimensión en: (a) 10 variables continuas; (b) 6 variables categóricas; (c) 4 continuas y 3 categóricas?
 
 ### Respuestas del Módulo 6
 
@@ -1619,6 +1679,10 @@ Lista de verificación para el analista:
 13. Permite fronteras **no lineales** usando productos internos en un espacio ampliado sin construir explícitamente las variables nuevas. Con $\gamma$ muy grande, cada punto solo influye en su entorno inmediato: la frontera se vuelve muy irregular y **sobreajusta**.
 14. Porque el SSE **siempre disminuye** al aumentar $K$ (con $K=n$ vale 0). Se busca el "codo" donde la mejora se aplana, o se usan otras medidas.
 15. Enlace **simple $\le$ promedio $\le$ completo** (en el ejemplo: 6, 9 y 12).
+16. Con $\{1,2,3,4,100\}$ la media es $22$ y la mediana es $3$. El centroide de K-Means (la media) queda arrastrado por el atípico y no representa a ningún punto del grupo; el de K-Medianas (la mediana) casi no se mueve. El medoide también sería $3$.
+17. Porque el medoide debe ser un **dato real** y para hallarlo hay que comparar los puntos de a pares: se necesita la **matriz de distancias**, que crece con $n^2$ en memoria y tiempo. K-Means, en cambio, solo calcula distancias punto-centroide, $O(nKp)$ por iteración.
+18. Porque la diagonal de la matriz de Burt cruza cada variable consigo misma y agrega inercia artificial: el porcentaje bruto subestima lo que cada eje explica. Se corrige con Benzécri o Greenacre.
+19. (a) Todas continuas: PCA. (b) Todas categóricas: ACM (tras comprobar la asociación con $\chi^2$). (c) Mezcla de ambos tipos: FAMD.
 
 ---
 
@@ -1809,6 +1873,7 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **AUC**: área bajo la curva ROC; 0.5 = azar, 1 = perfecto (5.2).
 * **Análisis de correspondencias**: equivalente del PCA para variables categóricas; trabaja con tablas de contingencia y distancia $\chi^2$ (6.8).
 * **Análisis paralelo de Horn**: criterio que retiene solo los componentes cuyo autovalor supera al de datos de ruido simulados (6.8).
+* **Análisis de correspondencias múltiple (ACM / MCA)**: extensión del análisis de correspondencias a tres o más variables categóricas (6.8).
 * **Atributo**: variable o columna de los datos (4).
 * **Autovalor (valor propio)**: varianza que captura un componente principal (6.4, 6.8).
 * **Bagging**: promediar modelos entrenados en muestras bootstrap (6.5).
@@ -1852,6 +1917,7 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **Gradient boosting**: boosting con árboles ajustados al gradiente de la pérdida (6.5).
 * **Heterocedasticidad**: varianza del error no constante (3.7).
 * **Gráfico de sedimentación (*scree plot*)**: autovalores en orden decreciente; se busca el codo (6.8).
+* **FAMD (análisis factorial de datos mixtos)**: reducción de dimensión para tablas con variables continuas y categóricas a la vez (6.8).
 * **Hiperparámetro**: parámetro que se fija antes de entrenar (6.3).
 * **Hiperplano**: generalización de la recta/plano a $k$ dimensiones (0.3, 6.6).
 * **Homocedasticidad**: varianza del error constante (3.6).
@@ -1861,11 +1927,13 @@ Los números entre paréntesis indican el módulo donde se explica cada término
 * **Kaiser-Guttman, regla de**: retener los componentes con autovalor mayor que 1 (6.8).
 * **Kernel**: función que calcula productos internos en un espacio ampliado (6.6).
 * **K-Means**: agrupamiento por centroides (6.7).
+* **K-Medianas / K-Medoides (PAM)**: variantes robustas de K-Means; el centro es la mediana / un dato real (el medoide) (6.7).
 * **Lasso**: regularización $L_1$ con selección de variables (6.4).
 * **LDA / QDA**: análisis discriminante lineal / cuadrático (5.4).
 * **Lift**: confianza dividida por el soporte del consecuente (4.4).
 * **Logit**: logaritmo de los odds (5.2).
 * **Margen**: distancia entre la frontera y los puntos más cercanos (6.6).
+* **Matriz de Burt**: tabla simétrica que cruza todas las categorías de todas las variables; base del ACM (6.8).
 * **Matriz de confusión**: aciertos y errores por clase (4.3).
 * **Media / mediana / moda**: promedio / valor central / valor más repetido (2.2).
 * **MLE (máxima verosimilitud)**: parámetros que hacen más plausibles los datos (2.6).

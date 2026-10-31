@@ -1,6 +1,6 @@
 import type { GlossaryEntry } from '../types'
 
-// Fuente: recorrido-guias-de-aprendizaje-v3.md, "Glosario" (96 términos, en el orden de la guía).
+// Fuente: recorrido-guias-de-aprendizaje-v3.md, "Glosario" (100 términos, en el orden de la guía).
 // Los números entre paréntesis de la guía son `references`: una sección ("6.4") o solo un
 // módulo ("4"). El término va en cursiva con `*...*` donde la guía lo marca (se muestra en negrita).
 const t = String.raw
@@ -10,6 +10,7 @@ export const glossary: GlossaryEntry[] = [
   { term: 'AUC', definition: 'área bajo la curva ROC; 0.5 = azar, 1 = perfecto', references: ['5.2'] },
   { term: 'Análisis de correspondencias', definition: t`equivalente del PCA para variables categóricas; trabaja con tablas de contingencia y distancia $\chi^2$`, references: ['6.8'] },
   { term: 'Análisis paralelo de Horn', definition: 'criterio que retiene solo los componentes cuyo autovalor supera al de datos de ruido simulados', references: ['6.8'] },
+  { term: 'Análisis de correspondencias múltiple (ACM / MCA)', definition: 'extensión del análisis de correspondencias a tres o más variables categóricas', references: ['6.8'] },
   { term: 'Atributo', definition: 'variable o columna de los datos', references: ['4'] },
   { term: 'Autovalor (valor propio)', definition: 'varianza que captura un componente principal', references: ['6.4', '6.8'] },
   { term: 'Bagging', definition: 'promediar modelos entrenados en muestras bootstrap', references: ['6.5'] },
@@ -108,6 +109,7 @@ export const glossary: GlossaryEntry[] = [
     references: ['6.5'],
   },
   { term: 'Heterocedasticidad', definition: 'varianza del error no constante', references: ['3.7'] },
+  { term: 'FAMD (análisis factorial de datos mixtos)', definition: 'reducción de dimensión para tablas con variables continuas y categóricas a la vez', references: ['6.8'] },
   { term: 'Gráfico de sedimentación (*scree plot*)', definition: 'autovalores en orden decreciente; se busca el codo', references: ['6.8'] },
   { term: 'Hiperparámetro', definition: 'parámetro que se fija antes de entrenar', references: ['6.3'] },
   {
@@ -130,6 +132,7 @@ export const glossary: GlossaryEntry[] = [
     references: ['6.6'],
   },
   { term: 'K-Means', definition: 'agrupamiento por centroides', references: ['6.7'] },
+  { term: 'K-Medianas / K-Medoides (PAM)', definition: 'variantes robustas de K-Means; el centro es la mediana / un dato real (el medoide)', references: ['6.7'] },
   { term: 'Lasso', definition: t`regularización $L_1$ con selección de variables`, references: ['6.4'] },
   { term: 'LDA / QDA', definition: 'análisis discriminante lineal / cuadrático', references: ['5.4'] },
   { term: 'Lift', definition: 'confianza dividida por el soporte del consecuente', references: ['4.4'] },
@@ -139,6 +142,7 @@ export const glossary: GlossaryEntry[] = [
     definition: 'distancia entre la frontera y los puntos más cercanos',
     references: ['6.6'],
   },
+  { term: 'Matriz de Burt', definition: 'tabla simétrica que cruza todas las categorías de todas las variables; base del ACM', references: ['6.8'] },
   { term: 'Matriz de confusión', definition: 'aciertos y errores por clase', references: ['4.3'] },
   {
     term: 'Media / mediana / moda',

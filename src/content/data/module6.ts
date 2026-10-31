@@ -781,6 +781,69 @@ El algoritmo no tiene cómo salir de ahí: con esos centroides nadie quiere camb
         type: 'extra',
         text: t`Una verdulería quiere agrupar a sus clientes por cuánto gastan al mes y con qué frecuencia vienen. Con $K=3$ podría encontrar un grupo de "compradores grandes y frecuentes", otro de "ocasionales de poco gasto" y otro intermedio, y los centroides serían el gasto y la frecuencia promedio de cada grupo. Si el gasto está en pesos y la frecuencia en visitas por mes, hay que estandarizar antes: si no, el gasto (miles) dominaría las distancias.`,
       },
+      { type: 'subheading', text: 'Otras distancias' },
+      { type: 'paragraph', text: t`Además de la euclídea, en dos puntos $(x_1,y_1)$ y $(x_2,y_2)$:` },
+      {
+        type: 'list',
+        items: [
+          t`**Manhattan** (*city block*): $|x_2-x_1| + |y_2-y_1|$. Es el recorrido por las calles de una cuadrícula.`,
+          t`**Chebyshev**: $\max(|x_2-x_1|, |y_2-y_1|)$. Cuenta solo la mayor diferencia en una dimensión.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`*Ejemplo:* entre $(1,2)$ y $(4,6)$: euclídea $5$, Manhattan $3+4=7$, Chebyshev $\max(3,4)=4$.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Tres formas de medir el camino',
+        text: t`**Tres formas de medir el camino.** La euclídea es la distancia en línea recta, como vuela un pájaro. Manhattan es la que camina una persona por las manzanas de una ciudad: solo puede ir en horizontal y en vertical, y suma los tramos. Chebyshev se queda con el tramo más largo, como el rey de ajedrez, que se mueve una casilla en cualquier dirección y llega en tantos pasos como la mayor diferencia entre columnas o filas. Con los puntos $(1,2)$ y $(4,6)$ dan $5$, $7$ y $4$.`,
+      },
+      { type: 'subheading', text: 'Variantes robustas: K-Medianas y K-Medoides (PAM)' },
+      {
+        type: 'paragraph',
+        text: t`Como el centroide de K-Means es un **promedio**, un solo valor extremo lo arrastra (un cliente multimillonario entre ingresos medios). Dos variantes lo evitan:`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**K-Medianas:** el centro es la **mediana** de cada variable y se usa la distancia Manhattan. Un atípico apenas lo mueve.`,
+          t`**K-Medoides (PAM):** el centro debe ser un **dato real** de la muestra, el **medoide**. Permite presentar a un cliente concreto como representante del grupo y admite cualquier distancia (por ejemplo, coseno).`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`*Ejemplo:* en el grupo $\{1,2,3,4,100\}$ la media es $22$ (no se parece a ningún miembro), mientras que la mediana y el medoide valen $3$.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Promedio, mediana y representante real',
+        text: t`**Promedio, mediana y representante real.** Si en una sala hay cuatro personas con ingresos normales y entra un billonario, el ingreso *promedio* de la sala se dispara y ya no describe a nadie. La *mediana* (la persona del medio) casi no se mueve. Y el *medoide* va un paso más allá: elige a una persona concreta de la sala como la representante del grupo. Con $\{1,2,3,4,100\}$ el promedio es $22$, pero la mediana y el medoide son $3$.`,
+      },
+      {
+        type: 'table',
+        headers: ['', 'K-Means', 'K-Medianas', 'K-Medoides (PAM)'],
+        rows: [
+          ['Centro', 'promedio (punto abstracto)', 'mediana (punto abstracto)', 'dato real'],
+          ['Distancia', 'euclídea', 'Manhattan', 'cualquiera'],
+          ['Sensibilidad a atípicos', 'alta', 'baja', 'muy baja'],
+          ['Costo', t`$O(nKp)$ por iteración`, t`$O(nKp)$ por iteración`, t`$O(K(n-K)^2)$`],
+          ['Escala a bases grandes', 'muy bien', 'bien', 'mal'],
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`El costo de PAM viene de que necesita la **matriz de distancias entre todos los pares** de puntos: con $10.000$ filas son $10^8$ distancias, y la memoria se agota mucho antes de llegar a bases grandes. Con $n$ grande hace falta submuestrear antes.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q27'] },
+      {
+        type: 'paragraph',
+        text: t`**Muchas columnas.** Con decenas o cientos de variables, las distancias entre puntos se vuelven casi iguales (maldición de la dimensionalidad, Módulo 4). La práctica habitual es **reducir primero** con PCA (continuas), ACM (categóricas) o FAMD (mixtas) y luego aplicar K-Means sobre los primeros ejes.`,
+      },
+      {
+        type: 'extra',
+        text: t`Una cadena de kioscos quiere elegir tres locales "modelo" para mostrar a un nuevo franquiciado. Con K-Means obtendría tres perfiles promedio que no coinciden con ningún local real (por ejemplo, "34,5 empleados y facturación de \$43.210"). Con K-Medoides cada grupo queda representado por un kiosco que existe, y se puede visitar. Pero si la cadena tuviera cientos de miles de locales, calcular las distancias entre todos los pares sería inviable, y haría falta tomar una muestra primero.`,
+      },
       { type: 'subheading', text: 'Clustering jerárquico y dendrogramas' },
       { type: 'paragraph', text: t`No exige fijar $K$ de antemano. En la versión **aglomerativa**:` },
       {
@@ -1076,13 +1139,95 @@ El algoritmo no tiene cómo salir de ahí: con esos centroides nadie quiere camb
         text: t`Una cadena de supermercados cruza "provincia" con "marca de yerba preferida". Antes de dibujar el mapa, hace la prueba de $\chi^2$ sobre esa tabla: si el p-valor da alto, las preferencias no dependen de la provincia y cualquier "cercanía" en el mapa sería un espejismo; si da muy bajo, hay asociación y el mapa sí puede mostrar qué marcas "pertenecen" a qué provincias.`,
       },
       { type: 'miniCheck', questionIds: ['m6-q23'] },
+      { type: 'subheading', text: 'Análisis de correspondencias múltiple (ACM / MCA)' },
+      {
+        type: 'paragraph',
+        text: t`El análisis simple cruza **dos** variables categóricas en una tabla de doble entrada. Con tres o más (cuatro, diez, veinte) los datos forman un "cubo" de muchas dimensiones imposible de tabular, y se usa el **análisis de correspondencias múltiple (ACM)**, en inglés *MCA*.`,
+      },
+      {
+        type: 'list',
+        items: [
+          t`**Matriz de Burt.** Es una supertabla simétrica que cruza todas las categorías de todas las variables entre sí. En su diagonal cada variable se cruza **consigo misma**, y eso agrega inercia artificial.`,
+          t`**Inercia inflada.** Por esa diagonal, los porcentajes brutos de los primeros ejes **subestiman** lo que realmente explican: puede parecer que la técnica sirve poco cuando sí funciona. Los programas corrigen esto con dos ajustes: **Benzécri** reajusta los autovalores quitando el efecto de la diagonal; **Greenacre** ajusta además el porcentaje acumulado usando el número real de variables y de categorías.`,
+        ],
+      },
+      {
+        type: 'analogy',
+        text: t`**Analogía del micrófono con eco:** analizar la matriz de Burt sin corregir es cantar con el eco al máximo: tu propia voz rebotando tapa la melodía. Las correcciones actúan como un filtro que quita ese eco.`,
+      },
+      {
+        type: 'workedExample',
+        title: 'Ejemplo didáctico: corregir los porcentajes con Benzécri (cifras construidas para ilustrar, no son resultados de la clase)',
+        steps: [
+          t`Con $Q=4$ variables y $J=12$ categorías en total, la inercia total de la tabla indicadora es $J/Q-1 = 2$ y el autovalor medio es $1/Q = 0.25$. Supongamos que solo dos autovalores superan $1/Q$: $\lambda_1 = 0.50$ y $\lambda_2 = 0.40$.`,
+          t`**Sin corregir:** $0.50/2 = 25\,\%$ y $0.40/2 = 20\,\%$. Parece poco.`,
+          t`**Benzécri:** $\lambda^{*}_k = \left(\dfrac{Q}{Q-1}\right)^{2} \left(\lambda_k - \dfrac{1}{Q}\right)^{2}$, es decir $\tfrac{16}{9}(0.25)^2 \approx 0.111$ y $\tfrac{16}{9}(0.15)^2 = 0.040$.`,
+          t`Repartiendo entre los dos: $0.111/0.151 \approx 73.5\,\%$ y $26.5\,\%$.`,
+        ],
+        result: t`Los dos ejes explican casi todo lo que hay para explicar, aunque sin corregir parecían explicar menos de la mitad.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`*Caso de la clase (vinos).* 200 vinos simulados con cuatro variables categóricas (región: Bordeaux, Loire, Burgundy, Rhône; color; cuerpo: ligero, medio, robusto; crianza en barrica sí/no), 12 categorías en total. En el mapa, el primer eje separa a **Loire con cuerpo ligero** de **Bordeaux con cuerpo robusto y color tinto**, y el segundo eje aísla a **Burgundy**.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`*Caso de la clase (negocio).* Con 10.000 comercios minoristas de Tucumán con heladeras entregadas en comodato, el mapa separó dos perfiles: kioscos periféricos de bajo volumen con atrasos en el pago, y bares y restaurantes céntricos de alta rotación y pago al día. La decisión fue reubicar las heladeras desde los primeros hacia los segundos.`,
+      },
+      {
+        type: 'paragraph',
+        text: t`Aplicaciones clásicas: Bourdieu cartografió el "espacio social" francés (educación, consumo cultural, clase social). Software: FactoMineR en R y prince en Python.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Muchas preguntas de encuesta a la vez',
+        text: t`**Muchas preguntas de encuesta a la vez.** El análisis simple mira cómo se relacionan dos preguntas (por ejemplo, vino y plato). El múltiple mira diez preguntas juntas y dibuja un solo mapa donde las respuestas parecidas quedan cerca. Un detalle técnico hace que, sin corregir, los primeros ejes parezcan explicar poco (como si el eco de la propia voz tapara la melodía); las correcciones de Benzécri y Greenacre quitan ese eco y muestran cuánto explican en realidad.`,
+      },
+      {
+        type: 'extra',
+        text: t`Un gimnasio encuesta a sus socios con cuatro preguntas de opción: turno preferido (mañana, tarde, noche), actividad (pesas, clases grupales, natación), frecuencia (baja, media, alta) y si compró un plan anual (sí, no). Un ACM podría mostrar, por ejemplo, que "tarde + clases grupales + frecuencia alta" quedan juntas y lejos de "noche + pesas + frecuencia baja", y que "plan anual: sí" cae cerca del primer grupo. Antes de interpretar el mapa conviene ver los porcentajes corregidos de los primeros ejes, no los brutos.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q29'] },
+      { type: 'subheading', text: 'Datos mixtos: FAMD' },
+      {
+        type: 'paragraph',
+        text: t`Las tablas reales suelen mezclar variables continuas (edad, ingreso) y categóricas (estado civil, nivel de riesgo). El PCA no puede tratar categorías, y el ACM obligaría a convertir las continuas en rangos y perder precisión. El **análisis factorial de datos mixtos (FAMD)** (Escofier, 1979, con el nombre francés AFDM) resuelve esto:`,
+      },
+      {
+        type: 'list',
+        ordered: true,
+        items: [
+          t`Las categóricas se pasan a columnas de $0$ y $1$ (*dummies*).`,
+          t`Se **equilibra** el peso de cada tipo: las continuas se estandarizan (cada una aporta $1$ de varianza) y las categóricas se ponderan para que una variable con muchas categorías no domine a una continua, ni al revés. Así, la inercia total es $p + J - Q$, con $p$ variables continuas y $Q$ categóricas que suman $J$ categorías.`,
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: t`*Ejemplo de la clase:* 100 vinos con $p=6$ continuas (pH, grado alcohólico, acidez, taninos, puntuación de calidad, intensidad de aroma) y $Q=2$ categóricas (suelo: volcánico o gravoso, 2 categorías; origen: Bordeaux, Burgundy o Loire, 3 categorías; $J=5$). Inercia total: $6 + 5 - 2 = 9$. El mapa permite ver juntas las categorías y las variables numéricas (por ejemplo, el suelo volcánico asociado a pH y grado alcohólico altos).`,
+      },
+      {
+        type: 'callout',
+        kind: 'advertencia',
+        text: t`No usar FAMD por comodidad si todas las variables son del mismo tipo. Con solo continuas corresponde el PCA; con solo categóricas, el ACM. La herramienta más compleja sobre datos simples introduce distorsiones innecesarias.`,
+      },
+      {
+        type: 'intuition',
+        title: 'Pesar en la misma balanza',
+        text: t`**Pesar en la misma balanza.** Mezclar edad (un número) con estado civil (una etiqueta) es como comparar kilos con colores. El FAMD convierte las etiquetas en columnas de sí/no y las pesa de modo que ningún tipo de variable "grite más fuerte" que el otro: cada variable continua aporta $1$ unidad de varianza y cada categórica aporta según sus categorías. Después es un PCA común sobre esa tabla ya balanceada.`,
+      },
+      {
+        type: 'extra',
+        text: t`La ficha de un cliente de un banco tiene edad y saldo promedio (continuas) más tipo de tarjeta y provincia (categóricas). Para dibujar un solo mapa de clientes, FAMD usa todo junto: no hace falta partir la edad en "joven/adulto/mayor" ni descartar la provincia. Si en cambio la ficha tuviera solo edad, saldo y antigüedad (todo numérico), alcanzaría con un PCA.`,
+      },
+      { type: 'miniCheck', questionIds: ['m6-q30'] },
       { type: 'subheading', text: 'Mapa de decisión y lista de verificación' },
       { type: 'paragraph', text: t`Para reducir dimensión:` },
       {
         type: 'list',
         items: [
           t`Si las variables son **continuas**: si tienen unidades o escalas distintas, PCA con la matriz de correlación ($R$); si no, con la de covarianza ($S$). En ambos casos, elegir los componentes con el gráfico de sedimentación, Kaiser ($\lambda>1$) y el análisis paralelo de Horn.`,
-          t`Si las variables son **categóricas**: comprobar la asociación con $\chi^2$. Si **no** hay asociación significativa, no hacer el mapa. Si la hay, análisis de correspondencias (simple o múltiple).`,
+          t`Si las variables son **categóricas**: comprobar la asociación con $\chi^2$. Si **no** hay asociación significativa, no hacer el mapa. Si la hay, análisis de correspondencias simple (dos variables) o múltiple (tres o más), mirando los porcentajes corregidos.`,
+          t`Si hay **ambos tipos**: FAMD.`,
         ],
       },
       { type: 'paragraph', text: t`Lista de verificación para el analista:` },
@@ -1094,7 +1239,7 @@ El algoritmo no tiene cómo salir de ahí: con esos centroides nadie quiere camb
           t`**Eliminar la multicolinealidad:** usar PCA o regresión sobre componentes cuando haya variables muy correlacionadas.`,
           t`**Estandarizar** (matriz $R$) si las unidades de medida son heterogéneas.`,
           t`**Validar la cantidad de ejes** triangulando codo, Kaiser y análisis paralelo.`,
-          t`**No forzar métodos:** PCA para continuas, análisis de correspondencias para categóricas asociadas.`,
+          t`**No forzar métodos:** PCA para continuas, análisis de correspondencias para categóricas asociadas, FAMD solo si hay mezcla.`,
         ],
       },
     ],
