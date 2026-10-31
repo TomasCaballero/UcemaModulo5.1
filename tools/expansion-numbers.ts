@@ -2,7 +2,7 @@ import type { CourseContent } from '@/content/types'
 import { aucByPairs, entropy, f1, logistic, logLikelihood, THRESHOLD_EXAMPLE } from '@/logic/classification/classification'
 import { euclidean, kDistances, neighborhoodSide } from '@/logic/clustering/distance'
 import { bayes } from '@/logic/simulations/bayes'
-import { mean, sampleVariance } from '@/logic/statistics/descriptive'
+import { mean, median, sampleVariance } from '@/logic/statistics/descriptive'
 import { binomialPmf, normalCdf, poissonPmf, tCritical, tTwoTailedPValue } from '@/logic/statistics/distributions'
 import { bernoulliLikelihood, cohensD, confidenceInterval, standardError } from '@/logic/statistics/inference'
 import { attenuationFactor, fStatistic, simpleOls, tRatio, waldEstimate } from '@/logic/statistics/regression'
@@ -27,7 +27,7 @@ import {
   realizableSampleSize,
   sauerBound,
 } from '@/logic/statistics/pac'
-import { explainedVariance, symmetric2x2Eigenvalues } from '@/logic/statistics/pca'
+import { explainedVariance, indicatorInertia, meanIndicatorEigenvalue, symmetric2x2Eigenvalues } from '@/logic/statistics/pca'
 import type { NumericExample } from './numeric-examples'
 
 /**
@@ -51,6 +51,11 @@ const sumOfSquaresAround = (data: number[], center: number) => data.reduce((acc,
 // Ampliación de 2.7: 1000 hipótesis, 100 reales, α = 0.05 y potencia 0.8.
 const truePositives = 100 * 0.8
 const falsePositives = 900 * 0.05
+
+// Grupo con un atípico de 6.7: la media es 22 y la mediana, 3.
+const outlierGroup = [1, 2, 3, 4, 100]
+const squaresAround = (data: number[], center: number) => data.reduce((acc, x) => acc + (x - center) ** 2, 0)
+const absoluteAround = (data: number[], center: number) => data.reduce((acc, x) => acc + Math.abs(x - center), 0)
 
 const example = (
   id: string,
@@ -254,6 +259,16 @@ const module6Examples: NumericExample[] = [
   example('6.7-final', r`baja a $9.33$`, 9.33, 2, () => finalSse(GUIDE_POINTS, guideStart)),
   example('6.7-natural', r`SSE $= 4 \times 0.5^2 = 1$`, 1, 6, () => finalSse(rectangle, [[0, 0.5], [10, 0.5]])),
   example('6.7-trampa', r`SSE $= 4 \times 25 = 100$`, 100, 6, () => finalSse(rectangle, [[0, 0], [0, 1]])),
+  example('6.7-cuadrados-media', r`$441 + 400 + 361 + 324 + 6084 = 7610$`, 7610, 6, () => squaresAround(outlierGroup, mean(outlierGroup))),
+  example('6.7-cuadrados-mediana', r`$4 + 1 + 0 + 1 + 9409 = 9415$`, 9415, 6, () => squaresAround(outlierGroup, median(outlierGroup))),
+  example('6.7-absolutos-media', r`$21 + 20 + 19 + 18 + 78 = 156$`, 156, 6, () => absoluteAround(outlierGroup, mean(outlierGroup))),
+  example('6.7-absolutos-mediana', r`$2 + 1 + 0 + 1 + 97 = 101$`, 101, 6, () => absoluteAround(outlierGroup, median(outlierGroup))),
+  example('6.7-aporte-atipico', r`$9409$ los pone el punto $100$ solo`, 9409, 6, () => (100 - median(outlierGroup)) ** 2),
+  example('6.8-inercia-indicadora', r`$12/4 - 1 = 2$`, 2, 6, () => indicatorInertia(12, 4)),
+  example('6.8-dimensiones-utiles', r`son $J - Q = 8$`, 8, 6, () => 12 - 4),
+  example('6.8-autovalor-medio', r`$2/8 = 0.25$`, 0.25, 6, () => meanIndicatorEigenvalue(12, 4)),
+  example('6.8-autovalor-medio-q', r`justamente $1/Q$`, 0.25, 6, () => 1 / 4),
+  example('6.8-distancia-umbral', r`$0.50 - 0.25 = 0.25$`, 0.25, 6, () => 0.5 - 1 / 4),
   example('6.8-autovalores', r`los autovalores son $1.9$ y $0.1$`, 1.9, 1, () => correlated[0]),
   example('6.8-segundo', r`los autovalores son $1.9$ y $0.1$`, 0.1, 1, () => correlated[1]),
   example('6.8-primero', r`$1.9/2 = 95$ %`, 95, 0, () => (explainedVariance(correlated)[0] as number) * 100),

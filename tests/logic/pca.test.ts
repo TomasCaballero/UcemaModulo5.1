@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
+  benzecriCorrected,
   componentsForVariance,
   cumulativeVariance,
   eigenvalueFromShare,
   explainedVariance,
+  famdInertia,
+  indicatorInertia,
   kaiserCount,
+  meanIndicatorEigenvalue,
   symmetric2x2Eigenvalues,
 } from '@/logic/statistics/pca'
 
@@ -52,5 +56,24 @@ describe('PCA: varianza explicada y criterios de retención', () => {
     expect(first).toBeCloseTo(1.9, 10)
     expect(second).toBeCloseTo(0.1, 10)
     expect(symmetric2x2Eigenvalues(4, 0, 1)).toEqual([4, 1])
+  })
+})
+
+describe('ACM y FAMD: inercia y corrección de Benzécri', () => {
+  it('con 4 variables y 12 categorías la inercia total es 2 y el autovalor medio es 1/Q', () => {
+    expect(indicatorInertia(12, 4)).toBe(2)
+    expect(meanIndicatorEigenvalue(12, 4)).toBeCloseTo(0.25, 12)
+  })
+
+  it('Benzécri descarta los autovalores que no superan 1/Q y reparte el resto', () => {
+    const corrected = benzecriCorrected([0.5, 0.4, 0.25, 0.1], 4)
+    expect(corrected).toHaveLength(2)
+    expect(corrected[0]).toBeCloseTo(0.1111, 4)
+    expect(corrected[1]).toBeCloseTo(0.04, 12)
+    expect((explainedVariance(corrected)[0] as number) * 100).toBeCloseTo(73.5, 1)
+  })
+
+  it('inercia del FAMD: 6 continuas más 5 categorías en 2 variables dan 9', () => {
+    expect(famdInertia(6, 5, 2)).toBe(9)
   })
 })

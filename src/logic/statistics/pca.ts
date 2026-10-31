@@ -33,3 +33,27 @@ export function symmetric2x2Eigenvalues(a: number, b: number, c: number): [numbe
 export function eigenvalueFromShare(share: number, variables: number): number {
   return share * variables
 }
+
+/** Inercia total de la tabla indicadora del ACM con `categories` ($J$) categorías en total y `variables` ($Q$) variables: $J/Q - 1$. */
+export function indicatorInertia(categories: number, variables: number): number {
+  return categories / variables - 1
+}
+
+/** Autovalor medio de las $J - Q$ dimensiones no triviales del ACM: la inercia total repartida en partes iguales, $1/Q$. */
+export function meanIndicatorEigenvalue(categories: number, variables: number): number {
+  return indicatorInertia(categories, variables) / (categories - variables)
+}
+
+/**
+ * Autovalores corregidos de Benzécri: $\left(\frac{Q}{Q-1}\right)^2 (\lambda_k - 1/Q)^2$ para los que superan
+ * $1/Q$; los demás se descartan.
+ */
+export function benzecriCorrected(eigenvalues: readonly number[], variables: number): number[] {
+  const factor = (variables / (variables - 1)) ** 2
+  return eigenvalues.filter((value) => value > 1 / variables).map((value) => factor * (value - 1 / variables) ** 2)
+}
+
+/** Inercia total del FAMD con `numeric` variables continuas y `categories` categorías en `variables` variables categóricas: $p + J - Q$. */
+export function famdInertia(numeric: number, categories: number, variables: number): number {
+  return numeric + categories - variables
+}

@@ -713,6 +713,10 @@ Pasa siempre: $(x \cdot z)^2 = \varphi(x) \cdot \varphi(z)$ (es el kernel polin�
             question: t`¿Por qué hay que escalar antes de agrupar?`,
             answer: t`Porque la distancia euclídea suma diferencias en las unidades de cada variable: un ingreso en pesos aplasta a una edad en años. Elegir cómo escalar es elegir qué significa "parecerse". Lo viste en Módulo 4.5.`,
           },
+          {
+            question: t`¿Qué le pasa al promedio con un valor atípico, y qué le pasa a la mediana?`,
+            answer: t`El promedio se desplaza hacia el valor extremo; la mediana, que es el valor del medio, casi no se mueve. Por eso la mediana es más robusta. Lo viste en Módulo 2.2.`,
+          },
         ],
       },
       { type: 'paragraph', text: 'Complementa el agrupamiento por densidad del Módulo 4.5.' },
@@ -835,6 +839,20 @@ El algoritmo no tiene cómo salir de ahí: con esos centroides nadie quiere camb
         type: 'paragraph',
         text: t`El costo de PAM viene de que necesita la **matriz de distancias entre todos los pares** de puntos: con $10.000$ filas son $10^8$ distancias, y la memoria se agota mucho antes de llegar a bases grandes. Con $n$ grande hace falta submuestrear antes.`,
       },
+      {
+        type: 'deepDive',
+        title: t`Por qué K-Medianas usa la mediana: cada centro minimiza una pérdida distinta`,
+        text: t`**El promedio hace mínima la suma de cuadrados; la mediana, la suma de valores absolutos.** Tomá el grupo $\{1,2,3,4,100\}$, con promedio $22$ y mediana $3$.
+
+Alrededor del promedio, la suma de cuadrados es $441 + 400 + 361 + 324 + 6084 = 7610$; alrededor de la mediana, $4 + 1 + 0 + 1 + 9409 = 9415$. Con cuadrados gana el promedio. Alrededor del promedio, la suma de distancias absolutas es $21 + 20 + 19 + 18 + 78 = 156$; alrededor de la mediana, $2 + 1 + 0 + 1 + 97 = 101$. Con valores absolutos gana la mediana.
+
+**Elevar al cuadrado le da una voz enorme al atípico.** Del total de $9415$ cuadrados alrededor de la mediana, $9409$ los pone el punto $100$ solo. Al minimizar cuadrados (K-Means) el centro se corre hacia ese punto para achicar su aporte; al minimizar distancias absolutas (K-Medianas, con la distancia Manhattan) el punto pesa $97$ de $101$ y el centro no necesita moverse.`,
+        sources: [
+          'Hastie, Tibshirani y Friedman, *The Elements of Statistical Learning*, cap. 14.3 (K-medias y K-medoides)',
+          'Kaufman y Rousseeuw, *Finding Groups in Data* (1990), cap. 2 (el algoritmo PAM)',
+          'Cifras inventadas para el ejemplo',
+        ],
+      },
       { type: 'miniCheck', questionIds: ['m6-q27'] },
       {
         type: 'paragraph',
@@ -901,6 +919,10 @@ El algoritmo no tiene cómo salir de ahí: con esos centroides nadie quiere camb
           {
             question: t`¿Por qué la colinealidad vuelve inestables los coeficientes?`,
             answer: t`Si dos variables casi se repiten, hay muchos repartos del efecto entre ellas que predicen casi igual, y un cambio chico en los datos hace saltar de un reparto a otro. Lo viste en Módulo 0.3.`,
+          },
+          {
+            question: t`¿Qué comprueba la prueba de $\chi^2$ sobre una tabla de contingencia?`,
+            answer: t`Si las dos variables categóricas están asociadas o si las diferencias entre celdas podrían ser puro azar. Es el control previo a cualquier mapa de correspondencias. Lo viste en Módulo 2.4.`,
           },
         ],
       },
@@ -1186,6 +1208,18 @@ El algoritmo no tiene cómo salir de ahí: con esos centroides nadie quiere camb
       {
         type: 'extra',
         text: t`Un gimnasio encuesta a sus socios con cuatro preguntas de opción: turno preferido (mañana, tarde, noche), actividad (pesas, clases grupales, natación), frecuencia (baja, media, alta) y si compró un plan anual (sí, no). Un ACM podría mostrar, por ejemplo, que "tarde + clases grupales + frecuencia alta" quedan juntas y lejos de "noche + pesas + frecuencia baja", y que "plan anual: sí" cae cerca del primer grupo. Antes de interpretar el mapa conviene ver los porcentajes corregidos de los primeros ejes, no los brutos.`,
+      },
+      {
+        type: 'deepDive',
+        title: t`De dónde sale la corrección: el autovalor medio del ACM es $1/Q$`,
+        text: t`**La tabla indicadora tiene inercia $J/Q - 1$.** Con las $Q = 4$ variables y las $J = 12$ categorías del ejemplo, $12/4 - 1 = 2$. Esa inercia se reparte entre las dimensiones útiles, que son $J - Q = 8$, así que cada una aporta en promedio $2/8 = 0.25$, que es justamente $1/Q$.
+
+**Un eje por debajo de $1/Q$ explica menos que el promedio.** No supera lo que se obtendría sin ninguna estructura. Benzécri toma ese umbral como punto de partida: resta $1/Q$ a cada autovalor, lo eleva al cuadrado y lo multiplica por $\left(	frac{Q}{Q-1}ight)^2$. Por eso un eje con autovalor $0.20$ desaparece del reparto, y uno de $0.50$ queda muy por encima: la diferencia con el umbral, $0.50 - 0.25 = 0.25$, es lo que cuenta.`,
+        sources: [
+          'Greenacre, *Correspondence Analysis in Practice* (3.ª ed.), capítulos sobre análisis de correspondencias múltiple',
+          'Abdi y Valentin (2007), "Multiple correspondence analysis", *Encyclopedia of Measurement and Statistics*',
+          'Cifras inventadas para el ejemplo',
+        ],
       },
       { type: 'miniCheck', questionIds: ['m6-q29'] },
       { type: 'subheading', text: 'Datos mixtos: FAMD' },
